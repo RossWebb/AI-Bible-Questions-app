@@ -17,3 +17,16 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(r => r || fetch(e.request))
   );
 });
+
+// === FULL SCREEN ON LAUNCH ===
+self.addEventListener('activate', e => {
+  e.waitUntil(clients.claim());
+});
+
+self.addEventListener('message', e => {
+  if (e.data === 'launch-fullscreen') {
+    clients.matchAll({ type: 'window' }).then(clients => {
+      clients.forEach(client => client.postMessage('fullscreen'));
+    });
+  }
+});
