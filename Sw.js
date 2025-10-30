@@ -2,8 +2,8 @@ const CACHE = 'baebol-v1';
 const FILES = [
   '/',
   'manifest.json',
-  'icon-192.png',
-  'icon-512.png'
+  'BibleQ192.png',
+  'BibleQ512.png'
 ];
 
 self.addEventListener('install', e => {
@@ -30,3 +30,4 @@ self.addEventListener('message', e => {
     });
   }
 });
+
