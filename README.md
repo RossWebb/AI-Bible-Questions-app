@@ -68,3 +68,32 @@ git clone https://github.com/YOUR-USERNAME/baebol-kwestin.git
 
 # 2. Open index.html in browser
 # (No server needed — works locally)
+
+> **Note:** This app uses **your own API keys** (already in `index.html`).  
+> To run it locally, **replace the placeholder keys** with your own from:  
+> - [OpenRouter](https://openrouter.ai/keys)  
+> - [Google AI Studio](https://aistudio.google.com/app/apikey)
+
+---
+
+## Contributing
+
+1. **Fork this repo**  
+2. Make your changes  
+3. Submit a **Pull Request**  
+4. Help bring God’s Word to Vanuatu!
+
+---
+
+## License
+
+**MIT License** – Free to use, modify, share.
+
+---
+
+> *“Go into all the world and preach the gospel…”* – **Mark 16:15 (TEV)**  
+
+---
+
+*Ross Webb*  
+[GitHub](https://github.com/RossWebb) · [Share this app](#)
