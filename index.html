@@ -165,24 +165,50 @@
             margin: 16px 0;
             display: none;
         }
+		/* ---------- ANSWER CONTAINER ---------- */
 		#answer {
-			margin-top: 12px;
-			padding: 18px;
-			background: #f8fbff;
-			border-radius: 12px;
-			border-left: 5px solid #3498db;
-			display: none;
-			font-size: 17px;
-			line-height: 1.3;
-			overflow-y: visible;           /* SCROLL IF LONG */
-			-webkit-overflow-scrolling: touch;
+		    margin-top: 12px;
+		    padding: 18px;
+		    background: #f8fbff;
+		    border-radius: 12px;
+		    border-left: 5px solid #3498db;
+		    display: none;
+		    font-size: 17px;
+		    line-height: 1.8;                     /* ← CHANGED: was 1.3 → now 1.8 for better reading */
+		    overflow-y: visible;
+		    -webkit-overflow-scrolling: touch;
 		}
-        #answerHeader {
-            display: none;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
+		
+		/* ---------- ANSWER HEADER ---------- */
+		#answerHeader {
+		    display: none;
+		    justify-content: space-between;
+		    align-items: flex-start;
+		    margin-bottom: 12px;
+		}
+		
+		/* ---------- ANSWER CONTENT (inside #answer) ---------- */
+		#answerContent {
+		    line-height: 1.8;                     /* ← Main answer text: open, readable */
+		}
+		
+		/* ---------- BIBLE CITATIONS (e.g. **Rom 8:28**) ---------- */
+		#answerContent strong {
+		    line-height: 1.4;                     /* tighter for citations */
+		    display: block;                       /* each on its own line */
+		    margin: 0.6rem 0 0.4rem;              /* space above/below */
+		    font-weight: 600;
+		    color: #1a5276;                       /* optional: match your theme */
+		}
+		
+		/* ---------- VERSE TEXT (italic) ---------- */
+		#answerContent em {
+		    line-height: 1.7;                     /* slightly tighter than main text */
+		    display: block;
+		    margin: 0.3rem 0 1rem;
+		    font-style: italic;
+		    color: #2c3e50;
+		}
         #explainMoreBtn {
             background: #3498db;
             color: white;
@@ -772,6 +798,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
