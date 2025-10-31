@@ -157,14 +157,15 @@
         }
         .random-q-btn:hover { background: #d35400; }
 
-        /* === LOADING & ANSWER === */
-        #loading {
-            text-align: center;
-            color: #7f8c8d;
-            font-style: italic;
-            margin: 16px 0;
-            display: none;
-        }
+		/* === LOADING & ANSWER === */
+		#loading {
+		    text-align: center;
+		    color: #7f8c8d;
+		    font-style: italic;
+		    margin: 16px 0;
+		    display: none;
+		}
+		
 		/* ---------- ANSWER CONTAINER ---------- */
 		#answer {
 		    margin-top: 12px;
@@ -174,7 +175,7 @@
 		    border-left: 5px solid #3498db;
 		    display: none;
 		    font-size: 17px;
-		    line-height: 1.8;                     /* ← CHANGED: was 1.3 → now 1.8 for better reading */
+		    line-height: 1.8;                     /* main answer text */
 		    overflow-y: visible;
 		    -webkit-overflow-scrolling: touch;
 		}
@@ -187,48 +188,68 @@
 		    margin-bottom: 12px;
 		}
 		
-		/* ---------- ANSWER CONTENT (inside #answer) ---------- */
+		/* ---------- ANSWER CONTENT ---------- */
 		#answerContent {
-		    line-height: 1.8;                     /* ← Main answer text: open, readable */
+		    line-height: 1.8;                     /* main paragraphs */
 		}
 		
-		/* ---------- BIBLE CITATIONS (e.g. **Rom 8:28**) ---------- */
+		/* ---------- BIBLE REFERENCE (Book Chapter:Verse) ---------- */
 		#answerContent strong {
-		    line-height: 1.4;                     /* tighter for citations */
-		    display: block;                       /* each on its own line */
-		    margin: 0.6rem 0 0.4rem;              /* space above/below */
-		    font-weight: 600;
-		    color: #1a5276;                       /* optional: match your theme */
-		}
-		
-		/* ---------- VERSE TEXT (italic) ---------- */
-		#answerContent em {
-		    line-height: 1.7;                     /* slightly tighter than main text */
-		    display: block;
-		    margin: 0.3rem 0 1rem;
-		    font-style: italic;
-		    color: #2c3e50;
-		}
-		/* Force citation on its own line and clean up */
-		#answerContent strong {
-		    display: block !important;      /* NEW LINE */
+		    display: block !important;           /* own line */
 		    margin: 0.6rem 0 0.4rem;
 		    line-height: 1.4;
 		    font-weight: 600;
+		    font-style: normal;
+		    color: #1a5276;
 		}
-
-/* Remove trailing comma after citation */
-#answerContent strong::after { content: none; }
-        #explainMoreBtn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+		
+		/* Remove any trailing comma that the AI might add */
+		#answerContent strong::after { content: none; }
+		
+		/* ---------- BIBLE VERSE TEXT (the quote) ---------- */
+		#answerContent em {
+		    display: block;
+		    margin: 0.3rem 0 1.2rem;
+		    line-height: 1.7;
+		    font-style: italic;
+		    color: #2c3e50;
+		    padding-left: 1.2rem;
+		    position: relative;
+		}
+		
+		/* Fancy opening/closing quotes */
+		#answerContent em::before { content: '“'; color: #3498db; font-weight: bold; position: absolute; left: 0; }
+		#answerContent em::after  { content: '”'; color: #3498db; font-weight: bold; }
+		
+		/* ---------- SHARE / COPY BUTTONS ---------- */
+		#answerActions {
+		    margin-top: 16px;
+		    text-align: center;
+		    display: none;                       /* shown by JS when answer appears */
+		}
+		#shareAnswerBtn, #copyAnswerBtn {
+		    background: #27ae60;
+		    color: white;
+		    border: none;
+		    padding: 8px 16px;
+		    border-radius: 8px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    margin: 0 4px;
+		}
+		#copyAnswerBtn { background: #3498db; }
+		
+		/* ---------- EXPLAIN MORE BUTTON ---------- */
+		#explainMoreBtn {
+		    background: #3498db;
+		    color: white;
+		    border: none;
+		    padding: 6px 10px;
+		    border-radius: 6px;
+		    font-size: 13px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
 
         /* === HISTORY BUTTON === */
         #historyBtn {
@@ -809,6 +830,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
