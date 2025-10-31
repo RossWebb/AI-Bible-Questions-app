@@ -217,6 +217,20 @@
 		    position: relative;
 		}
 		
+		/* Only show quotes if the <em> has text */
+		#answerContent em:not(:empty)::before { 
+		    content: '“'; 
+		    color: #3498db; 
+		    font-weight: bold; 
+		    position: absolute; 
+		    left: 0; 
+		}
+		#answerContent em:not(:empty)::after { 
+		    content: '”'; 
+		    color: #3498db; 
+		    font-weight: bold; 
+		}
+		
 		/* Fancy opening/closing quotes */
 		#answerContent em::before { content: '“'; color: #3498db; font-weight: bold; position: absolute; left: 0; }
 		#answerContent em::after  { content: '”'; color: #3498db; font-weight: bold; }
@@ -826,10 +840,19 @@ Examples of tone and length:
 			  .catch(err => console.log('SW failed', err));
 		  });
 		}
+		
+		// Clean up empty <br> before/after verses
+		answerContent.addEventListener('DOMNodeInserted', () => {
+		    const brs = answerContent.querySelectorAll('br');
+		    brs.forEach(br => {
+		        if (!br.nextSibling || !br.previousSibling) br.remove();
+		    });
+		});
     </script>
 </body>
 
 </html>
+
 
 
 
