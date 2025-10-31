@@ -649,6 +649,52 @@ Examples of tone and length:
 
         // Init
         updateHistoryButton();
+
+				// === SHARE, COPY, DARK MODE ===
+		const actionButtons = document.getElementById('actionButtons');
+		const shareBtn = document.getElementById('shareAnswerBtn');
+		const copyBtn = document.getElementById('copyAnswerBtn');
+		const darkBtn = document.getElementById('darkModeBtn');
+		
+		// Show buttons when answer appears
+		answerDiv.addEventListener('DOMNodeInserted', () => {
+		  if (answerContent.innerHTML) actionButtons.style.display = 'flex';
+		});
+		
+		// Share
+		shareBtn.onclick = async () => {
+		  const text = answerContent.innerText;
+		  const url = location.href;
+		  try {
+		    await navigator.share({ title: 'Baebol Kwestin', text, url });
+		  } catch {
+		    navigator.clipboard.writeText(`${text}\n\n${url}`);
+		    alert('Copied to clipboard!');
+		  }
+		};
+		
+		// Copy
+		copyBtn.onclick = () => {
+		  navigator.clipboard.writeText(answerContent.innerText);
+		  copyBtn.textContent = 'Copied!';
+		  setTimeout(() => copyBtn.textContent = 'Copy Answer', 2000);
+		};
+		
+		// Dark Mode
+		darkBtn.onclick = () => {
+		  document.body.classList.toggle('dark-mode');
+		  darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+		};
+		
+		// Add dark mode CSS
+		const style = document.createElement('style');
+		style.textContent = `
+		  .dark-mode { background: #1a1a1a; color: #f0f0f0; }
+		  .dark-mode .container { background: #2d2d2d; }
+		  .dark-mode #answer { background: #3a3a3a; color: #f0f0f0; }
+		  .dark-mode .footer { background: #2d2d2d; color: #aaa; }
+		`;
+		document.head.appendChild(style);
 		
 		// === PWA: Register Service Worker ===
 		if ('serviceWorker' in navigator) {
@@ -662,6 +708,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
