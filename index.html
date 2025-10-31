@@ -375,20 +375,29 @@
                     <button type="button" id="explainMoreBtn">Talem moa...</button>
                 </div>
                 <div id="answerContent"></div>
-            </div>
 
 			<!-- WELCOME VERSE -->
 			<div id="welcomeVerse" style="
 			  text-align: center;
 			  font-style: italic;
 			  color: #5d6d7e;
-			  margin: 20px 0;
-			  padding: 0 20px;
-			  line-height: 1.7;
+			  margin: 24px 0;
+			  padding: 0 16px;
+			  line-height: 1.8;
 			  display: none;
+			  border-left: none !important;
 			">
 			  <strong>John 3:16</strong><br>
 			  <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
+			  
+			  <p id="tapPrompt" style="
+			    text-align: center;
+			    color: #7f8c8d;
+			    font-size: 0.9em;
+			    margin: 16px 0 0;
+			    font-style: normal;
+			    display: none;
+			  ">Tajem ples ia blong askem kwestin...</p>
 			</div>
 			
             <!-- HISTORY BUTTON -->
@@ -771,27 +780,47 @@ Examples of tone and length:
         // Init
         updateHistoryButton();
 
-		// SHOW WELCOME VERSE
+		// === WELCOME VERSE (WITH FADE-IN & TAP PROMPT) ===
 		const welcomeVerse = document.getElementById('welcomeVerse');
-		
-		// Load last answer from localStorage
+		const tapPrompt = document.getElementById('tapPrompt');
 		const lastAnswer = history[0]?.answer || '';
 		
-		// If no history → show welcome verse
+		// If no history → show John 3:16 + tap prompt
 		if (!lastAnswer || lastAnswer.trim() === '') {
+		  welcomeVerse.innerHTML = `
+		    <strong>John 3:16</strong><br>
+		    <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
+		    <p id="tapPrompt" style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal;">Tap hia blong askem kwestin...</p>
+		  `;
 		  welcomeVerse.style.display = 'block';
 		  answerDiv.style.display = 'block';
 		  answerHeader.style.display = 'none';
+		
+		  // FADE IN
+		  welcomeVerse.style.opacity = '0';
+		  welcomeVerse.style.transition = 'opacity 0.6s ease';
+		  setTimeout(() => welcomeVerse.style.opacity = '1', 100);
+		
+		// Else: show last verse from previous answer
 		} else {
-		  // Optional: show last verse from last answer
 		  const parser = new DOMParser();
 		  const doc = parser.parseFromString(lastAnswer, 'text/html');
+		  const lastStrong = doc.querySelector('strong');
 		  const lastEm = doc.querySelector('em');
-		  if (lastEm) {
-		    welcomeVerse.innerHTML = `<em>${lastEm.innerHTML}</em>`;
+		  if (lastStrong && lastEm) {
+		    welcomeVerse.innerHTML = `
+		      <strong>${lastStrong.innerText}</strong><br>
+		      <em>${lastEm.innerHTML}</em>
+		      <p id="tapPrompt" style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal;">Tap hia blong askem kwestin...</p>
+		    `;
 		    welcomeVerse.style.display = 'block';
 		    answerDiv.style.display = 'block';
 		    answerHeader.style.display = 'none';
+		
+		    // FADE IN
+		    welcomeVerse.style.opacity = '0';
+		    welcomeVerse.style.transition = 'opacity 0.6s ease';
+		    setTimeout(() => welcomeVerse.style.opacity = '1', 100);
 		  }
 		}
 
@@ -924,6 +953,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
