@@ -650,19 +650,67 @@ Examples of tone and length:
         // Init
         updateHistoryButton();
 
-		// PWA INSTALL PROMPT
+		// === PWA INSTALL BANNER (Improved positioning + spacing) ===
 		let deferredPrompt;
+		
 		window.addEventListener('beforeinstallprompt', e => {
 		  e.preventDefault();
 		  deferredPrompt = e;
+		
+		  // Remove any old banner
+		  const oldBanner = document.getElementById('installBanner');
+		  if (oldBanner) oldBanner.remove();
+		
+		  // Create new banner
 		  const banner = document.createElement('div');
-		  banner.style = 'position:fixed; bottom:20; width:100%; background:#1a5276; color:white; padding:12px; text-align:center; font-size:14px; z-index:1000;';
-		  banner.innerHTML = `Bae mi putum Baebol Kwestin long skrin? <button style="background:white; color:#1a5276; border:none; padding:6px 12px; border-radius:6px; margin-left:8px;">Putum</button>`;
-		  banner.querySelector('button').onclick = () => {
-		    deferredPrompt.prompt();
-		    banner.remove();
-		  };
+		  banner.id = 'installBanner';
+		  banner.style = `
+		    position: fixed;
+		    bottom: 15%;               /* Lifted up from bottom */
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #1a5276;
+		    color: white;
+		    padding: 16px 20px;
+		    border-radius: 12px;
+		    font-size: 15px;
+		    font-weight: bold;
+		    text-align: center;
+		    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+		    max-width: 90%;
+		    z-index: 1000;
+		    display: flex;
+		    flex-direction: column;
+		    gap: 12px;                 /* Space between text and button */
+		    align-items: center;
+		  `;
+		
+		  banner.innerHTML = `
+		    <div>Install Baebol Kwestin on your phone?</div>
+		    <button id="installBtn" style="
+		      background: white;
+		      color: #1a5276;
+		      border: none;
+		      padding: 10px 20px;
+		      border-radius: 8px;
+		      font-weight: bold;
+		      font-size: 15px;
+		      cursor: pointer;
+		      min-width: 100px;
+		    ">Install</button>
+		  `;
+		
+		  // Add to page
 		  document.body.appendChild(banner);
+		
+		  // Button click
+		  banner.querySelector('#installBtn').onclick = () => {
+		    deferredPrompt.prompt();
+		    deferredPrompt.userChoice.then(choice => {
+		      banner.remove();
+		      deferredPrompt = null;
+		    });
+		  };
 		});
 		
 		// === SHARE, COPY, DARK MODE ===
@@ -723,6 +771,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
