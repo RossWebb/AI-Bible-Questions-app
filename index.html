@@ -595,6 +595,34 @@ form.addEventListener('submit', async e => {
 				loading.style.display = 'none';
 			}
 		};
+		
+		// === REMOVE SPURIOUS PUNCTUATION AFTER BIBLE REFERENCES ===
+		answerContent.addEventListener('DOMNodeInserted', () => {
+		    const strongs = answerContent.querySelectorAll('strong');
+		    strongs.forEach(strong => {
+		        const next = strong.nextSibling;
+		        const nextNext = strong.nextElementSibling;
+		
+		        // Case 1: Period as text node after <strong>
+		        if (next && next.nodeType === Node.TEXT_NODE && next.textContent.trim() === '.') {
+		            next.remove();
+		        }
+		
+		        // Case 2: Period in <br> or empty line
+		        if (nextNext && nextNext.tagName === 'BR' && strong.textContent.match(/^\*\*[A-Za-z0-9 ]+ [0-9]+:[0-9]+\*\*$/)) {
+		            nextNext.remove();
+		        }
+		
+		        // Case 3: Clean up any lone punctuation after strong
+		        if (next && next.nodeType === Node.TEXT_NODE) {
+		            const cleaned = next.textContent.replace(/^[\.\,\:\;\-\–\—\s]+/, '');
+		            if (cleaned !== next.textContent) {
+		                next.textContent = cleaned;
+		            }
+		        }
+		    });
+		});
+		
         // === RANDOM QUESTIONS (CLEAN OUTPUT) ===
         randomBtn.addEventListener('click', async () => {
             randomBtn.textContent = 'Mi stap tingting...';
@@ -858,6 +886,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
