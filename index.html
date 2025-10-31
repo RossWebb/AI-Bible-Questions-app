@@ -8,335 +8,331 @@
 	<link rel="icon" href="BibleQ192.png" sizes="192x192">
 	<link rel="apple-touch-icon" href="BibleQ92.png">
 	<meta name="theme-color" content="#1a5276">
-    <style>
-        /* === FULL PAGE LAYOUT === */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Georgia', serif;
-            background: linear-gradient(to bottom, #f0f7ff, #e6f0ff);
-            color: #2c3e50;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-
-        /* === HEADER === */
-        h1, .subtitle {
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            line-height: 1.1;
-        }
-        h1 {
-            color: #1a5276;
-            font-family: 'Arial', sans-serif;
-            font-size: 1.8em;
-        }
-        .subtitle {
-            margin: 4px 0 24px;
-            font-size: 1em;
-            color: #5d6d7e;
-            font-style: italic;
-        }
-
-        /* === CARD WRAPPER === */
-        .card-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding-bottom: 20px;
-        }
-
-        /* === COMPACT CARD === */
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            border: 1px solid #d6eaf8;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        /* === FORM ELEMENTS === */
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #1a5276;
-            font-size: 1.1em;
-        }
-
-        /* === TEXTAREA + CLEAR BUTTON === */
-        .textarea-wrapper {
-            position: relative;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        .textarea-wrapper textarea {
-            width: 100%;
-            padding: 12px 40px 12px 12px !important;
-            border: 1px solid #aed6f1;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: inherit;
-            min-height: 90px;
-            resize: vertical;
-        }
-        #clearBtn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-size: 16px;
-            line-height: 1;
-            cursor: pointer;
-            display: none;
-            padding: 0;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        /* === BUTTONS WITH SHADOW === */
-        .button-row {
-            display: flex;
-            gap: 10px;
-            margin: 8px 0 0;
-        }
-        .button-row button,
-        .random-q-btn {
-            flex: 1;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-        }
-        .button-row button:active,
-        .random-q-btn:active {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transform: translateY(1px);
-        }
-        #askBtn { background: #2980b9; color: white; }
-        #askBtn:hover { background: #1a5276; }
-        #randomBtn { background: #9b59b6; color: white; }
-        #randomBtn:hover { background: #8e44ad; }
-
-        /* === RANDOM QUESTIONS === */
-        #randomQuestions {
-            margin-top: 12px;
-            text-align: center;
-            display: none;
-        }
-        .random-q-btn {
-            display: block;
-            width: 100%;
-            background: #e67e22;
-            color: white;
-            margin: 6px 0;
-            font-size: 14px;
-        }
-        .random-q-btn:hover { background: #d35400; }
-
-		/* === LOADING & ANSWER === */
-		#loading {
-		    text-align: center;
-		    color: #7f8c8d;
-		    font-style: italic;
-		    margin: 16px 0;
-		    display: none;
-		}
-		
-		/* ---------- ANSWER CONTAINER ---------- */
-		#answer {
-		    margin-top: 12px;
-		    padding: 18px;
-		    background: #f8fbff;
-		    border-radius: 12px;
-		    border-left: 5px solid #3498db;
-		    display: none;
-		    font-size: 17px;
-		    line-height: 1.8;                     /* main answer text */
-		    overflow-y: visible;
-		    -webkit-overflow-scrolling: touch;
-		}
-		
-		/* ---------- ANSWER HEADER ---------- */
-		#answerHeader {
-		    display: none;
-		    justify-content: space-between;
-		    align-items: flex-start;
-		    margin-bottom: 12px;
-		}
-		
-		/* ---------- ANSWER CONTENT ---------- */
-		#answerContent {
-		    line-height: 1.8;                     /* main paragraphs */
-		}
-		
-		/* ---------- BIBLE REFERENCE (Book Chapter:Verse) ---------- */
-		#answerContent strong {
-		    display: block !important;           /* own line */
-		    margin: 0.6rem 0 0.4rem;
-		    line-height: 1.4;
-		    font-weight: 600;
-		    font-style: normal;
-		    color: #1a5276;
-		}
-		
-		/* Remove any trailing comma that the AI might add */
-		#answerContent strong::after { content: none; }
-		
-		/* ---------- BIBLE VERSE TEXT (the quote) ---------- */
-		#answerContent em {
-		    display: block;
-		    margin: 0.3rem 0 1.2rem;
-		    line-height: 1.7;
-		    font-style: italic;
-		    color: #2c3e50;
-		    padding-left: 1.2rem;
-		    position: relative;
-		}
-		
-		/* Only show quotes if the <em> has text */
-		#answerContent em:not(:empty)::before { 
-		    content: '“'; 
-		    color: #3498db; 
-		    font-weight: bold; 
-		    position: absolute; 
-		    left: 0; 
-		}
-		#answerContent em:not(:empty)::after { 
-		    content: '”'; 
-		    color: #3498db; 
-		    font-weight: bold; 
-		}
-		
-		/* Fancy opening/closing quotes */
-		#answerContent em::before { content: '“'; color: #3498db; font-weight: bold; position: absolute; left: 0; }
-		#answerContent em::after  { content: '”'; color: #3498db; font-weight: bold; }
-		
-		/* ---------- SHARE / COPY BUTTONS ---------- */
-		#answerActions {
-		    margin-top: 16px;
-		    text-align: center;
-		    display: none;                       /* shown by JS when answer appears */
-		}
-		#shareAnswerBtn, #copyAnswerBtn {
-		    background: #27ae60;
-		    color: white;
-		    border: none;
-		    padding: 8px 16px;
-		    border-radius: 8px;
-		    font-size: 14px;
-		    cursor: pointer;
-		    margin: 0 4px;
-		}
-		#copyAnswerBtn { background: #3498db; }
-		
-		/* ---------- EXPLAIN MORE BUTTON ---------- */
-		#explainMoreBtn {
-		    background: #3498db;
-		    color: white;
-		    border: none;
-		    padding: 6px 10px;
-		    border-radius: 6px;
-		    font-size: 13px;
-		    cursor: pointer;
-		    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-		}
-
-        /* === HISTORY BUTTON === */
-        #historyBtn {
-            margin-top: 12px;
-            text-align: center;
-            display: none;
-        }
-        #showHistoryBtn {
-            background: #27ae60;
-            color: white;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-			font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-        }
-
-        .error {
-            background: #fdf2f2;
-            border: 1px solid #e74c3c;
-            color: #c0392b;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        /* === HISTORY MODAL === */
-        #historyModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-        #historyModal > div {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        /* === FOOTER === */
-        .footer {
-            text-align: center;
-            color: #95a5a6;
-            font-size: 0.85em;
-            padding: 12px 0;
-            background: #f8fbff;
-            border-top: 1px solid #d6eaf8;
-            margin: 0;
-            flex-shrink: 0;
-        }
-
-        /* === MOBILE === */
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-            .container { padding: 16px; }
-            h1 { font-size: 1.6em; }
-            .subtitle { font-size: 0.95em; margin-bottom: 8px; }
-            .textarea-wrapper textarea { font-size: 15px; min-height: 80px; }
-            .button-row button { font-size: 15px; padding: 10px; }
-            .random-q-btn { font-size: 13px; }
-        }
-    </style>
+	<style>
+	    /* === FULL PAGE LAYOUT === */
+	    html, body {
+	        height: 100%;
+	        margin: 0;
+	        padding: 0;
+	        font-family: 'Georgia', serif;
+	        background: linear-gradient(to bottom, #f0f7ff, #e6f0ff);
+	        color: #2c3e50;
+	    }
+	
+	    body {
+	        display: flex;
+	        flex-direction: column;
+	        min-height: 100vh;
+	        max-width: 800px;
+	        margin: 0 auto;
+	        padding: 15px;
+	        box-sizing: border-box;
+	    }
+	
+	    /* === HEADER === */
+	    h1, .subtitle {
+	        text-align: center;
+	        margin: 0;
+	        padding: 0;
+	        line-height: 1.1;
+	    }
+	    h1 {
+	        color: #1a5276;
+	        font-family: 'Arial', sans-serif;
+	        font-size: 1.8em;
+	    }
+	    .subtitle {
+	        margin: 4px 0 24px;
+	        font-size: 1em;
+	        color: #5d6d7e;
+	        font-style: italic;
+	    }
+	
+	    /* === CARD WRAPPER === */
+	    .card-wrapper {
+	        flex: 1;
+	        display: flex;
+	        justify-content: center;
+	        align-items: flex-start;
+	        padding-bottom: 20px;
+	    }
+	
+	    /* === COMPACT CARD === */
+	    .container {
+	        background: white;
+	        padding: 20px;
+	        border-radius: 16px;
+	        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+	        border: 1px solid #d6eaf8;
+	        width: 100%;
+	        max-width: 600px;
+	    }
+	
+	    /* === FORM ELEMENTS === */
+	    label {
+	        display: block;
+	        margin-bottom: 8px;
+	        font-weight: bold;
+	        color: #1a5276;
+	        font-size: 1.1em;
+	    }
+	
+	    /* === TEXTAREA + CLEAR BUTTON === */
+	    .textarea-wrapper {
+	        position: relative;
+	        width: 100%;
+	        margin-bottom: 12px;
+	    }
+	    .textarea-wrapper textarea {
+	        width: 100%;
+	        padding: 12px 40px 12px 12px !important;
+	        border: 1px solid #aed6f1;
+	        border-radius: 10px;
+	        box-sizing: border-box;
+	        font-size: 16px;
+	        font-family: inherit;
+	        min-height: 90px;
+	        resize: vertical;
+	    }
+	    #clearBtn {
+	        position: absolute;
+	        top: 8px;
+	        right: 8px;
+	        background: #e74c3c;
+	        color: white;
+	        border: none;
+	        width: 26px;
+	        height: 26px;
+	        border-radius: 50%;
+	        font-size: 16px;
+	        line-height: 1;
+	        cursor: pointer;
+	        display: none;
+	        padding: 0;
+	        font-weight: bold;
+	        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	    }
+	
+	    /* === BUTTONS WITH SHADOW === */
+	    .button-row {
+	        display: flex;
+	        gap: 10px;
+	        margin: 8px 0 0;
+	    }
+	    .button-row button,
+	    .random-q-btn {
+	        flex: 1;
+	        padding: 12px;
+	        font-size: 16px;
+	        font-weight: bold;
+	        border: none;
+	        border-radius: 10px;
+	        cursor: pointer;
+	        transition: 0.2s;
+	        box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+	    }
+	    .button-row button:active,
+	    .random-q-btn:active {
+	        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+	        transform: translateY(1px);
+	    }
+	    #askBtn { background: #2980b9; color: white; }
+	    #askBtn:hover { background: #1a5276; }
+	    #randomBtn { background: #9b59b6; color: white; }
+	    #randomBtn:hover { background: #8e44ad; }
+	
+	    /* === RANDOM QUESTIONS === */
+	    #randomQuestions {
+	        margin-top: 12px;
+	        text-align: center;
+	        display: none;
+	    }
+	    .random-q-btn {
+	        display: block;
+	        width: 100%;
+	        background: #e67e22;
+	        color: white;
+	        margin: 6px 0;
+	        font-size: 14px;
+	    }
+	    .random-q-btn:hover { background: #d35400; }
+	
+	    /* === LOADING & ANSWER === */
+	    #loading {
+	        text-align: center;
+	        color: #7f8c8d;
+	        font-style: italic;
+	        margin: 16px 0;
+	        display: none;
+	    }
+	
+	    /* ---------- ANSWER CONTAINER ---------- */
+	    #answer {
+	        margin-top: 12px;
+	        padding: 18px;
+	        background: #f8fbff;
+	        border-radius: 12px;
+	        border-left: 5px solid #3498db;
+	        display: none;
+	        font-size: 17px;
+	        line-height: 1.8;
+	        overflow-y: visible;
+	        -webkit-overflow-scrolling: touch;
+	    }
+	
+	    /* ---------- ANSWER HEADER ---------- */
+	    #answerHeader {
+	        display: none;
+	        justify-content: space-between;
+	        align-items: flex-start;
+	        margin-bottom: 12px;
+	    }
+	
+	    /* ---------- ANSWER CONTENT ---------- */
+	    #answerContent {
+	        line-height: 1.8;
+	    }
+	
+	    /* ---------- BIBLE REFERENCE (Book Chapter:Verse) ---------- */
+	    #answerContent strong {
+	        display: block !important;
+	        margin: 0.6rem 0 0.4rem;
+	        line-height: 1.4;
+	        font-weight: 600;
+	        font-style: normal;
+	        color: #1a5276;
+	    }
+	
+	    /* Remove trailing comma/colon from AI */
+	    #answerContent strong::after { content: none; }
+	
+	    /* ---------- BIBLE VERSE TEXT (the quote) ---------- */
+	    #answerContent em {
+	        display: block;
+	        margin: 0.3rem 0 1.2rem;
+	        line-height: 1.7;
+	        font-style: italic;
+	        color: #2c3e50;
+	        padding-left: 1.2rem;
+	        position: relative;
+	    }
+	
+	    /* Only add quotes if <em> has real text */
+	    #answerContent em:not(:empty)::before { 
+	        content: '“'; 
+	        color: #3498db; 
+	        font-weight: bold; 
+	        position: absolute; 
+	        left: 0; 
+	    }
+	    #answerContent em:not(:empty)::after { 
+	        content: '”'; 
+	        color: #3498db; 
+	        font-weight: bold; 
+	    }
+	
+	    /* ---------- SHARE / COPY BUTTONS ---------- */
+	    #answerActions {
+	        margin-top: 16px;
+	        text-align: center;
+	        display: none;
+	    }
+	    #shareAnswerBtn, #copyAnswerBtn {
+	        background: #27ae60;
+	        color: white;
+	        border: none;
+	        padding: 8px 16px;
+	        border-radius: 8px;
+	        font-size: 14px;
+	        cursor: pointer;
+	        margin: 0 4px;
+	    }
+	    #copyAnswerBtn { background: #3498db; }
+	
+	    /* ---------- EXPLAIN MORE BUTTON ---------- */
+	    #explainMoreBtn {
+	        background: #3498db;
+	        color: white;
+	        border: none;
+	        padding: 6px 10px;
+	        border-radius: 6px;
+	        font-size: 13px;
+	        cursor: pointer;
+	        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+	    }
+	
+	    /* === HISTORY BUTTON === */
+	    #historyBtn {
+	        margin-top: 12px;
+	        text-align: center;
+	        display: none;
+	    }
+	    #showHistoryBtn {
+	        background: #27ae60;
+	        color: white;
+	        padding: 10px 16px;
+	        border: none;
+	        border-radius: 8px;
+	        font-weight: bold;
+	        font-size: 14px;
+	        cursor: pointer;
+	        box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+	    }
+	
+	    .error {
+	        background: #fdf2f2;
+	        border: 1px solid #e74c3c;
+	        color: #c0392b;
+	        padding: 14px;
+	        border-radius: 8px;
+	        font-weight: bold;
+	        text-align: center;
+	    }
+	
+	    /* === HISTORY MODAL === */
+	    #historyModal {
+	        display: none;
+	        position: fixed;
+	        top: 0; left: 0;
+	        width: 100%; height: 100%;
+	        background: rgba(0,0,0,0.5);
+	        z-index: 100;
+	        justify-content: center;
+	        align-items: center;
+	    }
+	    #historyModal > div {
+	        background: white;
+	        padding: 20px;
+	        border-radius: 16px;
+	        max-width: 90%;
+	        max-height: 80%;
+	        overflow-y: auto;
+	        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+	    }
+	
+	    /* === FOOTER === */
+	    .footer {
+	        text-align: center;
+	        color: #95a5a6;
+	        font-size: 0.85em;
+	        padding: 12px 0;
+	        background: #f8fbff;
+	        border-top: 1px solid #d6eaf8;
+	        margin: 0;
+	        flex-shrink: 0;
+	    }
+	
+	    /* === MOBILE === */
+	    @media (max-width: 480px) {
+	        body { padding: 10px; }
+	        .container { padding: 16px; }
+	        h1 { font-size: 1.6em; }
+	        .subtitle { font-size: 0.95em; margin-bottom: 8px; }
+	        .textarea-wrapper textarea { font-size: 15px; min-height: 80px; }
+	        .button-row button { font-size: 15px; padding: 10px; }
+	        .random-q-btn { font-size: 13px; }
+	    }
+	</style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
@@ -852,6 +848,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
