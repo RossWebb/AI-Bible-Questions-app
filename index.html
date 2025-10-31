@@ -209,6 +209,16 @@
 		    font-style: italic;
 		    color: #2c3e50;
 		}
+		/* Force citation on its own line and clean up */
+		#answerContent strong {
+		    display: block !important;      /* NEW LINE */
+		    margin: 0.6rem 0 0.4rem;
+		    line-height: 1.4;
+		    font-weight: 600;
+		}
+
+/* Remove trailing comma after citation */
+#answerContent strong::after { content: none; }
         #explainMoreBtn {
             background: #3498db;
             color: white;
@@ -798,6 +808,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
