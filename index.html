@@ -335,7 +335,7 @@
     </div>
 
     <footer class="footer">
-        Mi, Ross Webb, mi mekem app ia. Mi prea se bae God i yusum app ia blo givhan long Kristim laef blong yu.
+        Mi, Ross Webb, mi mekem app ia (V1.0). Mi prea se bae God i yusum app ia blo givhan long Kristim laef blong yu.
     </footer>
 
     <script>
@@ -650,7 +650,22 @@ Examples of tone and length:
         // Init
         updateHistoryButton();
 
-				// === SHARE, COPY, DARK MODE ===
+		// PWA INSTALL PROMPT
+		let deferredPrompt;
+		window.addEventListener('beforeinstallprompt', e => {
+		  e.preventDefault();
+		  deferredPrompt = e;
+		  const banner = document.createElement('div');
+		  banner.style = 'position:fixed; bottom:0; width:100%; background:#1a5276; color:white; padding:12px; text-align:center; font-size:14px; z-index:1000;';
+		  banner.innerHTML = `Install Baebol Kwestin? <button style="background:white; color:#1a5276; border:none; padding:6px 12px; border-radius:6px; margin-left:8px;">Install</button>`;
+		  banner.querySelector('button').onclick = () => {
+		    deferredPrompt.prompt();
+		    banner.remove();
+		  };
+		  document.body.appendChild(banner);
+		});
+		
+		// === SHARE, COPY, DARK MODE ===
 		const actionButtons = document.getElementById('actionButtons');
 		const shareBtn = document.getElementById('shareAnswerBtn');
 		const copyBtn = document.getElementById('copyAnswerBtn');
@@ -708,6 +723,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
