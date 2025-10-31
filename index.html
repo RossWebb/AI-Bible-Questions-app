@@ -377,6 +377,20 @@
                 <div id="answerContent"></div>
             </div>
 
+			// == WECOME VERSE
+			<div id="welcomeVerse" style="
+			  text-align: center;
+			  font-style: italic;
+			  color: #5d6d7e;
+			  margin: 20px 0;
+			  padding: 0 20px;
+			  line-height: 1.7;
+			  display: none;
+			">
+			  <strong>John 3:16</strong><br>
+			  <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
+			</div>
+			
             <!-- HISTORY BUTTON -->
             <div id="historyBtn">
                 <button type="button" id="showHistoryBtn">Ol kwestin yu askem finis (0)</button>
@@ -757,6 +771,30 @@ Examples of tone and length:
         // Init
         updateHistoryButton();
 
+		// SHOW WELCOME VERSE
+		const welcomeVerse = document.getElementById('welcomeVerse');
+		
+		// Load last answer from localStorage
+		const lastAnswer = history[0]?.answer || '';
+		
+		// If no history → show welcome verse
+		if (!lastAnswer || lastAnswer.trim() === '') {
+		  welcomeVerse.style.display = 'block';
+		  answerDiv.style.display = 'block';
+		  answerHeader.style.display = 'none';
+		} else {
+		  // Optional: show last verse from last answer
+		  const parser = new DOMParser();
+		  const doc = parser.parseFromString(lastAnswer, 'text/html');
+		  const lastEm = doc.querySelector('em');
+		  if (lastEm) {
+		    welcomeVerse.innerHTML = `<em>${lastEm.innerHTML}</em>`;
+		    welcomeVerse.style.display = 'block';
+		    answerDiv.style.display = 'block';
+		    answerHeader.style.display = 'none';
+		  }
+		}
+
 		// === PWA INSTALL BANNER (Improved positioning + spacing) ===
 		let deferredPrompt;
 		
@@ -886,6 +924,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
