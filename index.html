@@ -43,7 +43,7 @@
             font-size: 1.8em;
         }
         .subtitle {
-            margin: 6px 0 16px; /* REDUCED SPACING */
+            margin: 6px 0 16px;
             font-size: 1em;
             color: #5d6d7e;
             font-style: italic;
@@ -211,7 +211,7 @@
             position: relative;
         }
 
-        /* SMART QUOTES: Only add if not present */
+        /* SMART QUOTES */
         #answerContent em:not(:empty):not(:has(br)):not(:has(.-only))::before { 
             content: '“'; 
             color: #3498db; 
@@ -225,12 +225,6 @@
             font-weight: bold; 
         }
 
-        #answerContent em:empty,
-        #answerContent em:has(.-only),
-        #answerContent em:has(br:only-child) {
-            display: none !important;
-        }
-
         #explainMoreBtn {
             background: #3498db;
             color: white;
@@ -242,18 +236,36 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* === WELCOME VERSE === */
+        /* === WELCOME VERSE: CLEAN, NO BLUE LINE, SAME STYLE AS ANSWER === */
         #welcomeVerse {
             width: 100%;
             max-width: 600px;
+            padding: 18px;
+            background: #f8fbff;
+            border-radius: 12px;
+            border-left: none !important; /* NO BLUE LINE */
             text-align: center;
             font-style: italic;
-            color: #5d6d7e;
+            color: #2c3e50;
             margin: 0;
-            padding: 0 16px;
             line-height: 1.8;
-            border-left: none !important;
+            display: none;
         }
+        #welcomeVerse strong {
+            display: block;
+            margin: 0 0 0.4rem;
+            font-weight: 600;
+            color: #1a5276;
+        }
+        #welcomeVerse em {
+            display: block;
+            margin: 0 0 1.2rem;
+            line-height: 1.7;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        #welcomeVerse em::before { content: '“'; color: #3498db; font-weight: bold; position: absolute; left: 0; }
+        #welcomeVerse em::after { content: '”'; color: #3498db; font-weight: bold; }
 
         /* === HISTORY BUTTON === */
         #historyBtn {
@@ -331,13 +343,17 @@
         /* === DARK MODE FIXES === */
         .dark-mode { background: #1a1a1a; color: #f0f0f0; }
         .dark-mode .container { background: #2d2d2d; }
-        .dark-mode #answer { background: #3a3a3a; color: #f0f0f0; }
+        .dark-mode #answer,
+        .dark-mode #welcomeVerse { background: #3a3a3a; color: #f0f0f0; }
         .dark-mode .footer { background: #2d2d2d; color: #aaa; }
         .dark-mode #answerContent em::before,
-        .dark-mode #answerContent em::after {
+        .dark-mode #answerContent em::after,
+        .dark-mode #welcomeVerse em::before,
+        .dark-mode #welcomeVerse em::after {
             color: #4FC3F7 !important;
         }
-        .dark-mode #answerContent strong {
+        .dark-mode #answerContent strong,
+        .dark-mode #welcomeVerse strong {
             color: #64B5F6 !important;
         }
     </style>
@@ -375,7 +391,7 @@
             <div id="answerContent"></div>
         </div>
 
-        <!-- WELCOME VERSE (SHOWS LAST VERSE EVERY TIME) -->
+        <!-- WELCOME VERSE (CLEAN, NO BLUE LINE, SAME STYLE) -->
         <div id="welcomeVerse"></div>
 
         <!-- HISTORY BUTTON -->
@@ -439,7 +455,6 @@
         const ENCODED_GEMINI_KEY = "QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN"; // ← Replace!
         const OR_KEY = atob(ENCODED_OR_KEY);
         const GEMINI_KEY = atob(ENCODED_GEMINI_KEY);
-
         marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
         // === ELEMENTS ===
@@ -535,7 +550,8 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
                         stopSequences: []
                     },
                     safetySettings: [
-                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT
+                        ", threshold: "BLOCK_NONE" },
                         { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
                         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
                         { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
@@ -558,7 +574,7 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
             answerHeader.style.display = 'none';
             answerContent.innerHTML = '';
             welcomeVerse.style.display = 'none';
-            actionButtons.style.display = 'none'; // HIDE BUTTONS
+            actionButtons.style.display = 'none';
 
             let result;
             try {
@@ -576,7 +592,6 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
 
                 const wordCount = (text || '').split(/\s+/).length;
                 if (wordCount < 50 && q.length > 20) {
-                    console.log('Answer too short, retrying...');
                     setTimeout(() => form.dispatchEvent(new Event('submit')), 800);
                     return;
                 }
@@ -584,13 +599,11 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
                 answerContent.innerHTML = marked.parse(text || 'No answer.');
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
-                // ONLY SHOW BUTTONS IF REAL ANSWER
                 if (answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) {
                     actionButtons.style.display = 'flex';
                 }
                 saveAnswer(q, answerContent.innerHTML);
             } catch (err) {
-                console.error('AI Error:', err);
                 answerContent.innerHTML = `<div class="error">${err.message}</div>`;
                 answerDiv.style.display = 'block';
             } finally {
@@ -764,7 +777,6 @@ Examples of tone and length:
         if (history.length > 0) {
             const lastEntry = history[0];
             const lastAnswerHTML = lastEntry.answer;
-
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = lastAnswerHTML;
             const firstVerse = tempDiv.querySelector('em');
@@ -773,7 +785,6 @@ Examples of tone and length:
             if (firstVerse && strongTag) {
                 const verseText = firstVerse.textContent.trim();
                 const refText = strongTag.textContent.trim();
-
                 welcomeVerse.innerHTML = `
                     <strong>${refText}</strong><br>
                     <em>${verseText}</em>
@@ -789,8 +800,9 @@ Examples of tone and length:
         }
 
         welcomeVerse.style.display = 'block';
-        answerDiv.style.display = 'block';
+        answerDiv.style.display = 'none';
         answerHeader.style.display = 'none';
+        actionButtons.style.display = 'none';
         welcomeVerse.style.opacity = '0';
         welcomeVerse.style.transition = 'opacity 0.6s ease';
         setTimeout(() => welcomeVerse.style.opacity = '1', 100);
@@ -861,6 +873,11 @@ ${answerContent.innerText}`;
                     .catch(err => console.log('SW failed', err));
             });
         }
+
+        // === INITIAL STATE: HIDE EVERYTHING ON LOAD ===
+        answerDiv.style.display = 'none';
+        answerHeader.style.display = 'none';
+        actionButtons.style.display = 'none';
     </script>
 </body>
 </html>
