@@ -43,7 +43,7 @@
             font-size: 1.8em;
         }
         .subtitle {
-            margin: 4px 0 24px;
+            margin: 6px 0 16px; /* REDUCED SPACING */
             font-size: 1em;
             color: #5d6d7e;
             font-style: italic;
@@ -384,7 +384,7 @@
         </div>
     </div>
 
-    <!-- ACTION BUTTONS (ONLY AFTER ANSWER) -->
+    <!-- ACTION BUTTONS (ONLY AFTER REAL ANSWER) -->
     <div id="actionButtons" style="display:none; margin-top:12px; text-align:center; gap:8px; display:flex; justify-content:center; flex-wrap:wrap;">
         <button id="shareAnswerBtn" style="background:#27ae60; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
             Share Answer
@@ -413,6 +413,24 @@
     </footer>
 
     <script>
+        // === INSTALL BANNER ===
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.createElement('button');
+            installBtn.textContent = 'Install Baebol Kwestin';
+            installBtn.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#27ae60; color:white; padding:12px 24px; border:none; border-radius:12px; font-weight:bold; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+            installBtn.onclick = async () => {
+                installBtn.style.display = 'none';
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            };
+            document.body.appendChild(installBtn);
+            setTimeout(() => installBtn.style.opacity = '1', 100);
+        });
+
         // === YOUR API KEY (ENCODED) ===
 		// Proper key encoded first at https://www.base64encode.org/ and the pasted below
 		// 1. OpenRouter key (from openrouter.ai/keys)
@@ -540,6 +558,7 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
             answerHeader.style.display = 'none';
             answerContent.innerHTML = '';
             welcomeVerse.style.display = 'none';
+            actionButtons.style.display = 'none'; // HIDE BUTTONS
 
             let result;
             try {
