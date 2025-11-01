@@ -211,6 +211,7 @@
             position: relative;
         }
 
+        /* SMART QUOTES: Only add if not present */
         #answerContent em:not(:empty):not(:has(br)):not(:has(.-only))::before { 
             content: '“'; 
             color: #3498db; 
@@ -218,7 +219,7 @@
             position: absolute; 
             left: 0; 
         }
-        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only))::after { 
+        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only)):not(:has(.”))::after { 
             content: '”'; 
             color: #3498db; 
             font-weight: bold; 
@@ -326,6 +327,19 @@
             .button-row button { font-size: 15px; padding: 10px; }
             .random-q-btn { font-size: 13px; }
         }
+
+        /* === DARK MODE FIXES === */
+        .dark-mode { background: #1a1a1a; color: #f0f0f0; }
+        .dark-mode .container { background: #2d2d2d; }
+        .dark-mode #answer { background: #3a3a3a; color: #f0f0f0; }
+        .dark-mode .footer { background: #2d2d2d; color: #aaa; }
+        .dark-mode #answerContent em::before,
+        .dark-mode #answerContent em::after {
+            color: #4FC3F7 !important;
+        }
+        .dark-mode #answerContent strong {
+            color: #64B5F6 !important;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -362,10 +376,7 @@
         </div>
 
         <!-- WELCOME VERSE -->
-        <div id="welcomeVerse">
-            <strong>John 3:16</strong><br>
-            <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
-        </div>
+        <div id="welcomeVerse"></div>
 
         <!-- HISTORY BUTTON -->
         <div id="historyBtn">
@@ -374,7 +385,7 @@
     </div>
 
     <!-- ACTION BUTTONS -->
-    <div id="actionButtons" style="display:none; margin-top:12px; text-align:center; gap:8px; display:flex; justify-content:center;">
+    <div id="actionButtons" style="display:none; margin-top:12px; text-align:center; gap:8px; display:flex; justify-content:center; flex-wrap:wrap;">
         <button id="shareAnswerBtn" style="background:#27ae60; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
             Share Answer
         </button>
@@ -383,6 +394,9 @@
         </button>
         <button id="darkModeBtn" style="background:#7f8c8d; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
             Dark Mode
+        </button>
+        <button id="bislamaBtn" style="background:#8e44ad; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
+            Bislama
         </button>
     </div>
 
@@ -411,32 +425,34 @@
         const OR_KEY = atob(ENCODED_OR_KEY);
         const GEMINI_KEY = atob(ENCODED_GEMINI_KEY);
 
-marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+        marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
-    // === ELEMENTS ===
-    const form = document.getElementById('queryForm');
-    const questionInput = document.getElementById('question');
-    const loading = document.getElementById('loading');
-    const answerDiv = document.getElementById('answer');
-    const answerHeader = document.getElementById('answerHeader');
-    const answerContent = document.getElementById('answerContent');
-    const explainMoreBtn = document.getElementById('explainMoreBtn');
-    const randomBtn = document.getElementById('randomBtn');
-    const randomDiv = document.getElementById('randomQuestions');
-    const clearBtn = document.getElementById('clearBtn');
-    const historyBtn = document.getElementById('historyBtn');
-    const showHistoryBtn = document.getElementById('showHistoryBtn');
-    const historyModal = document.getElementById('historyModal');
-    const historyList = document.getElementById('historyList');
-    const closeHistory = document.getElementById('closeHistory');
-    const welcomeVerse = document.getElementById('welcomeVerse');
-    const actionButtons = document.getElementById('actionButtons');
-    const shareBtn = document.getElementById('shareAnswerBtn');
-    const copyBtn = document.getElementById('copyAnswerBtn');
-    const darkBtn = document.getElementById('darkModeBtn');
+        // === ELEMENTS ===
+        const form = document.getElementById('queryForm');
+        const questionInput = document.getElementById('question');
+        const loading = document.getElementById('loading');
+        const answerDiv = document.getElementById('answer');
+        const answerHeader = document.getElementById('answerHeader');
+        const answerContent = document.getElementById('answerContent');
+        const explainMoreBtn = document.getElementById('explainMoreBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const randomDiv = document.getElementById('randomQuestions');
+        const clearBtn = document.getElementById('clearBtn');
+        const historyBtn = document.getElementById('historyBtn');
+        const showHistoryBtn = document.getElementById('showHistoryBtn');
+        const historyModal = document.getElementById('historyModal');
+        const historyList = document.getElementById('historyList');
+        const closeHistory = document.getElementById('closeHistory');
+        const welcomeVerse = document.getElementById('welcomeVerse');
+        const actionButtons = document.getElementById('actionButtons');
+        const shareBtn = document.getElementById('shareAnswerBtn');
+        const copyBtn = document.getElementById('copyAnswerBtn');
+        const darkBtn = document.getElementById('darkModeBtn');
+        const bislamaBtn = document.getElementById('bislamaBtn');
 
-    // === SYSTEM PROMPT ===
-    const systemPrompt = `You are a Bible teacher. 
+        let currentQuestion = '';
+
+        const systemPrompt = `You are a Bible teacher. 
 The user will ask in Bislama (Vanuatu). Understand it and answer in SIMPLE ENGLISH that a 13-year-old can read. No passive voice.
 
 Do NOT answer in Bislama!
@@ -471,133 +487,134 @@ Keep short, kind, under 500 words.
 
 Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu no askem ol kranke kwestin olsem. App ya blong asarem ol tru kwestin long Baebol."`;
 
-    // === AI CALLS ===
-    async function tryOpenRouter(q) {
-        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OR_KEY}`
-            },
-            body: JSON.stringify({
-                model: 'mistralai/devstral-small-2505:free',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: q }
-                ],
-                max_tokens: 2048,
-                temperature: 0.7
-            })
-        });
-        return { response: res, source: 'OpenRouter' };
-    }
-
-    async function tryGemini(q) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + q }] }],
-                generationConfig: { 
-                    maxOutputTokens: 2048,
-                    temperature: 0.7,
-                    stopSequences: []
+        // === AI CALLS ===
+        async function tryOpenRouter(q) {
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OR_KEY}`
                 },
-                safetySettings: [
-                    { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                    { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-                ]
-            })
+                body: JSON.stringify({
+                    model: 'mistralai/devstral-small-2505:free',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: q }
+                    ],
+                    max_tokens: 2048,
+                    temperature: 0.7
+                })
+            });
+            return { response: res, source: 'OpenRouter' };
+        }
+
+        async function tryGemini(q) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + q }] }],
+                    generationConfig: { 
+                        maxOutputTokens: 2048,
+                        temperature: 0.7,
+                        stopSequences: []
+                    },
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+                    ]
+                })
+            });
+            return { response: res, source: 'Gemini' };
+        }
+
+        // === SUBMIT FORM ===
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const q = questionInput.value.trim();
+            if (!q) return alert('Yu no raetem wan kwestin yet!');
+            currentQuestion = q;
+
+            loading.style.display = 'block';
+            loading.textContent = 'Mi stap tingbaot...';
+            answerDiv.style.display = 'none';
+            answerHeader.style.display = 'none';
+            answerContent.innerHTML = '';
+            welcomeVerse.style.display = 'none';
+
+            let result;
+            try {
+                result = await tryOpenRouter(q);
+                if (!result.response.ok && result.response.status !== 429) {
+                    loading.textContent = 'OpenRouter i no wok... Mi traem Gemini...';
+                    result = await tryGemini(q);
+                }
+                if (!result.response.ok) throw new Error(`Error ${result.response.status}`);
+
+                const json = await result.response.json();
+                const text = result.source === 'OpenRouter'
+                    ? json.choices?.[0]?.message?.content
+                    : json.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                const wordCount = (text || '').split(/\s+/).length;
+                if (wordCount < 50 && q.length > 20) {
+                    console.log('Answer too short, retrying...');
+                    setTimeout(() => form.dispatchEvent(new Event('submit')), 800);
+                    return;
+                }
+
+                answerContent.innerHTML = marked.parse(text || 'No answer.');
+                answerHeader.style.display = 'flex';
+                answerDiv.style.display = 'block';
+                actionButtons.style.display = 'flex';
+                saveAnswer(q, answerContent.innerHTML);
+            } catch (err) {
+                console.error('AI Error:', err);
+                answerContent.innerHTML = `<div class="error">${err.message}</div>`;
+                answerDiv.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
         });
-        return { response: res, source: 'Gemini' };
-    }
 
-    // === SUBMIT FORM ===
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        const q = questionInput.value.trim();
-        if (!q) return alert('Yu no raetem wan kwestin yet!');
+        // === EXPLAIN MORE ===
+        explainMoreBtn.onclick = async () => {
+            const q = currentQuestion;
+            loading.style.display = 'block';
+            loading.textContent = 'Mi stap pulum ansa i kam longfala moa...';
 
-        loading.style.display = 'block';
-        loading.textContent = 'Mi stap tingbaot...';
-        answerDiv.style.display = 'none';
-        answerHeader.style.display = 'none';
-        answerContent.innerHTML = '';
-        welcomeVerse.style.display = 'none';
+            let result;
+            try {
+                result = await tryOpenRouter(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
+                if (!result.response.ok) {
+                    result = await tryGemini(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
+                }
+                if (!result.response.ok) throw new Error('Failed');
 
-        let result;
-        try {
-            result = await tryOpenRouter(q);
-            if (!result.response.ok && result.response.status !== 429) {
-                loading.textContent = 'OpenRouter i no wok... Mi traem Gemini...';
-                result = await tryGemini(q);
+                const json = await result.response.json();
+                const longText = result.source === 'OpenRouter'
+                    ? json.choices?.[0]?.message?.content
+                    : json.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                answerContent.innerHTML = marked.parse(longText || 'No more detail.');
+                saveAnswer(q, answerContent.innerHTML);
+            } catch (e) {
+                answerContent.innerHTML += `<p style="color:#c0392b; margin-top:12px; font-weight:bold;">Sori, mi no save mekem long answer.</p>`;
+            } finally {
+                loading.style.display = 'none';
             }
-            if (!result.response.ok) throw new Error(`Error ${result.response.status}`);
+        };
 
-            const json = await result.response.json();
-            const text = result.source === 'OpenRouter'
-                ? json.choices?.[0]?.message?.content
-                : json.candidates?.[0]?.content?.parts?.[0]?.text;
+        // === RANDOM QUESTIONS ===
+        randomBtn.addEventListener('click', async () => {
+            randomBtn.textContent = 'Mi stap tingting...';
+            randomDiv.style.display = 'none';
+            randomDiv.innerHTML = '';
 
-            const wordCount = (text || '').split(/\s+/).length;
-            if (wordCount < 50 && q.length > 20) {
-                console.log('Answer too short, retrying...');
-                setTimeout(() => form.dispatchEvent(new Event('submit')), 800);
-                return;
-            }
-
-            answerContent.innerHTML = marked.parse(text || 'No answer.');
-            answerHeader.style.display = 'flex';
-            answerDiv.style.display = 'block';
-            actionButtons.style.display = 'flex';
-            saveAnswer(q, answerContent.innerHTML);
-        } catch (err) {
-            console.error('AI Error:', err);
-            answerContent.innerHTML = `<div class="error">${err.message}</div>`;
-            answerDiv.style.display = 'block';
-        } finally {
-            loading.style.display = 'none';
-        }
-    });
-
-    // === EXPLAIN MORE ===
-    explainMoreBtn.onclick = async () => {
-        const q = questionInput.value;
-        loading.style.display = 'block';
-        loading.textContent = 'Mi stap pulum ansa i kam longfala moa...';
-
-        let result;
-        try {
-            result = await tryOpenRouter(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
-            if (!result.response.ok) {
-                result = await tryGemini(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
-            }
-            if (!result.response.ok) throw new Error('Failed');
-
-            const json = await result.response.json();
-            const longText = result.source === 'OpenRouter'
-                ? json.choices?.[0]?.message?.content
-                : json.candidates?.[0]?.content?.parts?.[0]?.text;
-
-            answerContent.innerHTML = marked.parse(longText || 'No more detail.');
-            saveAnswer(q, answerContent.innerHTML);
-        } catch (e) {
-            answerContent.innerHTML += `<p style="color:#c0392b; margin-top:12px; font-weight:bold;">Sori, mi no save mekem long answer.</p>`;
-        } finally {
-            loading.style.display = 'none';
-        }
-    };
-
-    // === RANDOM QUESTIONS ===
-    randomBtn.addEventListener('click', async () => {
-        randomBtn.textContent = 'Mi stap tingting...';
-        randomDiv.style.display = 'none';
-        randomDiv.innerHTML = '';
-
-        const prompt = `You are a Bible teacher.  
+            const prompt = `You are a Bible teacher.  
 Generate **exactly 3 different questions** that an adult would ask about the Bible or Christian life.  
 Ask one question that people in animistic cultures might ask. (Do **NOT** label it as such.
 One source for questions is: https://hope.study/en/blog/50-most-asked-bible-questions/
@@ -619,172 +636,191 @@ Examples of tone and length:
 - Is it OK for a married man to go to another woman?
 - Tell me how to explain how to be saved.`;
 
-        let result;
-        try {
-            result = await tryGemini(prompt);
-            if (!result.response.ok && result.response.status !== 429) {
-                result = await tryOpenRouter(prompt);
-            }
-            if (!result.response.ok) throw new Error('Both AIs failed');
+            let result;
+            try {
+                result = await tryGemini(prompt);
+                if (!result.response.ok && result.response.status !== 429) {
+                    result = await tryOpenRouter(prompt);
+                }
+                if (!result.response.ok) throw new Error('Both AIs failed');
 
-            const json = await result.response.json();
-            const text = result.source === 'OpenRouter'
-                ? json.choices?.[0]?.message?.content
-                : json.candidates?.[0]?.content?.parts?.[0]?.text;
+                const json = await result.response.json();
+                const text = result.source === 'OpenRouter'
+                    ? json.choices?.[0]?.message?.content
+                    : json.candidates?.[0]?.content?.parts?.[0]?.text;
 
-            const lines = (text || '').match(/\d+\.\s*.+/g) || [];
+                const lines = (text || '').match(/\d+\.\s*.+/g) || [];
 
-            if (lines.length >= 3) {
-                lines.slice(0, 3).forEach(line => {
-                    let q = line.replace(/^\d+\.\s*/, '').trim();
-                    q = q.replace(/^\*+|\*+$/g, '').trim();
-                    if (!q) return;
-                    const btn = document.createElement('button');
-                    btn.className = 'random-q-btn';
-                    btn.textContent = q;
-                    btn.onclick = () => {
-                        questionInput.value = q;
-                        questionInput.dispatchEvent(new Event('input'));
-                        randomDiv.innerHTML = '';
-                        randomDiv.style.display = 'none';
-                        randomBtn.textContent = 'Givim Kwestin';
-                        form.dispatchEvent(new Event('submit'));
-                    };
-                    randomDiv.appendChild(btn);
-                });
+                if (lines.length >= 3) {
+                    lines.slice(0, 3).forEach(line => {
+                        let q = line.replace(/^\d+\.\s*/, '').trim();
+                        q = q.replace(/^\*+|\*+$/g, '').trim();
+                        if (!q) return;
+                        const btn = document.createElement('button');
+                        btn.className = 'random-q-btn';
+                        btn.textContent = q;
+                        btn.onclick = () => {
+                            questionInput.value = q;
+                            questionInput.dispatchEvent(new Event('input'));
+                            randomDiv.innerHTML = '';
+                            randomDiv.style.display = 'none';
+                            randomBtn.textContent = 'Givim Kwestin';
+                            form.dispatchEvent(new Event('submit'));
+                        };
+                        randomDiv.appendChild(btn);
+                    });
+                    randomDiv.style.display = 'block';
+                    randomBtn.textContent = 'Givim Kwestin';
+                } else {
+                    throw new Error('No valid questions');
+                }
+            } catch (e) {
+                randomDiv.innerHTML = `<p style="color:#c0392b; font-size:0.9em;">
+                    A sore. Mi traem bakegen. (Gemini + OpenRouter i no wok)
+                </p>`;
                 randomDiv.style.display = 'block';
                 randomBtn.textContent = 'Givim Kwestin';
-            } else {
-                throw new Error('No valid questions');
             }
-        } catch (e) {
-            randomDiv.innerHTML = `<p style="color:#c0392b; font-size:0.9em;">
-                A sore. Mi traem bakegen. (Gemini + OpenRouter i no wok)
-            </p>`;
-            randomDiv.style.display = 'block';
-            randomBtn.textContent = 'Givim Kwestin';
+        });
+
+        // === CLEAR BUTTON ===
+        questionInput.addEventListener('input', () => {
+            clearBtn.style.display = questionInput.value ? 'block' : 'none';
+        });
+        clearBtn.addEventListener('click', () => {
+            questionInput.value = '';
+            clearBtn.style.display = 'none';
+            questionInput.focus();
+        });
+
+        // === HISTORY ===
+        const history = JSON.parse(localStorage.getItem('bibleAnswers') || '[]');
+
+        function saveAnswer(q, a) {
+            const entry = { question: q, answer: a, date: new Date().toLocaleString('en-GB') };
+            history.unshift(entry);
+            if (history.length > 50) history.pop();
+            localStorage.setItem('bibleAnswers', JSON.stringify(history));
+            updateHistoryButton();
         }
-    });
 
-    // === CLEAR BUTTON ===
-    questionInput.addEventListener('input', () => {
-        clearBtn.style.display = questionInput.value ? 'block' : 'none';
-    });
-    clearBtn.addEventListener('click', () => {
-        questionInput.value = '';
-        clearBtn.style.display = 'none';
-        questionInput.focus();
-    });
-
-    // === HISTORY ===
-    const history = JSON.parse(localStorage.getItem('bibleAnswers') || '[]');
-
-    function saveAnswer(q, a) {
-        const entry = { question: q, answer: a, date: new Date().toLocaleString('en-GB') };
-        history.unshift(entry);
-        if (history.length > 50) history.pop();
-        localStorage.setItem('bibleAnswers', JSON.stringify(history));
-        updateHistoryButton();
-    }
-
-    function updateHistoryButton() {
-        const count = history.length;
-        if (count > 0) {
-            showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${count})`;
-            historyBtn.style.display = 'block';
+        function updateHistoryButton() {
+            const count = history.length;
+            if (count > 0) {
+                showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${count})`;
+                historyBtn.style.display = 'block';
+            }
         }
-    }
 
-    showHistoryBtn.onclick = () => {
-        historyList.innerHTML = '';
-        history.forEach((item, i) => {
-            const div = document.createElement('div');
-            div.style = 'border-bottom:1px solid #eee; padding:12px 0; cursor:pointer;';
-            div.innerHTML = `
-                <p style="margin:0; font-weight:bold; color:#1a5276;">${item.question}</p>
-                <p style="margin:4px 0 8px; font-size:0.9em; color:#7f8c8d;">${item.date}</p>
-                <div style="font-size:15px; line-height:1.7;">${item.answer}</div>
+        showHistoryBtn.onclick = () => {
+            historyList.innerHTML = '';
+            history.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.style = 'border-bottom:1px solid #eee; padding:12px 0; cursor:pointer;';
+                div.innerHTML = `
+                    <p style="margin:0; font-weight:bold; color:#1a5276;">${item.question}</p>
+                    <p style="margin:4px 0 8px; font-size:0.9em; color:#7f8c8d;">${item.date}</p>
+                    <div style="font-size:15px; line-height:1.7;">${item.answer}</div>
+                `;
+                div.onclick = () => {
+                    questionInput.value = item.question;
+                    questionInput.dispatchEvent(new Event('input'));
+                    answerContent.innerHTML = item.answer;
+                    answerHeader.style.display = 'flex';
+                    answerDiv.style.display = 'block';
+                    actionButtons.style.display = 'flex';
+                    welcomeVerse.style.display = 'none';
+                    historyModal.style.display = 'none';
+                };
+                historyList.appendChild(div);
+            });
+            historyModal.style.display = 'flex';
+        };
+
+        closeHistory.onclick = () => { historyModal.style.display = 'none'; };
+        historyModal.onclick = (e) => { if (e.target === historyModal) historyModal.style.display = 'none'; };
+
+        // === WELCOME VERSE ===
+        const lastAnswer = history[0]?.answer || '';
+        if (!lastAnswer || lastAnswer.trim() === '') {
+            welcomeVerse.innerHTML = `
+                <strong>John 3:16</strong><br>
+                <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
+                <p style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal; cursor:pointer;" onclick="document.getElementById('question').focus();">
+                    Tap hia blong askem kwestin...
+                </p>
             `;
-            div.onclick = () => {
-                questionInput.value = item.question;
-                questionInput.dispatchEvent(new Event('input'));
-                answerContent.innerHTML = item.answer;
-                answerHeader.style.display = 'flex';
-                answerDiv.style.display = 'block';
-                actionButtons.style.display = 'flex';
-                welcomeVerse.style.display = 'none';
-                historyModal.style.display = 'none';
-            };
-            historyList.appendChild(div);
-        });
-        historyModal.style.display = 'flex';
-    };
-
-    closeHistory.onclick = () => { historyModal.style.display = 'none'; };
-    historyModal.onclick = (e) => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-
-    // === WELCOME VERSE ===
-    const lastAnswer = history[0]?.answer || '';
-    if (!lastAnswer || lastAnswer.trim() === '') {
-        welcomeVerse.innerHTML = `
-            <strong>John 3:16</strong><br>
-            <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
-            <p style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal; cursor:pointer;" onclick="document.getElementById('question').focus();">
-                Tap hia blong askem kwestin...
-            </p>
-        `;
-        welcomeVerse.style.display = 'block';
-        answerDiv.style.display = 'block';
-        answerHeader.style.display = 'none';
-        welcomeVerse.style.opacity = '0';
-        welcomeVerse.style.transition = 'opacity 0.6s ease';
-        setTimeout(() => welcomeVerse.style.opacity = '1', 100);
-    }
-
-    updateHistoryButton();
-
-    // === SHARE / COPY / DARK MODE ===
-    shareBtn.onclick = async () => {
-        const text = answerContent.innerText;
-        const url = location.href;
-        try {
-            await navigator.share({ title: 'Baebol Kwestin', text, url });
-        } catch {
-            navigator.clipboard.writeText(`${text}\n\n${url}`);
-            alert('Copied to clipboard!');
+            welcomeVerse.style.display = 'block';
+            answerDiv.style.display = 'block';
+            answerHeader.style.display = 'none';
+            welcomeVerse.style.opacity = '0';
+            welcomeVerse.style.transition = 'opacity 0.6s ease';
+            setTimeout(() => welcomeVerse.style.opacity = '1', 100);
         }
-    };
 
-    copyBtn.onclick = () => {
-        navigator.clipboard.writeText(answerContent.innerText);
-        copyBtn.textContent = 'Copied!';
-        setTimeout(() => copyBtn.textContent = 'Copy Answer', 2000);
-    };
+        updateHistoryButton();
 
-    darkBtn.onclick = () => {
-        document.body.classList.toggle('dark-mode');
-        darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
-    };
+        // === SHARE / COPY / DARK MODE ===
+        shareBtn.onclick = async () => {
+            const text = answerContent.innerText;
+            const url = location.href;
+            try {
+                await navigator.share({ title: 'Baebol Kwestin', text, url });
+            } catch {
+                navigator.clipboard.writeText(`${text}\n\n${url}`);
+                alert('Copied to clipboard!');
+            }
+        };
 
-    // === DARK MODE CSS ===
-    const style = document.createElement('style');
-    style.textContent = `
-        .dark-mode { background: #1a1a1a; color: #f0f0f0; }
-        .dark-mode .container { background: #2d2d2d; }
-        .dark-mode #answer { background: #3a3a3a; color: #f0f0f0; }
-        .dark-mode .footer { background: #2d2d2d; color: #aaa; }
-    `;
-    document.head.appendChild(style);
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(answerContent.innerText);
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => copyBtn.textContent = 'Copy Answer', 2000);
+        };
 
-    // === SERVICE WORKER ===
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('SW registered', reg))
-                .catch(err => console.log('SW failed', err));
-        });
-    }
-</script>
+        darkBtn.onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+        };
+
+        // === BISLAMA TOGGLE ===
+        bislamaBtn.onclick = async () => {
+            if (!currentQuestion) return alert('Askem wan kwestin fastaem!');
+
+            bislamaBtn.textContent = 'Mi stap translet...';
+            bislamaBtn.disabled = true;
+
+            try {
+                const prompt = `Translate this answer into **simple Bislama** (Vanuatu). Keep Bible verses in English. Do NOT explain. Just translate.
+
+Answer:
+${answerContent.innerText}`;
+
+                const result = await tryGemini(prompt);
+                if (!result.response.ok) throw new Error('Gemini failed');
+
+                const json = await result.response.json();
+                const bislamaText = json.candidates?.[0]?.content?.parts?.[0]?.text || 'No translation.';
+
+                answerContent.innerHTML = marked.parse(bislamaText);
+                bislamaBtn.textContent = 'English';
+                bislamaBtn.onclick = () => location.reload();
+            } catch (e) {
+                alert('Sori, mi no save translet. Traem bakegen.');
+                bislamaBtn.textContent = 'Bislama';
+            } finally {
+                bislamaBtn.disabled = false;
+            }
+        };
+
+        // === SERVICE WORKER ===
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered', reg))
+                    .catch(err => console.log('SW failed', err));
+            });
+        }
+    </script>
 </body>
 </html>
-
