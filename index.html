@@ -375,7 +375,7 @@
             <div id="answerContent"></div>
         </div>
 
-        <!-- WELCOME VERSE -->
+        <!-- WELCOME VERSE (SHOWS LAST VERSE EVERY TIME) -->
         <div id="welcomeVerse"></div>
 
         <!-- HISTORY BUTTON -->
@@ -384,7 +384,7 @@
         </div>
     </div>
 
-    <!-- ACTION BUTTONS -->
+    <!-- ACTION BUTTONS (ONLY AFTER ANSWER) -->
     <div id="actionButtons" style="display:none; margin-top:12px; text-align:center; gap:8px; display:flex; justify-content:center; flex-wrap:wrap;">
         <button id="shareAnswerBtn" style="background:#27ae60; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
             Share Answer
@@ -565,7 +565,10 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
                 answerContent.innerHTML = marked.parse(text || 'No answer.');
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
-                actionButtons.style.display = 'flex';
+                // ONLY SHOW BUTTONS IF REAL ANSWER
+                if (answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) {
+                    actionButtons.style.display = 'flex';
+                }
                 saveAnswer(q, answerContent.innerHTML);
             } catch (err) {
                 console.error('AI Error:', err);
@@ -724,7 +727,9 @@ Examples of tone and length:
                     answerContent.innerHTML = item.answer;
                     answerHeader.style.display = 'flex';
                     answerDiv.style.display = 'block';
-                    actionButtons.style.display = 'flex';
+                    if (answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) {
+                        actionButtons.style.display = 'flex';
+                    }
                     welcomeVerse.style.display = 'none';
                     historyModal.style.display = 'none';
                 };
@@ -736,27 +741,54 @@ Examples of tone and length:
         closeHistory.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = (e) => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        // === WELCOME VERSE ===
-        const lastAnswer = history[0]?.answer || '';
-        if (!lastAnswer || lastAnswer.trim() === '') {
-            welcomeVerse.innerHTML = `
+        // === WELCOME VERSE: Show last verse every time app opens ===
+        if (history.length > 0) {
+            const lastEntry = history[0];
+            const lastAnswerHTML = lastEntry.answer;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = lastAnswerHTML;
+            const firstVerse = tempDiv.querySelector('em');
+            const strongTag = tempDiv.querySelector('strong');
+
+            if (firstVerse && strongTag) {
+                const verseText = firstVerse.textContent.trim();
+                const refText = strongTag.textContent.trim();
+
+                welcomeVerse.innerHTML = `
+                    <strong>${refText}</strong><br>
+                    <em>${verseText}</em>
+                    <p style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal; cursor:pointer;" onclick="document.getElementById('question').focus();">
+                        Tap hia blong askem moa...
+                    </p>
+                `;
+            } else {
+                welcomeVerse.innerHTML = getDefaultVerse();
+            }
+        } else {
+            welcomeVerse.innerHTML = getDefaultVerse();
+        }
+
+        welcomeVerse.style.display = 'block';
+        answerDiv.style.display = 'block';
+        answerHeader.style.display = 'none';
+        welcomeVerse.style.opacity = '0';
+        welcomeVerse.style.transition = 'opacity 0.6s ease';
+        setTimeout(() => welcomeVerse.style.opacity = '1', 100);
+
+        function getDefaultVerse() {
+            return `
                 <strong>John 3:16</strong><br>
                 <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
                 <p style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal; cursor:pointer;" onclick="document.getElementById('question').focus();">
                     Tap hia blong askem kwestin...
                 </p>
             `;
-            welcomeVerse.style.display = 'block';
-            answerDiv.style.display = 'block';
-            answerHeader.style.display = 'none';
-            welcomeVerse.style.opacity = '0';
-            welcomeVerse.style.transition = 'opacity 0.6s ease';
-            setTimeout(() => welcomeVerse.style.opacity = '1', 100);
         }
 
         updateHistoryButton();
 
-        // === SHARE / COPY / DARK MODE ===
+        // === SHARE / DARK MODE / BISLAMA ===
         shareBtn.onclick = async () => {
             const text = answerContent.innerText;
             const url = location.href;
@@ -773,7 +805,6 @@ Examples of tone and length:
             darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
         };
 
-        // === BISLAMA TOGGLE ===
         bislamaBtn.onclick = async () => {
             if (!currentQuestion) return alert('Askem wan kwestin fastaem!');
 
@@ -814,4 +845,3 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
-
