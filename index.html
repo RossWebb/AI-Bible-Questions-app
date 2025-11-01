@@ -342,10 +342,10 @@
 	</style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body>
+<body style="overscroll-behavior: none;">
     <h1>Baebol Kwestin</h1>
     <p class="subtitle">Askem eni kwestin long Baebol</p>
-	<body style="overscroll-behavior: none;">
+	
 
     <div class="card-wrapper">
         <div class="container">
@@ -771,17 +771,18 @@ Examples of tone and length:
         // Init
         updateHistoryButton();
 
-		// === WELCOME VERSE (WITH FADE-IN & TAP PROMPT) ===
+		// === WELCOME VERSE (FIXED & SAFE) ===
 		const welcomeVerse = document.getElementById('welcomeVerse');
-		const tapPrompt = document.getElementById('tapPrompt');
 		const lastAnswer = history[0]?.answer || '';
 		
-		// If no history → show John 3:16 + tap prompt
+		// Show welcome verse (first load or no history)
 		if (!lastAnswer || lastAnswer.trim() === '') {
 		  welcomeVerse.innerHTML = `
 		    <strong>John 3:16</strong><br>
 		    <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
-		    <p id="tapPrompt" style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal;">Tap hia blong askem kwestin...</p>
+		    <p style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal; cursor:pointer;" onclick="document.getElementById('question').focus();">
+		      Tap hia blong askem kwestin...
+		    </p>
 		  `;
 		  welcomeVerse.style.display = 'block';
 		  answerDiv.style.display = 'block';
@@ -791,29 +792,8 @@ Examples of tone and length:
 		  welcomeVerse.style.opacity = '0';
 		  welcomeVerse.style.transition = 'opacity 0.6s ease';
 		  setTimeout(() => welcomeVerse.style.opacity = '1', 100);
-		
-		// Else: show last verse from previous answer
-		} else {
-		  const parser = new DOMParser();
-		  const doc = parser.parseFromString(lastAnswer, 'text/html');
-		  const lastStrong = doc.querySelector('strong');
-		  const lastEm = doc.querySelector('em');
-		  if (lastStrong && lastEm) {
-		    welcomeVerse.innerHTML = `
-		      <strong>${lastStrong.innerText}</strong><br>
-		      <em>${lastEm.innerHTML}</em>
-		      <p id="tapPrompt" style="text-align:center; color:#7f8c8d; font-size:0.9em; margin:16px 0 0; font-style:normal;">Tap hia blong askem kwestin...</p>
-		    `;
-		    welcomeVerse.style.display = 'block';
-		    answerDiv.style.display = 'block';
-		    answerHeader.style.display = 'none';
-		
-		    // FADE IN
-		    welcomeVerse.style.opacity = '0';
-		    welcomeVerse.style.transition = 'opacity 0.6s ease';
-		    setTimeout(() => welcomeVerse.style.opacity = '1', 100);
-		  }
 		}
+	}
 
 		// === PWA INSTALL BANNER (Improved positioning + spacing) ===
 		let deferredPrompt;
@@ -944,6 +924,7 @@ Examples of tone and length:
 </body>
 
 </html>
+
 
 
 
