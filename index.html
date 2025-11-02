@@ -585,33 +585,34 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
             }
         });
 
-        // === EXPLAIN MORE ===
-        explainMoreBtn.onclick = async () => {
-            const q = currentQuestion;
-            loading.style.display = 'block';
-            loading.textContent = 'Mi stap pulum ansa i kam longfala moa...';
-
-            let result;
-            try {
-                result = await tryOpenRouter(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
-                if (!result.response.ok) {
-                    result = await tryGemini(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
-                }
-                if (!result.response.ok) throw new Error('Failed');
-
-                const json = await result.response.json();
-                const longText = result.source === 'OpenRouter'
-                    ? json.choices?.[0]?.message?.content
-                    : json.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                answerContent.innerHTML = marked.parse(longText || 'No more detail.');
-                saveAnswer(q, answerContent.innerHTML);
-            } catch (e Herbs) {
-                answerContent.innerHTML += `<p style="color:#c0392b; margin-top:12px; font-weight:bold;">Sori, mi no save mekem long answer.</p>`;
-            } finally {
-                loading.style.display = 'none';
-            }
-        };
+		// === EXPLAIN MORE ===
+		explainMoreBtn.onclick = async () => {
+		    const q = currentQuestion;
+		    loading.style.display = 'block';
+		    loading.textContent = 'Mi stap pulum ansa i kam longfala moa...';
+		
+		    let result;
+		    try {
+		        result = await tryOpenRouter(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
+		        if (!result.response.ok) {
+		            result = await tryGemini(q + "\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
+		        }
+		        if (!result.response.ok) throw new Error('Failed');
+		
+		        const json = await result.response.json();
+		        const longText = result.source === 'OpenRouter'
+		            ? json.choices?.[0]?.message?.content
+		            : json.candidates?.[0]?.content?.parts?.[0]?.text;
+		
+		        answerContent.innerHTML = marked.parse(longText || 'No more detail.');
+		        saveAnswer(q, answerContent.innerHTML);
+		    } catch (err) {
+		        console.error("Explain more failed:", err);
+		        answerContent.innerHTML += `<p style="color:#c0392b; margin-top:12px; font-weight:bold;">Sori, mi no save mekem long answer.</p>`;
+		    } finally {
+		        loading.style.display = 'none';
+		    }
+		};
 
         // === RANDOM QUESTIONS ===
         randomBtn.addEventListener('click', async () => {
@@ -851,3 +852,4 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
