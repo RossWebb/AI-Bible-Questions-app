@@ -110,11 +110,20 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        .button-row {
-            display: flex;
-            gap: 10px;
-            margin: 8px 0 0;
-        }
+		.button-row button,
+		.random-q-btn {
+		    flex: 1;
+		    padding: 12px;
+		    font-size: 16px;
+		    font-weight: bold;
+		    border: none;
+		    border-radius: 10px;
+		    cursor: pointer;
+		    transition: 0.2s;
+		    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+		    appearance: none;        /* ADD THIS */
+		    -webkit-appearance: none; /* ADD THIS */
+		}
         .button-row button,
         .random-q-btn {
             flex: 1;
@@ -349,7 +358,7 @@
 
     <div class="card-wrapper">
         <div class="container">
-            <form id="queryForm">
+            <form id="queryForm" novalidate>
                 <label for="question">Raetem kwestin blong yu:</label>
                 <div class="textarea-wrapper">
                     <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
@@ -537,7 +546,8 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
 
         // === SUBMIT FORM ===
         form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+			console.log('FORM SUBMITTED!'); // ← ADD THIS
+			e.preventDefault();
             const q = questionInput.value.trim();
             if (!q) return alert('Yu no raetem wan kwestin yet!');
             currentQuestion = q;
@@ -852,4 +862,5 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
 
