@@ -118,20 +118,32 @@
 		}
 		
 		.button-row button,
-		.random-q-btn {
-		    flex: 1;
-		    max-width: 100%;
-		    padding: 12px;
-		    font-size: 16px;
-		    font-weight: bold;
-		    border: none;
-		    border-radius: 10px;
-		    cursor: pointer;
-		    transition: 0.2s;
-		    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-		    appearance: none;
-		    -webkit-appearance: none;
-		}
+        .random-q-btn {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            background: #e67e22;
+            color: white;
+            margin: 6px 0;
+            font-size: 14px;
+            padding: 12px;
+            text-align: center;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+        }
+
+        .random-q-btn:hover { 
+            background: #d35400; 
+        }
+
+        .random-q-btn:active {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transform: translateY(1px);
+        }
 		
 		.button-row button:active,
 		.random-q-btn:active {
@@ -860,6 +872,7 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
 
 
 
