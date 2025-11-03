@@ -36,15 +36,48 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; font-family: Georgia, serif; background: var(--bg); color: var(--text); }
         body { display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; padding: 12px; font-size: 17px; line-height: 1.7; }
-        h1 { text-align: center; color: var(--primary); font-family: Arial, sans-serif; font-size: 1.9em; margin: 12px 0 0 0; line-height: 1.0; }
-        .subtitle { text-align: center; font-style: italic; color: #5d6d7e; margin: 0 0 16px 0; font-size: 1em; }
+
+        /* === HEADER WITH FLOATING BUTTONS === */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            position: relative;
+        }
+        .header h1 {
+            flex: 1;
+            text-align: center;
+            color: var(--primary);
+            font-family: Arial, sans-serif;
+            font-size: 1.9em;
+            margin: 0;
+        }
+        .fab {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: 0 3px 8px var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .fab:hover { transform: scale(1.05); box-shadow: 0 5px 12px var(--shadow); }
+        .fab svg { width: 24px; height: 24px; fill: var(--primary); }
+
+        .subtitle { text-align: center; font-style: italic; color: #5d6d7e; margin: 0 0 16px; font-size: 1em; }
+
         .card-wrapper { flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 8px 0; }
         .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 6px 20px var(--shadow); border: 1px solid var(--border); }
         label { display: block; font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 1.1em; }
         .input-wrapper { position: relative; }
         textarea { width: 100%; padding: 12px 36px 12px 12px; border: 1px solid #aed6f1; border-radius: 10px; font-size: 16px; min-height: 90px; resize: vertical; font-family: inherit; }
-        
-        /* === CLEAR BUTTON === */
+
         .clear-circle {
             position: absolute;
             background: var(--danger);
@@ -74,7 +107,6 @@
         .random-q-btn:hover { background: #d35400; }
         #loading { text-align: center; color: #7f8c8d; font-style: italic; margin: 16px 0; display: none; }
 
-        /* === ANSWER CARD — DARK MODE FIXED === */
         #answer {
             background: var(--card);
             padding: 18px;
@@ -88,7 +120,6 @@
         #explainMoreBtn { background: var(--accent); color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: normal; }
         #answerContent { line-height: 1.8; }
 
-        /* === TIGHT SUBHEAD SPACING === */
         #answerContent h2 {
             font-size: 1.5em; color: var(--primary); margin: 1.2em 0 0.4em; 
             border-bottom: 2px solid var(--accent); padding-bottom: 6px;
@@ -104,14 +135,9 @@
         }
         #answerContent em::before { content: '“'; color: var(--accent); font-weight: bold; position: absolute; left: 0; }
         #answerContent em::after { content: '”'; color: var(--accent); font-weight: bold; }
-
-        /* === BULLETS FLUSH === */
-        #answerContent ul {
-            margin: 0.5rem 0 1rem; padding-left: 1.2rem; list-style: disc;
-        }
+        #answerContent ul { margin: 0.5rem 0 1rem; padding-left: 1.2rem; list-style: disc; }
         #answerContent li { margin: 0.3rem 0; }
 
-        /* === WELCOME VERSE — DARK MODE FIXED === */
         #welcomeVerse {
             text-align: center;
             background: var(--card);
@@ -124,15 +150,9 @@
         #welcomeVerse em::before { content: '“'; color: var(--accent); left: 0; }
         #welcomeVerse em::after { content: '”'; color: var(--accent); }
 
-        #actionButtons { display: none; justify-content: center; gap: 10px; margin: 12px 0; flex-wrap: wrap; }
-        #actionButtons button { padding: 8px 16px; font-size: 14px; }
-        #shareAnswerBtn { background: var(--success); color: white; }
-        #darkModeBtn { background: #7f8c8d; color: white; }
-
         #historyModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
         #historyModal > div { background: var(--card); padding: 20px; border-radius: 16px; max-width: 90%; max-height: 80%; overflow-y: auto; box-shadow: 0 10px 30px var(--shadow); position: relative; }
 
-        /* === FOOTER — DARK MODE FIXED === */
         .footer {
             text-align: center;
             color: #95a5a6;
@@ -147,7 +167,9 @@
 
         @media (max-width: 480px) {
             body { padding: 8px; }
-            h1 { font-size: 1.7em; }
+            .header h1 { font-size: 1.6em; }
+            .fab { width: 44px; height: 44px; }
+            .fab svg { width: 20px; height: 20px; }
             textarea { font-size: 15px; min-height: 80px; }
             button { font-size: 13px; padding: 10px; }
         }
@@ -156,7 +178,18 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <h1>Baebol Kwestin</h1>
+    <!-- HEADER WITH FABs -->
+    <div class="header">
+        <button id="shareFab" class="fab" title="Share">
+            <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+        </button>
+        <h1>Baebol Kwestin</h1>
+        <button id="darkFab" class="fab" title="Dark Mode">
+            <svg id="sunIcon" viewBox="0 0 24 24" style="display:block;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41z"/></svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5.39 0 .74.15 1.01.39.26.23.61.38.99.38.83 0 1.5-.67 1.5-1.5 0-4.97-4.03-9-9-9z"/></svg>
+        </button>
+    </div>
+
     <p class="subtitle">Askem eni kwestin long Baebol</p>
 
     <div class="card-wrapper">
@@ -189,11 +222,6 @@
         <div id="welcomeVerse"></div>
     </div>
 
-    <div id="actionButtons">
-        <button id="shareAnswerBtn">Share Answer</button>
-        <button id="darkModeBtn">Dark Mode</button>
-    </div>
-
     <div id="historyModal">
         <div>
             <button type="button" id="closeHistoryBtn" class="clear-circle">x</button>
@@ -212,8 +240,8 @@
         window.addEventListener('beforeinstallprompt', e => {
             e.preventDefault(); deferredPrompt = e;
             const btn = document.createElement('button');
-            btn.textContent = 'Instolem Baebol Kwestin\napp ia';
-            btn.style.cssText = 'position:fixed;bottom:40%;left:50%;transform:translateX(-50%);background:#D30000;color:white;padding:16px 28px;border:none;border-radius:12px;font-weight:bold;font-size:18px;white-space:pre-line;text-align:center;max-width:200px;line-height:1.3;z-index:1000;animation:flash 1.5s infinite;';
+            btn.textContent = 'Instolem app ia';
+            btn.style.cssText = 'position:fixed;bottom:40%;left:50%;transform:translateX(-50%);background:#D30000;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:bold;z-index:1000;animation:flash 1.5s infinite;';
             btn.onclick = async () => { btn.remove(); deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
             document.body.appendChild(btn);
         });
@@ -224,10 +252,8 @@
         const OR_KEY = atob(ENCODED_OR_KEY);
         const GEMINI_KEY = atob(ENCODED_GEMINI_KEY);
 
-        // === MARKED ===
         marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
-        // === ELEMENTS ===
         const form = document.getElementById('queryForm');
         const questionInput = document.getElementById('question');
         const loading = document.getElementById('loading');
@@ -243,13 +269,13 @@
         const historyList = document.getElementById('historyList');
         const closeHistoryBtn = document.getElementById('closeHistoryBtn');
         const welcomeVerse = document.getElementById('welcomeVerse');
-        const actionButtons = document.getElementById('actionButtons');
-        const shareBtn = document.getElementById('shareAnswerBtn');
-        const darkBtn = document.getElementById('darkModeBtn');
+        const shareFab = document.getElementById('shareFab');
+        const darkFab = document.getElementById('darkFab');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
 
         let currentQuestion = '';
 
-        // === SYSTEM PROMPT ===
         const systemPrompt = `You are a kind Bible teacher in Vanuatu. 
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
 
@@ -284,7 +310,6 @@ End with one short sentence of hope or encouragement.
 
 Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
 
-        // === AI CALLS ===
         async function callAI(q, isContinue = false) {
             const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
@@ -317,7 +342,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             answerHeader.style.display = 'none';
             answerContent.innerHTML = '';
             welcomeVerse.style.display = 'none';
-            actionButtons.style.display = 'none';
 
             try {
                 let text = await callAI(q);
@@ -329,7 +353,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 answerContent.innerHTML = marked.parse(text);
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
-                actionButtons.style.display = 'flex';
                 saveAnswer(q, answerContent.innerHTML);
             } catch (err) {
                 answerContent.innerHTML = `<div class="error">${err.message}</div>`;
@@ -339,7 +362,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         });
 
-        // === EXPLAIN MORE ===
         explainMoreBtn.onclick = async () => {
             loading.style.display = 'block';
             loading.textContent = 'Mi stap pulum ansa longfala...';
@@ -354,43 +376,53 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         };
 
-        // === RANDOM QUESTIONS — FIXED ===
+        // === RANDOM QUESTIONS (with fallback) ===
         randomBtn.onclick = async () => {
             randomBtn.textContent = 'Mi stap tingting...';
-            randomDiv.innerHTML = '<p style="color:#7f8c8d;font-size:0.9em;">Mi stap lukaotem kwestin...</p>';
+            randomDiv.innerHTML = '<p style="color:#7f8c8d;font-size:0.9em;">Mi stap lukaotem kuestin...</p>';
             randomDiv.style.display = 'block';
 
-            const prompt = `You are a Bible teacher.  
-Generate **exactly 5 different questions** that an adult would ask about the Bible or Christian life.  
-Ask one question that people in animistic cultures might ask. (Do **NOT** label it as such.)
-One source for questions is: https://hope.study/en/blog/50-most-asked-bible-questions/
-
-Write them in **very simple English** (11-year-old reading level).
-Do **NOT** repeat common questions like "If God knows..." 
-Do **NOT** repeat common questions like "Why do bad things happen?"
-
-Cover a mix of theology, daily living, and Scripture.  
-Don't be afraid to be gently directive.
-Format as a numbered list:  
-1. Question?  
-2. Question?  
-3. Question? 
-4. Question?
-5. Question? 
-
-Examples of tone and length:  
-- Is it OK to be baptised more than once?  
-- What does the Bible say about love?  
-- Is it OK for a married man to go to another woman?
-- Tell me how to explain how to be saved.`;
+            const prompt = `Generate EXACTLY 5 Bible questions in simple English for a 13-year-old. 
+One question should relate to village/island life (e.g. spirits, storms, family, fishing).
+Use ONLY this format — no extra text:
+1. Question one?
+2. Question two?
+3. Question three?
+4. Question four?
+5. Question five?`;
 
             try {
                 const text = await callAI(prompt);
-                const lines = text.match(/\d+\.\s*.+/g) || [];
+                const lines = text.match(/\d+\.\s*.+\?/g) || [];
                 randomDiv.innerHTML = '';
-                lines.slice(0,5).forEach(line => {
-                    const q = line.replace(/^\d+\.\s*/,'').trim();
-                    if (!q) return;
+                if (lines.length >= 3) {
+                    lines.slice(0, 5).forEach(line => {
+                        const q = line.replace(/^\d+\.\s*/,'').trim();
+                        if (!q) return;
+                        const btn = document.createElement('button');
+                        btn.className = 'random-q-btn';
+                        btn.textContent = q;
+                        btn.onclick = () => {
+                            questionInput.value = q;
+                            questionInput.dispatchEvent(new Event('input'));
+                            randomDiv.innerHTML = ''; 
+                            randomDiv.style.display = 'none';
+                            randomBtn.textContent = 'Givim Kwestin';
+                            form.dispatchEvent(new Event('submit'));
+                        };
+                        randomDiv.appendChild(btn);
+                    });
+                } else throw new Error("Not enough questions");
+            } catch (err) {
+                randomDiv.innerHTML = '';
+                const fallback = [
+                    "From wanem Jisas i mas ded long kros?",
+                    "Hao mi save talem ol man long Baebol?",
+                    "Wanem mi save mekem bae mi no lus laef?",
+                    "Bae mi save talem Jisas long ol man we oli no wantem hem?",
+                    "From wanem Baebol i talem se God i lovem mi?"
+                ];
+                fallback.forEach(q => {
                     const btn = document.createElement('button');
                     btn.className = 'random-q-btn';
                     btn.textContent = q;
@@ -404,23 +436,16 @@ Examples of tone and length:
                     };
                     randomDiv.appendChild(btn);
                 });
-                if (!lines.length) throw new Error("No questions");
-            } catch (err) {
-                randomDiv.innerHTML = `<p style="color:var(--danger);font-size:0.9em;">A sore, mi no save faenem kwestin. Traem bakegen.</p>`;
+                randomDiv.innerHTML += '<p style="font-size:0.8em;color:#7f8c8d;">(Mi yusum ol kuestin we mi save.)</p>';
             } finally {
                 randomBtn.textContent = 'Givim Kwestin';
             }
         };
 
-        // === INPUT & HISTORY ===
         questionInput.addEventListener('input', () => {
             clearBtn.style.display = questionInput.value ? 'flex' : 'none';
         });
-        clearBtn.onclick = () => {
-            questionInput.value = ''; 
-            clearBtn.style.display = 'none'; 
-            questionInput.focus();
-        };
+        clearBtn.onclick = () => { questionInput.value = ''; clearBtn.style.display = 'none'; questionInput.focus(); };
 
         const history = JSON.parse(localStorage.getItem('bibleHistory') || '[]');
         function saveAnswer(q, a) {
@@ -448,7 +473,6 @@ Examples of tone and length:
                     answerContent.innerHTML = item.a;
                     answerHeader.style.display = 'flex';
                     answerDiv.style.display = 'block';
-                    actionButtons.style.display = 'flex';
                     welcomeVerse.style.display = 'none';
                     historyModal.style.display = 'none';
                 };
@@ -459,7 +483,6 @@ Examples of tone and length:
         closeHistoryBtn.onclick = () => historyModal.style.display = 'none';
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        // === WELCOME VERSE ===
         const dailyVerses = [
             { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
             { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
@@ -473,15 +496,19 @@ Examples of tone and length:
             welcomeVerse.style.display = 'block';
         }
 
-        // === SHARE & DARK MODE ===
-        shareBtn.onclick = async () => {
+        // === FAB ACTIONS ===
+        shareFab.onclick = async () => {
+            if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
             const text = answerContent.innerText;
             try { await navigator.share({ title: 'Baebol Kwestin', text }); }
             catch { navigator.clipboard.writeText(text); alert('Copied!'); }
         };
-        darkBtn.onclick = () => {
+
+        darkFab.onclick = () => {
             document.body.classList.toggle('dark-mode');
-            darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+            const isDark = document.body.classList.contains('dark-mode');
+            sunIcon.style.display = isDark ? 'none' : 'block';
+            moonIcon.style.display = isDark ? 'block' : 'none';
         };
 
         // === INIT ===
@@ -493,4 +520,3 @@ Examples of tone and length:
     </script>
 </body>
 </html>
-
