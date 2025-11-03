@@ -30,11 +30,11 @@
         #randomBtn {background:#9b59b6;color:white;} #randomBtn:hover {background:#8e44ad;}
         #randomQuestions {margin-top:12px;text-align:center;display:none;}
         #loading {text-align:center;color:#7f8c8d;font-style:italic;margin:16px 0;display:none;}
-        #answer {width:100%;max-width:600px;padding:18px;background:#f8fbff;border-radius:12px;border-left:5px solid #3498db;display:none;font-size:17px;line-height:1.8;flex-shrink:0;overflow-y:auto;}
+        #answer {width:100%;max-width:600px;padding:18px;background:#f8fbff;border-radius:12px;border-left:5px solid #3498db;display:none;font-size:17px;line-height:1.8;overflow-y:auto;max-height:calc(100vh - 300px);}
         #answerHeader {display:none;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
         #answerContent {line-height:1.8;}
         
-        /* === MARKDOWN HEADINGS === */
+        /* === MARKDOWN HEADINGS (now rendered) === */
         #answerContent h2 {
             font-size:1.4em;color:#1a5276;margin:1.2em 0 .6em;font-weight:600;
             border-bottom:2px solid #3498db;padding-bottom:6px;
@@ -53,7 +53,7 @@
             font-style:italic;color:#2c3e50;padding-left:1.2rem;position:relative;
         }
 
-        /* === FIX: Only add quotes if verse has no quotes already === */
+        /* === QUOTES (only if verse has no children) === */
         #answerContent em:not(:has(> *))::before { content:'“'; color:#3498db; font-weight:bold; position:absolute; left:0; }
         #answerContent em:not(:has(> *))::after { content:'”'; color:#3498db; font-weight:bold; }
 
@@ -159,7 +159,7 @@
         const OR_KEY = atob(ENCODED_OR_KEY);
         const GEMINI_KEY = atob(ENCODED_GEMINI_KEY);
 
-        // === MARKED: Enable headings ===
+        // === MARKED: Enable headings + no sanitizing ===
         marked.setOptions({gfm:true,breaks:false,sanitize:false,headerIds:false});
 
         // === ELEMENTS ===
@@ -185,7 +185,7 @@
 
         let currentQuestion = '';
 
-        // === SYSTEM PROMPT (FIXED: No forced period) ===
+        // === SYSTEM PROMPT (unchanged) ===
         const systemPrompt = `You are a Bible teacher. 
 The user will ask in Bislama (Vanuatu). Understand it and answer in SIMPLE ENGLISH that a 13-year-old can read. No passive voice. Change difficult nouns to verbal forms. Don't use the word sovereign. Think of another way to say it.
 
@@ -281,7 +281,7 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
             }
         });
 
-        // === EXPLAIN MORE, RANDOM, HISTORY, ETC. (unchanged from last working version) ===
+        // === EXPLAIN MORE, RANDOM, HISTORY, ETC. (unchanged) ===
         explainMoreBtn.onclick = async () => {
             const q = currentQuestion;
             loading.style.display='block';
