@@ -641,7 +641,7 @@ Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu n
             randomDiv.innerHTML = '';
 
             const prompt = `You are a Bible teacher.  
-Generate **exactly 4 different questions** that an adult would ask about the Bible or Christian life.  
+Generate **exactly 5 different questions** that an adult would ask about the Bible or Christian life.  
 Ask one question that people in animistic cultures might ask. (Do **NOT** label it as such.
 One source for questions is: https://hope.study/en/blog/50-most-asked-bible-questions/
 
@@ -677,7 +677,7 @@ Examples of tone and length:
 
                 const lines = (text || '').match(/\d+\.\s*.+/g) || [];
 
-                if (lines.length >= 3) {
+                if (lines.length >= 5) {
                     lines.slice(0, 3).forEach(line => {
                         let q = line.replace(/^\d+\.\s*/, '').trim();
                         q = q.replace(/^\*+|\*+$/g, '').trim();
@@ -872,6 +872,7 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
 
 
 
