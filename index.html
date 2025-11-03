@@ -10,420 +10,81 @@
     <meta name="theme-color" content="#1a5276">
     <style>
         /* === FULL PAGE LAYOUT === */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Georgia', serif;
-            background: linear-gradient(to bottom, #f0f7ff, #e6f0ff);
-            color: #2c3e50;
-            overflow-x: hidden;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-
-        h1, .subtitle {
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            line-height: 1.1;
-        }
-        h1 {
-            color: #1a5276;
-			margin: 4px;
-            font-family: 'Arial', sans-serif;
-            font-size: 1.8em;
-        }
-        .subtitle {
-            margin: 6px 0 16px;
-            font-size: 1em;
-            color: #5d6d7e;
-            font-style: italic;
-        }
-
-		.card-wrapper {
-		    flex: 1;
-		    display: flex;
-		    flex-direction: column;
-		    align-items: center;
-		    padding: 20px 0;
-		    gap: 16px;
-		}
-		
-		.container {
-		    background: white;
-		    padding: 20px;
-		    border-radius: 16px;
-		    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-		    border: 1px solid #d6eaf8;
-		    width: 100%;
-		    max-width: 600px;
-		}
-		
-		#historyBtn {
-		    margin-top: 0;
-		    text-align: center;
-		}
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #1a5276;
-            font-size: 1.1em;
-        }
-
-        .textarea-wrapper {
-            position: relative;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        .textarea-wrapper textarea {
-            width: 100%;
-            padding: 12px 40px 12px 12px !important;
-            border: 1px solid #aed6f1;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
-            font-family: inherit;
-            min-height: 90px;
-            resize: vertical;
-        }
-        #clearBtn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            font-size: 16px;
-            line-height: 1;
-            cursor: pointer;
-            display: none;
-            padding: 0;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-		.button-row {
-		    display: flex;
-		    gap: 10px;
-		    margin: 8px 0 0;
-		    justify-content: center;
-		}
-		
-		.button-row button,
-        .random-q-btn {
-            display: block;
-            width: 100%;
-            max-width: 100%;
-            box-sizing: border-box;
-            background: #e67e22;
-            color: white;
-            margin: 6px 0;
-            font-size: 14px;
-            padding: 12px;
-            text-align: center;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-        }
-
-        .random-q-btn:hover { 
-            background: #d35400; 
-        }
-
-        .random-q-btn:active {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transform: translateY(1px);
-        }
-		
-		.button-row button:active,
-		.random-q-btn:active {
-		    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-		    transform: translateY(1px);
-		}
-		
-		#askBtn { background: #2980b9; color: white; }
-		#askBtn:hover { background: #1a5276; }
-		#randomBtn { background: #9b59b6; color: white; }
-		#randomBtn:hover { background: #8e44ad; }
-
-        #randomQuestions {
-            margin-top: 12px;
-            text-align: center;
-            display: none;
-        }
-        .random-q-btn {
-            display: block;
-            width: 100%;
-            background: #e67e22;
-            color: white;
-            margin: 6px 0;
-            font-size: 14px;
-        }
-        .random-q-btn:hover { background: #d35400; }
-
-        #loading {
-            text-align: center;
-            color: #7f8c8d;
-            font-style: italic;
-            margin: 16px 0;
-            display: none;
-        }
-
-        #answer {
-            width: 100%;
-            max-width: 600px;
-            padding: 18px;
-            background: #f8fbff;
-            border-radius: 12px;
-            border-left: 5px solid #3498db;
-            display: none;
-            font-size: 17px;
-            line-height: 1.8;
-            flex-shrink: 0;
-            max-height: none;
-            overflow-y: auto;
-        }
-
-        #answerHeader {
-            display: none;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        #answerContent {
-            line-height: 1.8;
-        }
-
-        /* === MARKDOWN HEADINGS === */
-        #answerContent h2 {
-            font-size: 1.4em;
-            color: #1a5276;
-            margin: 1.2em 0 0.6em;
-            font-weight: 600;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 6px;
-        }
-
-        #answerContent strong {
-            display: block !important;
-            margin: 0.6rem 0 0.4rem;
-            line-height: 1.4;
-            font-weight: 600;
-            font-style: normal;
-            color: #1a5276;
-        }
-
-        #answerContent em {
-            display: block;
-            margin: 0.3rem 0 1.2rem;
-            line-height: 1.7;
-            font-style: italic;
-            color: #2c3e50;
-            padding-left: 1.2rem;
-            position: relative;
-        }
-
-        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only))::before { 
-            content: '“'; 
-            color: #3498db; 
-            font-weight: bold; 
-            position: absolute; 
-            left: 0; 
-        }
-        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only)):not(:has(.”))::after { 
-            content: '”'; 
-            color: #3498db; 
-            font-weight: bold; 
-        }
-
-        #explainMoreBtn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        #welcomeVerse {
-            width: 100%;
-            max-width: 600px;
-            padding: 18px;
-            background: #f8fbff;
-            border-radius: 12px;
-            border-left: none !important;
-            text-align: center;
-            font-style: italic;
-            color: #2c3e50;
-            margin: 0;
-            line-height: 1.8;
-            display: none;
-        }
-        #welcomeVerse strong {
-            display: block;
-            margin: 0 0 0.4rem;
-            font-weight: 600;
-            color: #1a5276;
-        }
-        #welcomeVerse em {
-            display: block;
-            margin: 0 0 1.2rem;
-            line-height: 1.7;
-            padding-left: 1.2rem;
-            position: relative;
-        }
-        #welcomeVerse em::before { content: '“'; color: #3498db; font-weight: bold; position: absolute; left: 0; }
-        #welcomeVerse em::after { content: '”'; color: #3498db; font-weight: bold; }
-
-        #historyBtn {
-            margin-top: 12px;
-            text-align: center;
-        }
-        #showHistoryBtn {
-            background: #27ae60;
-            color: white;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-        }
-
-        .error {
-            background: #fdf2f2;
-            border: 1px solid #e74c3c;
-            color: #c0392b;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        #historyModal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-        #historyModal > div {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            max-width: 90%;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-
-        .footer {
-            text-align: center;
-            color: #95a5a6;
-            font-size: 0.85em;
-            padding: 12px 0;
-            background: #f8fbff;
-            border-top: 1px solid #d6eaf8;
-            margin: 0;
-            flex-shrink: 0;
-            white-space: normalocean;
-            word-wrap: break-word;
-        }
-
-        @media (max-width: 480px) {
-            body { padding: 10px; }
-            .container { padding: 16px; }
-            h1 { font-size: 1.6em; }
-            .subtitle { font-size: 0.95em; margin-bottom: 8px; }
-            .textarea-wrapper textarea { font-size: 15px; min-height: 80px; }
-            .button-row button { font-size: 15px; padding: 10px; }
-            .random-q-btn { font-size: 13px; }
-        }
-
-        /* === DARK MODE FIXES === */
-        .dark-mode { background: #1a1a1a; color: #f0f0f0; }
-        .dark-mode .container { background: #2d2d2d; }
-        .dark-mode #answer,
-        .dark-mode #welcomeVerse { background: #3a3a3a; color: #f0f0f0; }
-        .dark-mode .footer { background: #2d2d2d; color: #aaa; }
-
-        /* Dark mode: Headings */
-        .dark-mode #answerContent h2 {
-            color: #64B5F6;
-            border-bottom-color: #4FC3F7;
-        }
-
-        /* Dark mode: Verse references */
-        .dark-mode #answerContent strong,
-        .dark-mode #welcomeVerse strong {
-            color: #64B5F6 !important;
-        }
-
-        .dark-mode #answerContent em::before,
-        .dark-mode #answerContent em::after,
-        .dark-mode #welcomeVerse em::before,
-        .dark-mode #welcomeVerse em::after {
-            color: #4FC3F7 !important;
-        }
-
-        /* ---- FLASHING INSTALL BUTTON ---- */
-        @keyframes flash {
-            0%, 100% { background:#D30000; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
-            50% { background:#FF3333; box-shadow:0 6px 20px rgba(255,0,0,0.4); }
-        }
+        html, body {height:100%;margin:0;padding:0;font-family:'Georgia',serif;background:linear-gradient(to bottom,#f0f7ff,#e6f0ff);color:#2c3e50;overflow-x:hidden;}
+        body {display:flex;flex-direction:column;min-height:100vh;max-width:800px;margin:0 auto;padding:15px;box-sizing:border-box;}
+        h1, .subtitle {text-align:center;margin:0;padding:0;line-height:1.1;}
+        h1 {color:#1a5276;margin:4px;font-family:'Arial',sans-serif;font-size:1.8em;}
+        .subtitle {margin:6px 0 16px;font-size:1em;color:#5d6d7e;font-style:italic;}
+        .card-wrapper {flex:1;display:flex;flex-direction:column;align-items:center;padding:20px 0;gap:16px;}
+        .container {background:white;padding:20px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.1);border:1px solid #d6eaf8;width:100%;max-width:600px;}
+        #historyBtn {margin-top:0;text-align:center;}
+        label {display:block;margin-bottom:8px;font-weight:bold;color:#1a5276;font-size:1.1em;}
+        .textarea-wrapper {position:relative;width:100%;margin-bottom:12px;}
+        .textarea-wrapper textarea {width:100%;padding:12px 40px 12px 12px!important;border:1px solid #aed6f1;border-radius:10px;box-sizing:border-box;font-size:16px;font-family:inherit;min-height:90px;resize:vertical;}
+        #clearBtn {position:absolute;top:8px;right:8px;background:#e74c3c;color:white;border:none;width:26px;height:26px;border-radius:50%;font-size:16px;line-height:1;cursor:pointer;display:none;padding:0;font-weight:bold;box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+        .button-row {display:flex;gap:10px;margin:8px 0 0;justify-content:center;}
+        .button-row button,.random-q-btn {display:block;width:100%;max-width:100%;box-sizing:border-box;background:#e67e22;color:white;margin:6px 0;font-size:14px;padding:12px;text-align:center;border:none;border-radius:10px;cursor:pointer;transition:.2s;box-shadow:0 3px 6px rgba(0,0,0,0.16);}
+        .random-q-btn:hover {background:#d35400;}
+        .random-q-btn:active,.button-row button:active {box-shadow:0 1px 3px rgba(0,0,0,0.2);transform:translateY(1px);}
+        #askBtn {background:#2980b9;color:white;} #askBtn:hover {background:#1a5276;}
+        #randomBtn {background:#9b59b6;color:white;} #randomBtn:hover {background:#8e44ad;}
+        #randomQuestions {margin-top:12px;text-align:center;display:none;}
+        #loading {text-align:center;color:#7f8c8d;font-style:italic;margin:16px 0;display:none;}
+        #answer {width:100%;max-width:600px;padding:18px;background:#f8fbff;border-radius:12px;border-left:5px solid #3498db;display:none;font-size:17px;line-height:1.8;flex-shrink:0;overflow-y:auto;}
+        #answerHeader {display:none;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+        #answerContent {line-height:1.8;}
+        #answerContent h2 {font-size:1.4em;color:#1a5276;margin:1.2em 0 .6em;font-weight:600;border-bottom:2px solid #3498db;padding-bottom:6px;}
+        #answerContent strong {display:block!important;margin:.6rem 0 .4rem;line-height:1.4;font-weight:600;font-style:normal;color:#1a5276;}
+        #answerContent em {display:block;margin:.3rem 0 1.2rem;line-height:1.7;font-style:italic;color:#2c3e50;padding-left:1.2rem;position:relative;}
+        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only))::before {content:'“';color:#3498db;font-weight:bold;position:absolute;left:0;}
+        #answerContent em:not(:empty):not(:has(br)):not(:has(.-only)):not(:has(.”))::after {content:'”';color:#3498db;font-weight:bold;}
+        #explainMoreBtn {background:#3498db;color:white;border:none;padding:6px 10px;border-radius:6px;font-size:13px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+        #welcomeVerse {width:100%;max-width:600px;padding:18px;background:#f8fbff;border-radius:12px;border-left:none!important;text-align:center;font-style:italic;color:#2c3e50;margin:0;line-height:1.8;display:none;}
+        #welcomeVerse strong {display:block;margin:0 0 .4rem;font-weight:600;color:#1a5276;}
+        #welcomeVerse em {display:block;margin:0 0 1.2rem;line-height:1.7;padding-left:1.2rem;position:relative;}
+        #welcomeVerse em::before {content:'“';color:#3498db;font-weight:bold;position:absolute;left:0;}
+        #welcomeVerse em::after {content:'”';color:#3498db;font-weight:bold;}
+        #showHistoryBtn {background:#27ae60;color:white;padding:10px 16px;border:none;border-radius:8px;font-weight:bold;font-size:14px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,0.16);}
+        .error {background:#fdf2f2;border:1px solid #e74c3c;color:#c0392b;padding:14px;border-radius:8px;font-weight:bold;text-align:center;}
+        #historyModal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:100;justify-content:center;align-items:center;}
+        #historyModal > div {background:white;padding:20px;border-radius:16px;max-width:90%;max-height:80%;overflow-y:auto;box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+        .footer {text-align:center;color:#95a5a6;font-size:.85em;padding:12px 0;background:#f8fbff;border-top:1px solid #d6eaf8;margin:0;flex-shrink:0;white-space:normal;word-wrap:break-word;}
+        @media (max-width:480px){body{padding:10px;}.container{padding:16px;}h1{font-size:1.6em;}.subtitle{font-size:.95em;margin-bottom:8px;}.textarea-wrapper textarea{font-size:15px;min-height:80px;}.button-row button{font-size:15px;padding:10px;}.random-q-btn{font-size:13px;}}
+        .dark-mode{background:#1a1a1a;color:#f0f0f0;}.dark-mode .container{background:#2d2d2d;}.dark-mode #answer,.dark-mode #welcomeVerse{background:#3a3a3a;color:#f0f0f0;}.dark-mode .footer{background:#2d2d2d;color:#aaa;}
+        .dark-mode #answerContent h2{color:#64B5F6;border-bottom-color:#4FC3F7;}
+        .dark-mode #answerContent strong,.dark-mode #welcomeVerse strong{color:#64B5F6!important;}
+        .dark-mode #answerContent em::before,.dark-mode #answerContent em::after,.dark-mode #welcomeVerse em::before,.dark-mode #welcomeVerse em::after{color:#4FC3F7!important;}
+        @keyframes flash{0%,100%{background:#D30000;box-shadow:0 4px 12px rgba(0,0,0,.2);}50%{background:#FF3333;box-shadow:0 6px 20px rgba(255,0,0,.4);}}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
-<body style="overscroll-behavior: none;">
+<body style="overscroll-behavior:none;">
     <h1>Baebol Kwestin</h1>
     <p class="subtitle">Askem eni kwestin long Baebol</p>
 
     <div class="card-wrapper">
-<div class="container">
-    <form id="queryForm">
-        <label for="question">Raetem kwestin blong yu:</label>
-        <div class="textarea-wrapper">
-            <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
-            <button type="button" id="clearBtn">x</button>
+        <div class="container">
+            <form id="queryForm">
+                <label for="question">Raetem kwestin blong yu:</label>
+                <div class="textarea-wrapper">
+                    <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
+                    <button type="button" id="clearBtn">x</button>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" id="askBtn">Askem Baebol</button>
+                    <button type="button" id="randomBtn">Givim Kwestin</button>
+                </div>
+
+                <div id="historyBtn">
+                    <button type="button" id="showHistoryBtn">Ol kwestin we yu askem finis (0)</button>
+                </div>
+
+                <div id="randomQuestions"></div>
+            </form>
+
+            <div id="loading">Mi stap tingbaot... Wet smol.</div>
         </div>
-
-        <div class="button-row">
-            <button type="submit" id="askBtn">Askem Baebol</button>
-            <button type="button" id="randomBtn">Givim Kwestin</button>
-        </div>
-
-        <div id="historyBtn">
-            <button type="button" id="showHistoryBtn">Ol kwestin we yu askem finis (0)</button>
-        </div>
-
-        <div id="randomQuestions"></div>
-    </form>
-
-    <div id="loading">Mi stap tingbaot... Wet smol.</div>
-</div>
 
         <div id="answer">
             <div id="answerHeader">
@@ -436,21 +97,16 @@
         <div id="welcomeVerse"></div>
     </div>
 
-    <!-- Only Share + Dark Mode -->
-    <div id="actionButtons" style="display:none; margin-top:12px; text-align:center; gap:8px; display:flex; justify-content:center; flex-wrap:wrap;">
-        <button id="shareAnswerBtn" style="background:#27ae60; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
-            Share Answer
-        </button>
-        <button id="darkModeBtn" style="background:#7f8c8d; color:white; padding:8px 16px; border:none; border-radius:8px; font-size:14px; cursor:pointer;">
-            Dark Mode
-        </button>
+    <div id="actionButtons" style="display:none;margin-top:12px;text-align:center;gap:8px;display:flex;justify-content:center;flex-wrap:wrap;">
+        <button id="shareAnswerBtn" style="background:#27ae60;color:white;padding:8px 16px;border:none;border-radius:8px;font-size:14px;cursor:pointer;">Share Answer</button>
+        <button id="darkModeBtn" style="background:#7f8c8d;color:white;padding:8px 16px;border:none;border-radius:8px;font-size:14px;cursor:pointer;">Dark Mode</button>
     </div>
 
     <div id="historyModal">
         <div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <h3 style="margin:0; color:#1a5276;">Ol kwestin we yu askem finis</h3>
-                <button type="button" id="closeHistory" style="background:none; border:none; font-size:20px; cursor:pointer; color:#95a5a6;">x</button>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                <h3 style="margin:0;color:#1a5276;">Ol kwestin we yu askem finis</h3>
+                <button type="button" id="closeHistory" style="background:none;border:none;font-size:20px;cursor:pointer;color:#95a5a6;">x</button>
             </div>
             <div id="historyList"></div>
         </div>
@@ -463,32 +119,15 @@
     <script>
         // === INSTALL BANNER (FLASHING) ===
         let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault(); deferredPrompt = e;
             const installBtn = document.createElement('button');
             installBtn.textContent = 'Instolem app ia';
-            installBtn.style.cssText = `
-                position:fixed;
-                bottom:40%;
-                left:50%;
-                transform:translateX(-50%);
-                background:#D30000;
-                color:white;
-                padding:12px 24px;
-                border:none;
-                border-radius:12px;
-                font-weight:bold;
-                z-index:1000;
-                box-shadow:0 4px 12px rgba(0,0,0,0.2);
-                opacity:0;
-                transition:opacity 0.3s;
-                animation: flash 1.5s infinite;
-            `;
+            installBtn.style.cssText = `position:fixed;bottom:40%;left:50%;transform:translateX(-50%);background:#D30000;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:bold;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.2);opacity:0;transition:opacity .3s;animation:flash 1.5s infinite;`;
             installBtn.onclick = async () => {
                 installBtn.style.display = 'none';
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
             };
             document.body.appendChild(installBtn);
@@ -501,7 +140,7 @@
         const OR_KEY = atob(ENCODED_OR_KEY);
         const GEMINI_KEY = atob(ENCODED_GEMINI_KEY);
 
-        marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+        marked.setOptions({gfm:true,breaks:false,sanitize:false,headerIds:false});
 
         // === ELEMENTS ===
         const form = document.getElementById('queryForm');
@@ -526,7 +165,7 @@
 
         let currentQuestion = '';
 
-        // === SYSTEM PROMPT ===
+        // === SYSTEM PROMPT (your tweaks) ===
         const systemPrompt = `You are a Bible teacher. 
 The user will ask in Bislama (Vanuatu). Understand it and answer in SIMPLE ENGLISH that a 13-year-old can read. No passive voice. Change difficult nouns to verbal forms. Don't use the word sovereign. Think of another way to say it.
 
@@ -566,140 +205,236 @@ Keep short, kind, under 500 words.
 Sex/gender questions OK if Biblical. No rude words. If unsure, reply: "Plis yu no askem ol kranke kwestin olsem. App ya blong asarem ol tru kwestin long Baebol."`;
 
         // === AI CALLS ===
-        async function tryOpenRouter(q) {
-            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${OR_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'openrouter/auto',
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: q }
-                    ],
-                    max_tokens: 4000,
-                    temperature: 0.7
-                })
-            });
-            return { response: res, source: 'OpenRouter' };
-        }
-
-        async function tryGemini(q) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + q }] }],
-                    generationConfig: { 
-                        maxOutputTokens: 8192,
-                        temperature: 0.7 
-                    },
-                    safetySettings: [
-                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-                    ]
-                })
-            });
-            return { response: res, source: 'Gemini' };
-        }
+        async function tryOpenRouter(q){const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${OR_KEY}`},body:JSON.stringify({model:'openrouter/auto',messages:[{role:'system',content:systemPrompt},{role:'user',content:q}],max_tokens:4000,temperature:0.7})});return{response:res,source:'OpenRouter'};}
+        async function tryGemini(q){const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:systemPrompt+"\n\nQuestion: "+q}]}],generationConfig:{maxOutputTokens:8192,temperature:0.7},safetySettings:[{category:"HARM_CATEGORY_DANGEROUS_CONTENT",threshold:"BLOCK_NONE"},{category:"HARM_CATEGORY_HATE_SPEECH",threshold:"BLOCK_NONE"},{category:"HARM_CATEGORY_HARASSMENT",threshold:"BLOCK_NONE"},{category:"HARM_CATEGORY_SEXUALLY_EXPLICIT",threshold:"BLOCK_NONE"}]})});return{response:res,source:'Gemini'};}
 
         // === SUBMIT FORM ===
-        form.addEventListener('submit', async (e) => {
+        form.addEventListener('submit', async e=>{
             e.preventDefault();
-            const q = questionInput.value.trim();
-            if (!q) return alert('Yu no raetem wan kwestin yet!');
-            currentQuestion = q;
+            const q=questionInput.value.trim();
+            if(!q) return alert('Yu no raetem wan kwestin yet!');
+            currentQuestion=q;
 
-            loading.style.display = 'block';
-            loading.textContent = 'Mi stap tingbaot...';
-            answerDiv.style.display = 'none';
-            answerHeader.style.display = 'none';
-            answerContent.innerHTML = '';
-            welcomeVerse.style.display = 'none';
-            actionButtons.style.display = 'none';
+            loading.style.display='block';
+            loading.textContent='Mi stap tingbaot...';
+            answerDiv.style.display='none';
+            answerHeader.style.display='none';
+            answerContent.innerHTML='';
+            welcomeVerse.style.display='none';
+            actionButtons.style.display='none';
 
             let result;
-            try {
-                result = await tryOpenRouter(q);
-                if (!result.response.ok && result.response.status !== 429) {
-                    loading.textContent = 'OpenRouter i no wok... Mi traem Gemini...';
-                    result = await tryGemini(q);
+            try{
+                result=await tryOpenRouter(q);
+                if(!result.response.ok && result.response.status!==429){
+                    loading.textContent='OpenRouter i no wok... Mi traem Gemini...';
+                    result=await tryGemini(q);
                 }
-                if (!result.response.ok) throw new Error(`Error ${result.response.status}`);
+                if(!result.response.ok) throw new Error(`Error ${result.response.status}`);
 
-                const json = await result.response.json();
-                let fullText = result.source === 'OpenRouter'
-                    ? json.choices?.[0]?.message?.content
-                    : json.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                const json=await result.response.json();
+                let fullText=result.source==='OpenRouter'?json.choices?.[0]?.message?.content:json.candidates?.[0]?.content?.parts?.[0]?.text||'';
 
-                const MIN_WORDS = 120;
-                const endsWithPunctuation = /[.!?]\s*$/.test(fullText.trim());
-                if (fullText.split(/\s+/).length < MIN_WORDS || !endsWithPunctuation) {
-                    loading.textContent = 'Mi stap karem ansa...';
-                    const cont = await tryOpenRouter(q + "\n\nContinue the answer from where you stopped. Finish the thought. Do not repeat.");
-                    if (cont.response.ok) {
-                        const cjson = await cont.response.json();
-                        const extra = cont.source === 'OpenRouter'
-                            ? cjson.choices?.[0]?.message?.content
-                            : cjson.candidates?.[0]?.content?.parts?.[0]?.text;
-                        fullText += "\n\n" + (extra || '');
+                const MIN_WORDS=120;
+                const endsWithPunctuation=/[.!?]\s*$/.test(fullText.trim());
+                if(fullText.split(/\s+/).length<MIN_WORDS||!endsWithPunctuation){
+                    loading.textContent='Mi stap karem ansa...';
+                    const cont=await tryOpenRouter(q+"\n\nContinue the answer from where you stopped. Finish the thought. Do not repeat.");
+                    if(cont.response.ok){
+                        const cjson=await cont.response.json();
+                        const extra=cont.source==='OpenRouter'?cjson.choices?.[0]?.message?.content:cjson.candidates?.[0]?.content?.parts?.[0]?.text;
+                        fullText+="\n\n"+(extra||'');
                     }
                 }
 
-                answerContent.innerHTML = marked.parse(fullText || 'No answer.');
-                answerHeader.style.display = 'flex';
-                answerDiv.style.display = 'block';
-                if (answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) {
-                    actionButtons.style.display = 'flex';
-                }
-                saveAnswer(q, answerContent.innerHTML);
-            } catch (err) {
-                answerContent.innerHTML = `<div class="error">${err.message}</div>`;
-                answerDiv.style.display = 'block';
-            } finally {
-                loading.style.display = 'none';
+                answerContent.innerHTML=marked.parse(fullText||'No answer.');
+                answerHeader.style.display='flex';
+                answerDiv.style.display='block';
+                if(answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) actionButtons.style.display='flex';
+                saveAnswer(q,answerContent.innerHTML);
+            }catch(err){
+                answerContent.innerHTML=`<div class="error">${err.message}</div>`;
+                answerDiv.style.display='block';
+            }finally{
+                loading.style.display='none';
             }
         });
 
-        // === EXPLAIN MORE, RANDOM, HISTORY, ETC. (unchanged) ===
-        // ... [rest of script remains 100% identical to previous working version] ...
-
-        // === SHARE / DARK MODE ===
-        shareBtn.onclick = async () => {
-            const text = answerContent.innerText;
-            const url = location.href;
-            try {
-                await navigator.share({ title: 'Baebol Kwestin', text, url });
-            } catch {
-                navigator.clipboard.writeText(`${text}\n\n${url}`);
-                alert('Copied to clipboard!');
+        // === EXPLAIN MORE ===
+        explainMoreBtn.onclick = async () => {
+            const q = currentQuestion;
+            loading.style.display='block';
+            loading.textContent='Mi stap pulum ansa i kam longfala moa...';
+            try{
+                const result = await tryOpenRouter(q+"\n\nGive a FULL, DETAILED answer. Up to 1500 words. Use Markdown. Cite 5+ TEV verses. DO NOT summarize.");
+                if(!result.response.ok) throw new Error();
+                const json = await result.response.json();
+                const longText = json.choices?.[0]?.message?.content;
+                answerContent.innerHTML = marked.parse(longText||'No more detail.');
+                saveAnswer(q,answerContent.innerHTML);
+            }catch{
+                answerContent.innerHTML += `<p style="color:#c0392b;margin-top:12px;font-weight:bold;">Sori, mi no save mekem long answer.</p>`;
+            }finally{
+                loading.style.display='none';
             }
         };
 
+        // === RANDOM QUESTIONS ===
+        randomBtn.addEventListener('click', async () => {
+            randomBtn.textContent = 'Mi stap tingting...';
+            randomDiv.style.display='none';
+            randomDiv.innerHTML='';
+
+            const prompt = `You are a Bible teacher.  
+Generate **exactly 5 different questions** that an adult would ask about the Bible or Christian life.  
+Ask one question that people in animistic cultures might ask. (Do **NOT** label it as such.)
+One source for questions is: https://hope.study/en/blog/50-most-asked-bible-questions/
+
+Write them in **very simple English** (11-year-old reading level).
+Do **NOT** repeat common questions like "If God knows..." 
+Do **NOT** repeat common questions like "Why do bad things happen?"
+
+Cover a mix of theology, daily living, and Scripture.  
+Don't be afraid to be gently directive.
+Format as a numbered list:  
+1. Question?  
+2. Question?  
+3. Question?  
+
+Examples of tone and length:  
+- Is it OK to be baptised more than once?  
+- What does the Bible say about love?  
+- Is it OK for a married man to go to another woman?
+- Tell me how to explain how to be saved.`;
+
+            try{
+                let result = await tryGemini(prompt);
+                if(!result.response.ok && result.response.status!==429) result = await tryOpenRouter(prompt);
+                if(!result.response.ok) throw new Error();
+
+                const json = await result.response.json();
+                const text = result.source==='OpenRouter'?json.choices?.[0]?.message?.content:json.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                const lines = (text||'').match(/\d+\.\s*.+/g)||[];
+                if(lines.length<3) throw new Error();
+
+                lines.slice(0,5).forEach(line=>{
+                    let q = line.replace(/^\d+\.\s*/,'').trim().replace(/^\*+|\*+$/g,'').trim();
+                    if(!q) return;
+                    const btn = document.createElement('button');
+                    btn.className='random-q-btn';
+                    btn.textContent=q;
+                    btn.onclick=()=>{questionInput.value=q;questionInput.dispatchEvent(new Event('input'));randomDiv.innerHTML='';randomDiv.style.display='none';randomBtn.textContent='Givim Kwestin';form.dispatchEvent(new Event('submit'));}
+                    randomDiv.appendChild(btn);
+                });
+                randomDiv.style.display='block';
+                randomBtn.textContent='Givim Kwestin';
+            }catch{
+                randomDiv.innerHTML=`<p style="color:#c0392b;font-size:.9em;">A sore. Mi traem bakegen. (Gemini + OpenRouter i no wok)</p>`;
+                randomDiv.style.display='block';
+                randomBtn.textContent='Givim Kwestin';
+            }
+        });
+
+        // === CLEAR BUTTON ===
+        questionInput.addEventListener('input',()=>{clearBtn.style.display=questionInput.value?'block':'none';});
+        clearBtn.addEventListener('click',()=>{questionInput.value='';clearBtn.style.display='none';questionInput.focus();});
+
+        // === HISTORY (saveAnswer, showWelcomeVerse, updateHistoryButton) ===
+        const history = JSON.parse(localStorage.getItem('bibleAnswers')||'[]');
+
+        function saveAnswer(q,a){
+            const entry={question:q,answer:a,date:new Date().toLocaleString('en-GB')};
+            history.unshift(entry);
+            if(history.length>50) history.pop();
+            localStorage.setItem('bibleAnswers',JSON.stringify(history));
+            updateHistoryButton();
+        }
+
+        function updateHistoryButton(){
+            const cnt=history.length;
+            if(cnt>0){
+                showHistoryBtn.textContent=`Ol kwestin we yu askem finis (${cnt})`;
+                historyBtn.style.display='block';
+            }else{
+                historyBtn.style.display='none';
+            }
+        }
+
+        function showWelcomeVerse(){
+            if(history.length>0){
+                const last=history[0];
+                const tmp=document.createElement('div');
+                tmp.innerHTML=last.answer;
+                const firstVerse=tmp.querySelector('em');
+                const strongTag=tmp.querySelector('strong');
+                if(firstVerse && strongTag){
+                    const verse=firstVerse.textContent.trim();
+                    const ref=strongTag.textContent.trim();
+                    welcomeVerse.innerHTML=`<strong>${ref}</strong><br><em>${verse}</em><p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;font-style:normal;cursor:pointer;" onclick="document.getElementById('question').focus();">Tap hia blong askem moa...</p>`;
+                }else welcomeVerse.innerHTML=getDefaultVerse();
+            }else{
+                welcomeVerse.innerHTML=getDefaultVerse();
+            }
+            welcomeVerse.style.display='block';
+            welcomeVerse.style.opacity='0';
+            welcomeVerse.style.transition='opacity .6s ease';
+            setTimeout(()=>welcomeVerse.style.opacity='1',100);
+        }
+
+        function getDefaultVerse(){
+            return `<strong>John 3:16</strong><br>
+                    <em>“God i lavem tumas ol man long wol, nao hem i givim mi, mi stret Pikinini blong hem, mi wan nomo we hem i gat, blong olgeta man we oli bilif long mi bambae oli no save lus, oli gat laef we i no save finis.”</em>
+                    <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;font-style:normal;cursor:pointer;" onclick="document.getElementById('question').focus();">Tap hia blong askem kwestin...</p>`;
+        }
+
+        showHistoryBtn.onclick = () => {
+            historyList.innerHTML='';
+            history.forEach((item,i)=>{
+                const div=document.createElement('div');
+                div.style='border-bottom:1px solid #eee;padding:12px 0;cursor:pointer;';
+                div.innerHTML=`<p style="margin:0;font-weight:bold;color:#1a5276;">${item.question}</p>
+                               <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d;">${item.date}</p>
+                               <div style="font-size:15px;line-height:1.7;">${item.answer}</div>`;
+                div.onclick=()=>{
+                    questionInput.value=item.question;
+                    questionInput.dispatchEvent(new Event('input'));
+                    answerContent.innerHTML=item.answer;
+                    answerHeader.style.display='flex';
+                    answerDiv.style.display='block';
+                    if(answerContent.innerHTML.trim() && !answerContent.querySelector('.error')) actionButtons.style.display='flex';
+                    welcomeVerse.style.display='none';
+                    historyModal.style.display='none';
+                };
+                historyList.appendChild(div);
+            });
+            historyModal.style.display='flex';
+        };
+        closeHistory.onclick = ()=>{historyModal.style.display='none';};
+        historyModal.onclick = e=>{if(e.target===historyModal) historyModal.style.display='none';};
+
+        // === SHARE / DARK MODE ===
+        shareBtn.onclick = async () => {
+            const text=answerContent.innerText;
+            const url=location.href;
+            try{await navigator.share({title:'Baebol Kwestin',text,url});}
+            catch{navigator.clipboard.writeText(`${text}\n\n${url}`);alert('Copied to clipboard!');}
+        };
         darkBtn.onclick = () => {
             document.body.classList.toggle('dark-mode');
             darkBtn.textContent = document.body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
         };
 
-        // === INITIAL STATE ===
-        answerDiv.style.display = 'none';
-        answerHeader.style.display = 'none';
-        actionButtons.style.display = 'none';
+        // === INITIAL STATE (call AFTER functions are defined) ===
+        answerDiv.style.display='none';
+        answerHeader.style.display='none';
+        actionButtons.style.display='none';
         showWelcomeVerse();
         updateHistoryButton();
 
         // === SERVICE WORKER ===
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('SW registered', reg))
-                    .catch(err => console.log('SW failed', err));
-            });
+        if('serviceWorker' in navigator){
+            window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(r=>console.log('SW registered',r)).catch(e=>console.log('SW failed',e));});
         }
     </script>
 </body>
