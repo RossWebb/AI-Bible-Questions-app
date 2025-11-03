@@ -212,8 +212,8 @@
         window.addEventListener('beforeinstallprompt', e => {
             e.preventDefault(); deferredPrompt = e;
             const btn = document.createElement('button');
-            btn.textContent = 'Instolem app ia';
-            btn.style.cssText = 'position:fixed;bottom:40%;left:50%;transform:translateX(-50%);background:#D30000;color:white;padding:12px 24px;border:none;border-radius:12px;font-weight:bold;z-index:1000;animation:flash 1.5s infinite;';
+            btn.textContent = 'Instolem Baebol Kwestin\napp ia';
+            btn.style.cssText = 'position:fixed;bottom:40%;left:50%;transform:translateX(-50%);background:#D30000;color:white;padding:16px 28px;border:none;border-radius:12px;font-weight:bold;font-size:18px;white-space:pre-line;text-align:center;max-width:200px;line-height:1.3;z-index:1000;animation:flash 1.5s infinite;';
             btn.onclick = async () => { btn.remove(); deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; };
             document.body.appendChild(btn);
         });
@@ -493,3 +493,4 @@ Examples of tone and length:
     </script>
 </body>
 </html>
+
