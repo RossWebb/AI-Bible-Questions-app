@@ -37,29 +37,33 @@
         html, body { height: 100%; font-family: Georgia, serif; background: var(--bg); color: var(--text); }
         body { display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; padding: 12px; font-size: 17px; line-height: 1.7; }
 
-        /* === HEADER: FABs FLOAT OVER, NO PUSH === */
+        /* === HEADER WITH BIGGER FABs === */
         .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px;
             position: relative;
-            text-align: center;
-            padding: 16px 48px 8px; /* Space for FABs */
-            line-height: 1.0;
-            min-height: 30px;
         }
         .header h1 {
+            flex: 1;
+            text-align: center;
             color: var(--primary);
             font-family: Arial, sans-serif;
             font-size: 1.8em;
+			line-height: .5;
             margin: 0;
+            padding: 20px 2px 0 0; /* Space for 48px FAB + margin */
         }
         .fab {
             position: absolute;
             top: 16px;
-            width: 40px;
-            height: 40px;
+            width: 48px;      /* BIGGER */
+            height: 48px;     /* BIGGER */
             border-radius: 50%;
             background: var(--card);
             border: 1px solid var(--border);
-            box-shadow: 0 2px 6px var(--shadow);
+            box-shadow: 0 3px 8px var(--shadow);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -67,17 +71,16 @@
             transition: transform 0.2s, box-shadow 0.2s;
             z-index: 10;
         }
-        .fab:hover { transform: scale(1.1); box-shadow: 0 4px 10px var(--shadow); }
-        .fab svg { width: 20px; height: 20px; fill: var(--primary); }
-        #shareFab { left: 12px; }
-        #darkFab { right: 12px; }
-
-        .subtitle { 
-            font-style: italic; 
-            color: #5d6d7e; 
-            margin: 4px 0 16px; 
-            font-size: 1em; 
+        .fab:hover { transform: scale(1.1); box-shadow: 0 5px 12px var(--shadow); }
+        .fab svg { 
+            width: 28px;   /* BIGGER ICON */
+            height: 28px;  /* BIGGER ICON */
+            fill: var(--primary); 
         }
+        #shareFab { left: 8px; }
+        #darkFab { right: 8px; }
+
+        .subtitle { text-align: center; font-style: italic; color: #5d6d7e; margin: 2px 0 16px; font-size: 1em; }
 
         .card-wrapper { flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 8px 0; }
         .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 6px 20px var(--shadow); border: 1px solid var(--border); }
@@ -127,6 +130,24 @@
         #explainMoreBtn { background: var(--accent); color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: normal; }
         #answerContent { line-height: 1.8; }
 
+        #answerContent h2 {
+            font-size: 1.5em; color: var(--primary); margin: 1.2em 0 0.4em; 
+            border-bottom: 2px solid var(--accent); padding-bottom: 6px;
+        }
+        #answerContent h3 {
+            font-size: 1.25em; color: var(--primary); margin: 0.2em 0 0.4em; font-weight: 600;
+        }
+        #answerContent strong {
+            display: block; margin: 0.8rem 0 0.3rem; color: var(--primary); font-weight: 600; font-style: normal;
+        }
+        #answerContent em {
+            display: block; margin: 0 0 1rem; font-style: italic; color: var(--text); padding-left: 1.2rem; position: relative;
+        }
+        #answerContent em::before { content: '“'; color: var(--accent); font-weight: bold; position: absolute; left: 0; }
+        #answerContent em::after { content: '”'; color: var(--accent); font-weight: bold; }
+        #answerContent ul { margin: 0.5rem 0 1rem; padding-left: 1.2rem; list-style: disc; }
+        #answerContent li { margin: 0.3rem 0; }
+
         #welcomeVerse {
             text-align: center;
             background: var(--card);
@@ -134,6 +155,10 @@
             border-radius: 12px;
             display: none;
         }
+        #welcomeVerse strong { display: block; color: var(--primary); margin-bottom: 0.4rem; }
+        #welcomeVerse em { display: block; margin: 0 0 1.2rem; padding-left: 1.2rem; position: relative; }
+        #welcomeVerse em::before { content: '“'; color: var(--accent); left: 0; }
+        #welcomeVerse em::after { content: '”'; color: var(--accent); }
 
         #historyModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
         #historyModal > div { background: var(--card); padding: 20px; border-radius: 16px; max-width: 90%; max-height: 80%; overflow-y: auto; box-shadow: 0 10px 30px var(--shadow); position: relative; }
@@ -148,11 +173,13 @@
             flex-shrink: 0;
         }
 
+        .error { background: #fdf2f2; border: 1px solid var(--danger); color: #c0392b; padding: 14px; border-radius: 8px; text-align: center; font-weight: bold; }
+
         @media (max-width: 480px) {
             body { padding: 8px; }
-            .header h1 { font-size: 1.5em; }
-            .fab { width: 36px; height: 36px; top: 12px; }
-            .fab svg { width: 18px; height: 18px; }
+            .header h1 { font-size: 1.5em; padding: 0 48px; }
+            .fab { width: 44px; height: 44px; top: 12px; }
+            .fab svg { width: 26px; height: 26px; }
             .header { padding: 12px 44px 6px; }
             textarea { font-size: 15px; min-height: 80px; }
             button { font-size: 13px; padding: 10px; }
@@ -162,8 +189,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-
-    <!-- FLOATING FABs — NO PUSH -->
+    <!-- HEADER WITH BIGGER FABs -->
     <div class="header">
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
@@ -171,13 +197,14 @@
         <h1>Baebol Kwestin</h1>
         <button id="darkFab" class="fab" title="Dark Mode">
             <svg id="sunIcon" viewBox="0 0 24 24" style="display:block;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c.39-.39.39-1.02 0-1.41z"/></svg>
-            <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5.39 0 .74.15 1.01.39.26.23.61.38.99.38.83 0 1.5-.67 1.5-1.5 0-4.97-4.03-9-9-9z"/></svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;">
+                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16.5c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z" fill="currentColor"/>
+            </svg>
         </button>
     </div>
 
     <p class="subtitle">Askem eni kwestin long Baebol</p>
 
-    <!-- [REST OF PAGE UNCHANGED - CARD, FORM, ANSWER, etc.] -->
     <div class="card-wrapper">
         <div class="card">
             <form id="queryForm">
@@ -221,7 +248,7 @@
     </footer>
 
     <script>
-        // === ONE INSTALL BUTTON ONLY ===
+        // === INSTALL PROMPT ===
         let deferredPrompt = null;
         let installBtn = null;
 
@@ -246,7 +273,7 @@
             document.body.appendChild(installBtn);
         });
 
-        // === [ALL JS BELOW IS UNCHANGED FROM LAST WORKING VERSION] ===
+        // === API KEYS ===
         const ENCODED_OR_KEY = "c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==";
         const OR_KEY = atob(ENCODED_OR_KEY);
 
@@ -274,9 +301,227 @@
 
         let currentQuestion = '';
 
-        const systemPrompt = `You are a kind Bible teacher in Vanuatu...`; // [full prompt unchanged]
+        const systemPrompt = `You are a kind Bible teacher in Vanuatu. 
+Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
 
-        // [ALL OTHER JS FUNCTIONS: callAI, submit, random, history, etc. — same as before]
+Answers will be shaped by REFORMED theology.
+These truths should not be contradicted. They don't have to be in every answer:
+- God made everything and rules over all. He is the boss!
+- Every person sins and needs forgiveness
+- Jesus, God’s Son, died on the cross to take our punishment
+- He rose from death to give us new life
+- We are saved by trusting Jesus alone — not by good works
+- The Holy Spirit helps us obey God and love others
+- The Bible is God’s true Word
+- One day Jesus will return to judge everyone
+- Those who trust Him go to heaven; those who reject Him face hell
+
+**FORMAT EXACTLY LIKE THIS:**
+
+## Main Idea Here
+
+### Step 1: Do This
+- Use bullet points
+- Keep steps short
+
+### Step 2: Remember This
+**John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
+
+**Romans 5:8** *"But God has shown us how much he loves us—it was while we were still sinners that Christ died for us!"*
+
+**Ephesians 2:8-9** *"For it is by God's grace that you have been saved through faith. It is not the result of your own efforts, but God's gift, so that no one can boast about it."*
+
+End with one short sentence of hope or encouragement.
+
+Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
+
+        async function callAI(q, isContinue = false) {
+            const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OR_KEY}` },
+                body: JSON.stringify({
+                    model: 'openrouter/auto',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: isContinue ? `${q}\n\nContinue from where you stopped. Do not repeat.` : q }
+                    ],
+                    max_tokens: isContinue ? 1500 : 1000,
+                    temperature: 0.7
+                })
+            });
+            if (!res.ok) throw new Error(`AI error: ${res.status}`);
+            const data = await res.json();
+            return data.choices[0].message.content;
+        }
+
+        // === SUBMIT ===
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            const q = questionInput.value.trim();
+            if (!q) return alert('Yu no raetem wan kwestin yet!');
+            currentQuestion = q;
+
+            loading.style.display = 'block';
+            loading.textContent = 'Mi stap tingbaot...';
+            answerDiv.style.display = 'none';
+            answerHeader.style.display = 'none';
+            answerContent.innerHTML = '';
+            welcomeVerse.style.display = 'none';
+
+            try {
+                let text = await callAI(q);
+                const wordCount = text.split(/\s+/).length;
+                if (wordCount < 120 || !/[.!?]\s*$/.test(text.trim())) {
+                    loading.textContent = 'Mi stap wok yet...';
+                    text += '\n\n' + (await callAI(q, true));
+                }
+                answerContent.innerHTML = marked.parse(text);
+                answerHeader.style.display = 'flex';
+                answerDiv.style.display = 'block';
+                saveAnswer(q, answerContent.innerHTML);
+            } catch (err) {
+                answerContent.innerHTML = `<div class="error">${err.message}</div>`;
+                answerDiv.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+
+        explainMoreBtn.onclick = async () => {
+            loading.style.display = 'block';
+            loading.textContent = 'Mi stap pulum ansa longfala...';
+            try {
+                const long = await callAI(currentQuestion + "\n\nGive a FULL, DETAILED answer. Up to 1200 words. Cite 5+ TEV verses. DO NOT summarize.");
+                answerContent.innerHTML = marked.parse(long);
+                saveAnswer(currentQuestion, answerContent.innerHTML);
+            } catch {
+                answerContent.innerHTML += `<p style="color:var(--danger);margin-top:12px;font-weight:bold;">Sori, mi no save talem moa.</p>`;
+            } finally {
+                loading.style.display = 'none';
+            }
+        };
+
+        // === RANDOM QUESTIONS (with fallback) ===
+        randomBtn.onclick = async () => {
+            randomBtn.textContent = 'Mi stap tingting...';
+            randomDiv.innerHTML = '<p style="color:#7f8c8d;font-size:0.9em;">Mi stap lukaotem kuestin...</p>';
+            randomDiv.style.display = 'block';
+
+            const prompt = `Generate EXACTLY 5 Bible questions in simple English for a 13-year-old. 
+One question should relate to village/island life (e.g. spirits, storms, family, fishing).
+Use ONLY this format — no extra text:
+1. Question one?
+2. Question two?
+3. Question three?
+4. Question four?
+5. Question five?`;
+
+            try {
+                const text = await callAI(prompt);
+                const lines = text.match(/\d+\.\s*.+\?/g) || [];
+                randomDiv.innerHTML = '';
+                if (lines.length >= 3) {
+                    lines.slice(0, 5).forEach(line => {
+                        const q = line.replace(/^\d+\.\s*/,'').trim();
+                        if (!q) return;
+                        const btn = document.createElement('button');
+                        btn.className = 'random-q-btn';
+                        btn.textContent = q;
+                        btn.onclick = () => {
+                            questionInput.value = q;
+                            questionInput.dispatchEvent(new Event('input'));
+                            randomDiv.innerHTML = ''; 
+                            randomDiv.style.display = 'none';
+                            randomBtn.textContent = 'Givim Kwestin';
+                            form.dispatchEvent(new Event('submit'));
+                        };
+                        randomDiv.appendChild(btn);
+                    });
+                } else throw new Error("Not enough questions");
+            } catch (err) {
+                randomDiv.innerHTML = '';
+                const fallback = [
+                    "From wanem Jisas i mas ded long kros?",
+                    "Hao mi save talem ol man long Baebol?",
+                    "Wanem mi save mekem bae mi no lus laef?",
+                    "Bae mi save talem Jisas long ol man we oli no wantem hem?",
+                    "From wanem Baebol i talem se God i lovem mi?"
+                ];
+                fallback.forEach(q => {
+                    const btn = document.createElement('button');
+                    btn.className = 'random-q-btn';
+                    btn.textContent = q;
+                    btn.onclick = () => {
+                        questionInput.value = q;
+                        questionInput.dispatchEvent(new Event('input'));
+                        randomDiv.innerHTML = ''; 
+                        randomDiv.style.display = 'none';
+                        randomBtn.textContent = 'Givim Kwestin';
+                        form.dispatchEvent(new Event('submit'));
+                    };
+                    randomDiv.appendChild(btn);
+                });
+                randomDiv.innerHTML += '<p style="font-size:0.8em;color:#7f8c8d;">(Mi yusum ol kuestin we mi save.)</p>';
+            } finally {
+                randomBtn.textContent = 'Givim Kwestin';
+            }
+        };
+
+        // === INPUT & HISTORY ===
+        questionInput.addEventListener('input', () => {
+            clearBtn.style.display = questionInput.value ? 'flex' : 'none';
+        });
+        clearBtn.onclick = () => { questionInput.value = ''; clearBtn.style.display = 'none'; questionInput.focus(); };
+
+        const history = JSON.parse(localStorage.getItem('bibleHistory') || '[]');
+        function saveAnswer(q, a) {
+            history.unshift({ q, a, date: new Date().toLocaleString('en-GB') });
+            if (history.length > 50) history.pop();
+            localStorage.setItem('bibleHistory', JSON.stringify(history));
+            updateHistoryBtn();
+        }
+        function updateHistoryBtn() {
+            const cnt = history.length;
+            showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
+            document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
+        }
+        showHistoryBtn.onclick = () => {
+            historyList.innerHTML = '';
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
+                div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary);">${item.q}</p>
+                                 <p style="margin:4px 0 8px;font-size:0.9em;color:#7f8c8d;">${item.date}</p>
+                                 <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
+                div.onclick = () => {
+                    questionInput.value = item.q;
+                    questionInput.dispatchEvent(new Event('input'));
+                    answerContent.innerHTML = item.a;
+                    answerHeader.style.display = 'flex';
+                    answerDiv.style.display = 'block';
+                    welcomeVerse.style.display = 'none';
+                    historyModal.style.display = 'none';
+                };
+                historyList.appendChild(div);
+            });
+            historyModal.style.display = 'flex';
+        };
+        closeHistoryBtn.onclick = () => historyModal.style.display = 'none';
+        historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
+
+        // === WELCOME VERSE ===
+        function showWelcome() {
+            const dailyVerses = [
+                { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
+                { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
+                { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
+            ];
+            const v = dailyVerses[new Date().getDate() % dailyVerses.length];
+            welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
+                <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
+                Tajem blong askem kwestin...</p>`;
+            welcomeVerse.style.display = 'block';
+        }
 
         // === FAB ACTIONS ===
         shareFab.onclick = async () => {
@@ -289,24 +534,11 @@
         darkFab.onclick = () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
-            sunIcon.style.display = isDark ? 'none' : 'block';
-            moonIcon.style.display = isDark ? 'block' : 'none';
+            sunIcon.style.display = isDark ? 'block' : 'none';
+            moonIcon.style.display = isDark ? 'none' : 'block';
         };
 
         // === INIT ===
-        function showWelcome() {
-            const dailyVerses = [ /* ... */ ];
-            const v = dailyVerses[new Date().getDate() % dailyVerses.length];
-            welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
-                <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
-                Tajem blong askem kwestin...</p>`;
-            welcomeVerse.style.display = 'block';
-        }
-
-        const history = JSON.parse(localStorage.getItem('bibleHistory') || '[]');
-        function saveAnswer(q, a) { /* ... */ }
-        function updateHistoryBtn() { /* ... */ }
-
         showWelcome();
         updateHistoryBtn();
         if ('serviceWorker' in navigator) {
@@ -315,4 +547,3 @@
     </script>
 </body>
 </html>
-
