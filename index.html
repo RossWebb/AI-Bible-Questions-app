@@ -32,12 +32,13 @@
 
         h1, .subtitle {
             text-align: center;
-            margin: 3px;
+            margin: 0px;
             padding: 0;
             line-height: 1.1;
         }
         h1 {
             color: #1a5276;
+			margin: 4px;
             font-family: 'Arial', sans-serif;
             font-size: 1.8em;
         }
@@ -441,23 +442,49 @@
     </footer>
 
     <script>
-        // === INSTALL BANNER ===
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const installBtn = document.createElement('button');
-            installBtn.textContent = 'Install Baebol Kwestin';
-            installBtn.style.cssText = 'position:fixed; bottom:40%; left:50%; transform:translateX(-50%); background:#D30000; color:white; padding:12px 24px; border:none; border-radius:12px; font-weight:bold; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.2); opacity:0; transition:opacity 0.3s;';
-            installBtn.onclick = async () => {
-                installBtn.style.display = 'none';
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-            };
-            document.body.appendChild(installBtn);
-            setTimeout(() => installBtn.style.opacity = '1', 100);
-        });
+		// === INSTALL BANNER (FLASHING) ===
+		let deferredPrompt;
+		window.addEventListener('beforeinstallprompt', (e) => {
+		    e.preventDefault();
+		    deferredPrompt = e;
+		    const installBtn = document.createElement('button');
+		    installBtn.textContent = 'Install Baebol Kwestin';
+		    installBtn.style.cssText = `
+		        position:fixed;
+		        bottom:40%;
+		        left:50%;
+		        transform:translateX(-50%);
+		        background:#D30000;
+		        color:white;
+		        padding:12px 24px;
+		        border:none;
+		        border-radius:12px;
+		        font-weight:bold;
+		        z-index:1000;
+		        box-shadow:0 4px 12px rgba(0,0,0,0.2);
+		        opacity:0;
+		        transition:opacity 0.3s;
+		        animation: flash 1.5s infinite;
+		    `;
+		    installBtn.onclick = async () => {
+		        installBtn.style.display = 'none';
+		        deferredPrompt.prompt();
+		        const { outcome } = await deferredPrompt.userChoice;
+		        deferredPrompt = null;
+		    };
+		    document.body.appendChild(installBtn);
+		    setTimeout(() => installBtn.style.opacity = '1', 100);
+		
+		    // Add flashing animation
+		    const style = document.createElement('style');
+		    style.textContent = `
+		        @keyframes flash {
+		            0%, 100% { background:#D30000; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+		            50% { background:#FF3333; box-shadow:0 6px 20px rgba(255,0,0,0.4); }
+		        }
+		    `;
+		    document.head.appendChild(style);
+		});
 
         // === YOUR API KEY (ENCODED) ===
 		// Proper key encoded first at https://www.base64encode.org/ and the pasted below
@@ -905,6 +932,7 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
 
 
 
