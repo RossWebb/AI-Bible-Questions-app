@@ -48,24 +48,29 @@
             font-style: italic;
         }
 
-        .card-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
-            gap: 16px;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            border: 1px solid #d6eaf8;
-            width: 100%;
-            max-width: 600px;
-        }
+		.card-wrapper {
+		    flex: 1;
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    padding: 20px 0;
+		    gap: 16px;
+		}
+		
+		.container {
+		    background: white;
+		    padding: 20px;
+		    border-radius: 16px;
+		    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+		    border: 1px solid #d6eaf8;
+		    width: 100%;
+		    max-width: 600px;
+		}
+		
+		#historyBtn {
+		    margin-top: 0;
+		    text-align: center;
+		}
 
         label {
             display: block;
@@ -367,21 +372,31 @@
     <p class="subtitle">Askem eni kwestin long Baebol</p>
 
     <div class="card-wrapper">
-        <div class="container">
-            <form id="queryForm" novalidate>
-                <label for="question">Raetem kwestin blong yu:</label>
-                <div class="textarea-wrapper">
-                    <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
-                    <button type="button" id="clearBtn">x</button>
-                </div>
-                <div class="button-row">
-                    <button type="submit" id="askBtn">Askem Baebol</button>
-                    <button type="button" id="randomBtn">Givim Kwestin</button>
-                </div>
-                <div id="randomQuestions"></div>
-            </form>
-            <div id="loading">Mi stap tingbaot... Wet smol.</div>
+<div class="container">
+    <form id="queryForm">
+        <label for="question">Raetem kwestin blong yu:</label>
+        <div class="textarea-wrapper">
+            <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
+            <button type="button" id="clearBtn">x</button>
         </div>
+
+        <!-- Two main buttons -->
+        <div class="button-row">
+            <button type="submit" id="askBtn">Askem Baebol</button>
+            <button type="button" id="randomBtn">Givim Kwestin</button>
+        </div>
+
+        <!-- History button — now right below the two buttons -->
+        <div id="historyBtn">
+            <button type="button" id="showHistoryBtn">Ol kwestin we yu askem finis (0)</button>
+        </div>
+
+        <!-- Random questions appear here -->
+        <div id="randomQuestions"></div>
+    </form>
+
+    <div id="loading">Mi stap tingbaot... Wet smol.</div>
+</div>
 
         <div id="answer">
             <div id="answerHeader">
@@ -872,6 +887,7 @@ ${answerContent.innerText}`;
     </script>
 </body>
 </html>
+
 
 
 
