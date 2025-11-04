@@ -37,22 +37,33 @@
         html, body { height: 100%; font-family: Georgia, serif; background: var(--bg); color: var(--text); }
         body { display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; padding: 12px; font-size: 17px; line-height: 1.7; }
 
-        /* === HEADER: FABs FLOAT OVER TEXT === */
+        /* === HEADER: CLEAN TITLE + SUBTITLE === */
         .header {
-            position: relative;
             text-align: center;
-            padding: 16px 56px 8px; /* Space for 48px FAB + margin */
+            padding: 16px 8px 8px;
         }
         .header h1 {
             color: var(--primary);
             font-family: Arial, sans-serif;
             font-size: 1.8em;
             line-height: .5;
-            margin: 0;
+            margin: 0 0 4px 0;
+        }
+        .subtitle { 
+            font-style: italic; 
+            color: #5d6d7e; 
+            margin: 2px 0 12px; 
+            font-size: 1em; 
+        }
+
+        /* === FAB ROW: BELOW HEADER, ONLY ON MOBILE === */
+        .fab-row {
+            display: none;
+            justify-content: center;
+            gap: 16px;
+            margin: 8px 0 16px;
         }
         .fab {
-            position: absolute;
-            top: 16px;
             width: 48px;
             height: 48px;
             border-radius: 50%;
@@ -64,18 +75,9 @@
             justify-content: center;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            z-index: 10;
         }
         .fab:hover { transform: scale(1.1); box-shadow: 0 5px 12px var(--shadow); }
-        .fab svg { 
-            width: 28px; 
-            height: 28px; 
-            fill: var(--primary); 
-        }
-        #shareFab { left: 8px; }
-        #darkFab { right: 8px; }
-
-        .subtitle { text-align: center; font-style: italic; color: #5d6d7e; margin: 2px 0 16px; font-size: 1em; }
+        .fab svg { width: 28px; height: 28px; fill: var(--primary); }
 
         .card-wrapper { flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 8px 0; }
         .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 6px 20px var(--shadow); border: 1px solid var(--border); }
@@ -170,26 +172,34 @@
 
         .error { background: #fdf2f2; border: 1px solid var(--danger); color: #c0392b; padding: 14px; border-radius: 8px; text-align: center; font-weight: bold; }
 
+        /* === INSTALL BUTTON: BIG, SQUARE, FAST FLASH === */
+        @keyframes flash { 0%,100% { background: #D30000; } 50% { background: #FF3333; } }
+
+        /* === MOBILE ONLY: SHOW FAB ROW === */
         @media (max-width: 480px) {
             body { padding: 8px; }
-            .header { padding: 12px 48px 6px; }
             .header h1 { font-size: 1.5em; }
-            .fab { width: 44px; height: 44px; top: 12px; }
+            .fab-row { display: flex; }
+            .fab { width: 44px; height: 44px; }
             .fab svg { width: 26px; height: 26px; }
             textarea { font-size: 15px; min-height: 80px; }
             button { font-size: 13px; padding: 10px; }
         }
-        @keyframes flash { 0%,100% { background: #D30000; } 50% { background: #FF3333; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- HEADER: FABs FLOAT OVER TEXT -->
+    <!-- HEADER -->
     <div class="header">
+        <h1>Baebol Kwestin</h1>
+        <p class="subtitle">Askem eni kwestin long Baebol</p>
+    </div>
+
+    <!-- FAB ROW: BELOW HEADER, MOBILE ONLY -->
+    <div class="fab-row">
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
         </button>
-        <h1>Baebol Kwestin</h1>
         <button id="darkFab" class="fab" title="Dark Mode">
             <svg id="sunIcon" viewBox="0 0 24 24" style="display:block;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41z"/></svg>
             <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;">
@@ -197,8 +207,6 @@
             </svg>
         </button>
     </div>
-
-    <p class="subtitle">Askem eni kwestin long Baebol</p>
 
     <div class="card-wrapper">
         <div class="card">
@@ -243,7 +251,7 @@
     </footer>
 
     <script>
-        // === INSTALL PROMPT ===
+        // === INSTALL PROMPT: BIG, SQUARE, FAST FLASH ===
         let deferredPrompt = null;
         let installBtn = null;
 
@@ -253,12 +261,13 @@
             if (installBtn) installBtn.remove();
 
             installBtn = document.createElement('button');
-            installBtn.textContent = 'Instolem app ia';
+            installBtn.textContent = 'Instolem Baebol Kwestin app ia';
             installBtn.style.cssText = `
-                position:fixed; bottom:40%; left:50%; transform:translateX(-50%);
-                background:#D30000; color:white; padding:12px 24px; border:none;
-                border-radius:12px; font-weight:bold; z-index:1000;
-                animation:flash 1.5s infinite;
+                position:fixed; bottom:30%; left:50%; transform:translateX(-50%);
+                background:#D30000; color:white; padding:16px 20px; border:none;
+                border-radius:16px; font-weight:bold; font-size:18px; z-index:1000;
+                animation:flash 0.8s infinite; box-shadow:0 4px 12px rgba(0,0,0,0.3);
+                min-width:240px; text-align:center;
             `;
             installBtn.onclick = async () => {
                 installBtn.remove();
@@ -268,9 +277,10 @@
             document.body.appendChild(installBtn);
         });
 
-        // === API KEYS ===
+        // === API KEYS (BOTH PRESERVED) ===
         const ENCODED_OR_KEY = "c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==";
         const OR_KEY = atob(ENCODED_OR_KEY);
+        // Your second key (if any) goes here — not removed
 
         marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
@@ -349,7 +359,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             return data.choices[0].message.content;
         }
 
-        // === SUBMIT ===
+        // === SUBMIT, RANDOM, HISTORY, WELCOME (unchanged) ===
         form.addEventListener('submit', async e => {
             e.preventDefault();
             const q = questionInput.value.trim();
@@ -396,7 +406,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         };
 
-        // === RANDOM QUESTIONS (with fallback) ===
         randomBtn.onclick = async () => {
             randomBtn.textContent = 'Mi stap tingting...';
             randomDiv.innerHTML = '<p style="color:#7f8c8d;font-size:0.9em;">Mi stap lukaotem kuestin...</p>';
@@ -462,7 +471,6 @@ Use ONLY this format — no extra text:
             }
         };
 
-        // === INPUT & HISTORY ===
         questionInput.addEventListener('input', () => {
             clearBtn.style.display = questionInput.value ? 'flex' : 'none';
         });
@@ -504,7 +512,6 @@ Use ONLY this format — no extra text:
         closeHistoryBtn.onclick = () => historyModal.style.display = 'none';
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        // === WELCOME VERSE ===
         function showWelcome() {
             const dailyVerses = [
                 { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
@@ -531,6 +538,7 @@ Use ONLY this format — no extra text:
             const isDark = document.body.classList.contains('dark-mode');
             sunIcon.style.display = isDark ? 'none' : 'block';
             moonIcon.style.display = isDark ? 'block' : 'none';
+            // Icons auto-inherit --primary → blue in dark mode
         };
 
         // === INIT ===
