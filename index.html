@@ -9,204 +9,94 @@
     <link rel="apple-touch-icon" href="BibleQ192.png">
     <meta name="theme-color" content="#1a5276">
     <style>
-        :root {
-            --bg: #f8fbff;
-            --card: #ffffff;
-            --text: #2c3e50;
-            --primary: #1a5276;
-            --accent: #3498db;
-            --success: #27ae60;
-            --warning: #e67e22;
-            --danger: #e74c3c;
-            --border: #d6eaf8;
-            --shadow: rgba(0,0,0,0.1);
+        :root{
+            --bg:#f8fbff;--card:#ffffff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;
+            --success:#27ae60;--warning:#e67e22;--danger:#e74c3c;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);
         }
-        .dark-mode {
-            --bg: #1a1a1a;
-            --card: #2d2d2d;
-            --text: #f0f0f0;
-            --primary: #64B5F6;
-            --accent: #4FC3F7;
-            --success: #66BB6A;
-            --warning: #FF8A65;
-            --danger: #EF5350;
-            --border: #444;
-            --shadow: rgba(0,0,0,0.3);
+        .dark-mode{
+            --bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;
+            --success:#66BB6A;--warning:#FF8A65;--danger:#EF5350;--border:#444;--shadow:rgba(0,0,0,0.3);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; font-family: Georgia, serif; background: var(--bg); color: var(--text); }
-        body { display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; padding: 12px; font-size: 17px; line-height: 1.7; }
-
-        /* === HEADER: CLEAN TITLE + SUBTITLE === */
-        .header {
-            text-align: center;
-            padding: 16px 8px 8px;
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{height:100%;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
+        body{display:flex;flex-direction:column;max-width:800px;margin:0 auto;padding:12px;font-size:17px;line-height:1.7}
+        .header{position:relative;text-align:center;padding:16px 56px 8px}
+        .header h1{color:var(--primary);font-family:Arial,sans-serif;font-size:1.8em;line-height:.5;margin:0}
+        .fab{position:absolute;top:16px;width:48px;height:48px;border-radius:50%;background:var(--card);
+            border:1px solid var(--border);box-shadow:0 3px 8px var(--shadow);display:flex;align-items:center;
+            justify-content:center;cursor:pointer;transition:transform .2s,box-shadow .2s;z-index:10}
+        .fab:hover{transform:scale(1.1);box-shadow:0 5px 12px var(--shadow)}
+        .fab svg{width:28px;height:28px;fill:var(--primary)}
+        #shareFab{left:8px}#darkFab{right:8px}
+        .subtitle{text-align:center;font-style:italic;color:#5d6d7e;margin:2px 0 16px;font-size:1em}
+        .card-wrapper{flex:1;display:flex;flex-direction:column;gap:16px;padding:8px 0}
+        .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 6px 20px var(--shadow);border:1px solid var(--border)}
+        label{display:block;font-weight:bold;color:var(--primary);margin-bottom:8px;font-size:1.1em}
+        .input-wrapper{position:relative}
+        textarea{width:100%;padding:12px 36px 12px 12px;border:1px solid #aed6f1;border-radius:10px;
+            font-size:16px;min-height:90px;resize:vertical;font-family:inherit}
+        .clear-circle{position:absolute;background:var(--danger);color:white;border:none;width:20px;height:20px;
+            border-radius:50%;font-size:13px;font-weight:bold;cursor:pointer;display:flex;align-items:center;
+            justify-content:center;padding:0;line-height:1}
+        #clearBtn{top:6px;right:6px;display:none}#closeHistoryBtn{top:8px;right:8px}
+        .btn-row{display:flex;gap:10px;margin-top:8px}
+        button{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:bold;
+            cursor:pointer;transition:.2s;box-shadow:0 3px 6px var(--shadow)}
+        #askBtn{background:#2980b9;color:white}#askBtn:hover{background:#1a5276}
+        #randomBtn{background:#9b59b6;color:white}#randomBtn:hover{background:#8e44ad}
+        #randomQuestions{margin-top:12px;display:none;text-align:center}
+        .random-q-btn{display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
+            padding:14px;border-radius:12px;font-size:15px;text-align:left;cursor:pointer;
+            box-shadow:0 3px 8px var(--shadow);transition:.2s;font-weight:500}
+        .random-q-btn:hover{background:#2980b9;transform:translateY(-2px);box-shadow:0 5px 12px var(--shadow)}
+        #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);
+            max-height:60vh;overflow-y:auto;display:none}
+        #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
+        #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:normal}
+        #answerContent{line-height:1.8}
+        #answerContent h2{font-size:1.5em;color:var(--primary);margin:1.2em 0 .4em;border-bottom:2px solid var(--accent);padding-bottom:6px}
+        #answerContent h3{font-size:1.25em;color:var(--primary);margin:.2em 0 .4em;font-weight:600}
+        #answerContent strong{display:block;margin:.8rem 0 .3rem;color:var(--primary);font-weight:600;font-style:normal}
+        #answerContent em{display:block;margin:0 0 1rem;font-style:italic;color:var(--text);padding-left:1.2rem;position:relative}
+        #answerContent em::before{content:'“';color:var(--accent);font-weight:bold;position:absolute;left:0}
+        #answerContent em::after{content:'”';color:var(--accent);font-weight:bold}
+        #answerContent ul{margin:.5rem 0 1rem;padding-left:1.2rem;list-style:disc}
+        #answerContent li{margin:.3rem 0}
+        #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:none}
+        #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
+        #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:1.2rem;position:relative}
+        #welcomeVerse em::before{content:'“';color:var(--accent);left:0}
+        #welcomeVerse em::after{content:'”';color:var(--accent)}
+        #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);
+            z-index:100;justify-content:center;align-items:center}
+        #historyModal>div{background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;
+            overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative}
+        .footer{text-align:center;color:#95a5a6;font-size:.85em;padding:12px 0;background:var(--card);
+            border-top:1px solid var(--border);flex-shrink:0}
+        .error{background:#fdf2f2;border:1px solid var(--danger);color:#c0392b;padding:14px;border-radius:8px;
+            text-align:center;font-weight:bold}
+        @media(max-width:480px){
+            body{padding:8px}.header{padding:12px 48px 6px}.header h1{font-size:1.5em}
+            .fab{width:44px;height:44px;top:12px}.fab svg{width:26px;height:26px}
+            textarea{font-size:15px;min-height:80px}button{font-size:13px;padding:10px}
         }
-        .header h1 {
-            color: var(--primary);
-            font-family: Arial, sans-serif;
-            font-size: 1.8em;
-            line-height: .5;
-            margin: 0 0 4px 0;
-        }
-        .subtitle { 
-            font-style: italic; 
-            color: #5d6d7e; 
-            margin: 2px 0 12px; 
-            font-size: 1em; 
-        }
-
-        /* === FAB ROW: BELOW HEADER, ONLY ON MOBILE === */
-        .fab-row {
-            display: none;
-            justify-content: center;
-            gap: 16px;
-            margin: 8px 0 16px;
-        }
-        .fab {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--card);
-            border: 1px solid var(--border);
-            box-shadow: 0 3px 8px var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .fab:hover { transform: scale(1.1); box-shadow: 0 5px 12px var(--shadow); }
-        .fab svg { width: 28px; height: 28px; fill: var(--primary); }
-
-        .card-wrapper { flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 8px 0; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 6px 20px var(--shadow); border: 1px solid var(--border); }
-        label { display: block; font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 1.1em; }
-        .input-wrapper { position: relative; }
-        textarea { width: 100%; padding: 12px 36px 12px 12px; border: 1px solid #aed6f1; border-radius: 10px; font-size: 16px; min-height: 90px; resize: vertical; font-family: inherit; }
-
-        .clear-circle {
-            position: absolute;
-            background: var(--danger);
-            color: white;
-            border: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            line-height: 1;
-        }
-        #clearBtn { top: 6px; right: 6px; display: none; }
-        #closeHistoryBtn { top: 8px; right: 8px; }
-
-        .btn-row { display: flex; gap: 10px; margin-top: 8px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 6px var(--shadow); }
-        #askBtn { background: #2980b9; color: white; } #askBtn:hover { background: #1a5276; }
-        #randomBtn { background: #9b59b6; color: white; } #randomBtn:hover { background: #8e44ad; }
-        #randomQuestions { margin-top: 12px; display: none; text-align: center; }
-        .random-q-btn { display: block; width: 100%; margin: 6px 0; background: var(--warning); color: white; padding: 10px; border-radius: 8px; }
-        .random-q-btn:hover { background: #d35400; }
-        #loading { text-align: center; color: #7f8c8d; font-style: italic; margin: 16px 0; display: none; }
-
-        #answer {
-            background: var(--card);
-            padding: 18px;
-            border-radius: 12px;
-            border-left: 5px solid var(--accent);
-            max-height: 60vh;
-            overflow-y: auto;
-            display: none;
-        }
-        #answerHeader { display: none; justify-content: flex-end; margin-bottom: 8px; }
-        #explainMoreBtn { background: var(--accent); color: white; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: normal; }
-        #answerContent { line-height: 1.8; }
-
-        #answerContent h2 {
-            font-size: 1.5em; color: var(--primary); margin: 1.2em 0 0.4em; 
-            border-bottom: 2px solid var(--accent); padding-bottom: 6px;
-        }
-        #answerContent h3 {
-            font-size: 1.25em; color: var(--primary); margin: 0.2em 0 0.4em; font-weight: 600;
-        }
-        #answerContent strong {
-            display: block; margin: 0.8rem 0 0.3rem; color: var(--primary); font-weight: 600; font-style: normal;
-        }
-        #answerContent em {
-            display: block; margin: 0 0 1rem; font-style: italic; color: var(--text); padding-left: 1.2rem; position: relative;
-        }
-        #answerContent em::before { content: '“'; color: var(--accent); font-weight: bold; position: absolute; left: 0; }
-        #answerContent em::after { content: '”'; color: var(--accent); font-weight: bold; }
-        #answerContent ul { margin: 0.5rem 0 1rem; padding-left: 1.2rem; list-style: disc; }
-        #answerContent li { margin: 0.3rem 0; }
-
-        #welcomeVerse {
-            text-align: center;
-            background: var(--card);
-            padding: 18px;
-            border-radius: 12px;
-            display: none;
-        }
-        #welcomeVerse strong { display: block; color: var(--primary); margin-bottom: 0.4rem; }
-        #welcomeVerse em { display: block; margin: 0 0 1.2rem; padding-left: 1.2rem; position: relative; }
-        #welcomeVerse em::before { content: '“'; color: var(--accent); left: 0; }
-        #welcomeVerse em::after { content: '”'; color: var(--accent); }
-
-        #historyModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100; justify-content: center; align-items: center; }
-        #historyModal > div { background: var(--card); padding: 20px; border-radius: 16px; max-width: 90%; max-height: 80%; overflow-y: auto; box-shadow: 0 10px 30px var(--shadow); position: relative; }
-
-        .footer {
-            text-align: center;
-            color: #95a5a6;
-            font-size: 0.85em;
-            padding: 12px 0;
-            background: var(--card);
-            border-top: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .error { background: #fdf2f2; border: 1px solid var(--danger); color: #c0392b; padding: 14px; border-radius: 8px; text-align: center; font-weight: bold; }
-
-        /* === INSTALL BUTTON: BIG, SQUARE, FAST FLASH === */
-        @keyframes flash { 0%,100% { background: #D30000; } 50% { background: #FF3333; } }
-
-        /* === MOBILE ONLY: SHOW FAB ROW === */
-        @media (max-width: 480px) {
-            body { padding: 8px; }
-            .header h1 { font-size: 1.5em; }
-            .fab-row { display: flex; }
-            .fab { width: 44px; height: 44px; }
-            .fab svg { width: 26px; height: 26px; }
-            textarea { font-size: 15px; min-height: 80px; }
-            button { font-size: 13px; padding: 10px; }
-        }
+        @keyframes flash{0%,100%{background:#D30000}50%{background:#FF3333}}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-    <!-- HEADER -->
     <div class="header">
-        <h1>Baebol Kwestin</h1>
-        <p class="subtitle">Askem eni kwestin long Baebol</p>
-    </div>
-
-    <!-- FAB ROW: BELOW HEADER, MOBILE ONLY -->
-    <div class="fab-row">
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
         </button>
+        <h1>Baebol Kwestin</h1>
         <button id="darkFab" class="fab" title="Dark Mode">
             <svg id="sunIcon" viewBox="0 0 24 24" style="display:block;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41z"/></svg>
-            <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;">
-                <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16.5c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z" fill="currentColor"/>
-            </svg>
+            <svg id="moonIcon" viewBox="0 0 24 24" style="display:none;"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9zm0 16.5c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z"/></svg>
         </button>
     </div>
+
+    <p class="subtitle">Askem eni kwestin long Baebol</p>
 
     <div class="card-wrapper">
         <div class="card">
@@ -225,7 +115,6 @@
                 </div>
                 <div id="randomQuestions"></div>
             </form>
-            <div id="loading">Mi stap tingbaot... Wet smol.</div>
         </div>
 
         <div id="answer">
@@ -251,83 +140,72 @@
     </footer>
 
     <script>
-        // === INSTALL PROMPT: BIG, SQUARE, FAST FLASH ===
-        let deferredPrompt = null;
-        let installBtn = null;
-
-        window.addEventListener('beforeinstallprompt', e => {
-            e.preventDefault();
-            deferredPrompt = e;
-            if (installBtn) installBtn.remove();
-
-            installBtn = document.createElement('button');
-            installBtn.textContent = 'Instolem Baebol Kwestin app ia';
-            installBtn.style.cssText = `
-                position:fixed; bottom:30%; left:50%; transform:translateX(-50%);
-                background:#D30000; color:white; padding:16px 20px; border:none;
-                border-radius:16px; font-weight:bold; font-size:18px; z-index:1000;
-                animation:flash 0.8s infinite; box-shadow:0 4px 12px rgba(0,0,0,0.3);
-                min-width:240px; text-align:center;
-            `;
-            installBtn.onclick = async () => {
-                installBtn.remove();
-                deferredPrompt.prompt();
-                deferredPrompt = null;
-            };
+        // === INSTALL PROMPT ===
+        let deferredPrompt=null,installBtn=null;
+        window.addEventListener('beforeinstallprompt',e=>{
+            e.preventDefault();deferredPrompt=e;
+            if(installBtn)installBtn.remove();
+            installBtn=document.createElement('button');
+            installBtn.textContent='Instolem Baebol Kwestin app ia';
+            installBtn.style.cssText=`
+                position:fixed;bottom:30%;left:50%;transform:translateX(-50%);
+                background:#D30000;color:white;padding:16px 20px;border:none;
+                border-radius:16px;font-weight:bold;font-size:18px;z-index:1000;
+                animation:flash .8s infinite;box-shadow:0 4px 12px rgba(0,0,0,.3);
+                min-width:240px;text-align:center`;
+            installBtn.onclick=()=>{installBtn.remove();deferredPrompt.prompt();deferredPrompt=null;};
             document.body.appendChild(installBtn);
         });
 
-        // === API KEYS (BOTH PRESERVED) ===
-        const ENCODED_OR_KEY = "c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==";
-        const OR_KEY = atob(ENCODED_OR_KEY);
-        // Your second key (if any) goes here — not removed
+        // === KEYS (base64 → atob) ===
+        const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
+        const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ=="); // ← your OpenRouter key
 
-        marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+        marked.setOptions({gfm:true,breaks:false,sanitize:false,headerIds:false});
 
-        const form = document.getElementById('queryForm');
-        const questionInput = document.getElementById('question');
-        const loading = document.getElementById('loading');
-        const answerDiv = document.getElementById('answer');
-        const answerHeader = document.getElementById('answerHeader');
-        const answerContent = document.getElementById('answerContent');
-        const explainMoreBtn = document.getElementById('explainMoreBtn');
-        const randomBtn = document.getElementById('randomBtn');
-        const randomDiv = document.getElementById('randomQuestions');
-        const clearBtn = document.getElementById('clearBtn');
-        const showHistoryBtn = document.getElementById('showHistoryBtn');
-        const historyModal = document.getElementById('historyModal');
-        const historyList = document.getElementById('historyList');
-        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-        const welcomeVerse = document.getElementById('welcomeVerse');
-        const shareFab = document.getElementById('shareFab');
-        const darkFab = document.getElementById('darkFab');
-        const sunIcon = document.getElementById('sunIcon');
-        const moonIcon = document.getElementById('moonIcon');
+        const form=document.getElementById('queryForm'),
+              questionInput=document.getElementById('question'),
+              askBtn=document.getElementById('askBtn'),
+              randomBtn=document.getElementById('randomBtn'),
+              answerDiv=document.getElementById('answer'),
+              answerHeader=document.getElementById('answerHeader'),
+              answerContent=document.getElementById('answerContent'),
+              explainMoreBtn=document.getElementById('explainMoreBtn'),
+              randomDiv=document.getElementById('randomQuestions'),
+              clearBtn=document.getElementById('clearBtn'),
+              showHistoryBtn=document.getElementById('showHistoryBtn'),
+              historyModal=document.getElementById('historyModal'),
+              historyList=document.getElementById('historyList'),
+              closeHistoryBtn=document.getElementById('closeHistoryBtn'),
+              welcomeVerse=document.getElementById('welcomeVerse'),
+              shareFab=document.getElementById('shareFab'),
+              darkFab=document.getElementById('darkFab'),
+              sunIcon=document.getElementById('sunIcon'),
+              moonIcon=document.getElementById('moonIcon');
 
-        let currentQuestion = '';
+        let currentQuestion='';
 
-        const systemPrompt = `You are a kind Bible teacher in Vanuatu. 
+        // === SYSTEM PROMPT ===
+        const systemPrompt=`You are a kind Bible teacher in Vanuatu. 
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
 
-Answers will be shaped by REFORMED theology.
-These truths should not be contradicted. They don't have to be in every answer:
-- God made everything and rules over all. He is the boss!
-- Every person sins and needs forgiveness
-- Jesus, God’s Son, died on the cross to take our punishment
-- He rose from death to give us new life
-- We are saved by trusting Jesus alone — not by good works
-- The Holy Spirit helps us obey God and love others
-- The Bible is God’s true Word
-- One day Jesus will return to judge everyone
-- Those who trust Him go to heaven; those who reject Him face hell
+Answers follow REFORMED theology. Do NOT contradict these truths (they need not appear in every answer):
+- God created everything and is sovereign.
+- Every person sins and needs forgiveness.
+- Jesus, God’s Son, died on the cross to pay for sin.
+- He rose again to give new life.
+- Salvation is by faith in Jesus alone, not works.
+- The Holy Spirit helps us obey and love others.
+- The Bible is God’s true Word.
+- Jesus will return to judge; believers go to heaven, unbelievers to hell (as the Bible teaches).
 
 **FORMAT EXACTLY LIKE THIS:**
 
-## Main Idea Here
+## Main Idea
 
 ### Step 1: Do This
-- Use bullet points
-- Keep steps short
+- bullet points
+- keep short
 
 ### Step 2: Remember This
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
@@ -340,213 +218,237 @@ End with one short sentence of hope or encouragement.
 
 Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
 
-        async function callAI(q, isContinue = false) {
+        // === AI CALLS (YOUR WORKING CODE) ===
+        async function tryOpenRouter(q){
             const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${OR_KEY}` },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OR_KEY}`
+                },
                 body: JSON.stringify({
-                    model: 'openrouter/auto',
+                    model: 'mistralai/devstral-small-2505:free',
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: isContinue ? `${q}\n\nContinue from where you stopped. Do not repeat.` : q }
+                        { role: 'user', content: q }
                     ],
-                    max_tokens: isContinue ? 1500 : 1000,
+                    max_tokens: 4000,
                     temperature: 0.7
                 })
             });
-            if (!res.ok) throw new Error(`AI error: ${res.status}`);
-            const data = await res.json();
-            return data.choices[0].message.content;
+            return { response: res, source: 'OpenRouter' };
         }
 
-        // === SUBMIT, RANDOM, HISTORY, WELCOME (unchanged) ===
+        async function tryGemini(q){
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + q }] }],
+                    generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+                    ]
+                })
+            });
+            return { response: res, source: 'Gemini' };
+        }
+
+        // === MAIN CALL WITH FALLBACK ===
+        async function getAnswer(q, isExplainMore = false) {
+            const fullQ = isExplainMore
+                ? q + "\n\nGive a FULL, DETAILED answer. Up to 1200 words. Cite 5+ TEV verses."
+                : q;
+
+            // Try Gemini first
+            try {
+                console.log("Trying Gemini (2.5-flash)...");
+                const gemini = await tryGemini(fullQ);
+                if (gemini.response.ok) {
+                    const data = await gemini.response.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        console.log("Gemini succeeded");
+                        return text;
+                    }
+                } else {
+                    const err = await gemini.response.text();
+                    console.error("Gemini failed:", gemini.response.status, err);
+                }
+            } catch (e) {
+                console.error("Gemini network error:", e);
+            }
+
+            // Fallback to OpenRouter
+            console.log("Falling back to OpenRouter (devstral)...");
+            try {
+                const or = await tryOpenRouter(fullQ);
+                if (or.response.ok) {
+                    const data = await or.response.json();
+                    const text = data.choices?.[0]?.message?.content;
+                    if (text) {
+                        console.log("OpenRouter succeeded");
+                        return text;
+                    }
+                } else {
+                    const err = await or.response.text();
+                    console.error("OpenRouter failed:", or.response.status, err);
+                }
+            } catch (e) {
+                console.error("OpenRouter network error:", e);
+            }
+
+            return "Sore, mi no save talem. Gemini mo OpenRouter i no wok.";
+        }
+
+        // === SUBMIT ===
         form.addEventListener('submit', async e => {
             e.preventDefault();
             const q = questionInput.value.trim();
-            if (!q) return alert('Yu no raetem wan kwestin yet!');
+            if (!q) return;
             currentQuestion = q;
-
-            loading.style.display = 'block';
-            loading.textContent = 'Mi stap tingbaot...';
-            answerDiv.style.display = 'none';
-            answerHeader.style.display = 'none';
-            answerContent.innerHTML = '';
-            welcomeVerse.style.display = 'none';
+            askBtn.disabled = true; askBtn.textContent = 'Wet long ansa...';
+            answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
+            answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
 
             try {
-                let text = await callAI(q);
-                const wordCount = text.split(/\s+/).length;
-                if (wordCount < 120 || !/[.!?]\s*$/.test(text.trim())) {
-                    loading.textContent = 'Mi stap wok yet...';
-                    text += '\n\n' + (await callAI(q, true));
-                }
-                answerContent.innerHTML = marked.parse(text);
+                const txt = await getAnswer(q);
+                answerContent.innerHTML = marked.parse(txt);
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
                 saveAnswer(q, answerContent.innerHTML);
             } catch (err) {
-                answerContent.innerHTML = `<div class="error">${err.message}</div>`;
+                answerContent.innerHTML = `<div class="error">Sore, mi no save ansa. ${err.message}</div>`;
                 answerDiv.style.display = 'block';
             } finally {
-                loading.style.display = 'none';
+                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
             }
         });
 
-        explainMoreBtn.onclick = async () => {
-            loading.style.display = 'block';
-            loading.textContent = 'Mi stap pulum ansa longfala...';
-            try {
-                const long = await callAI(currentQuestion + "\n\nGive a FULL, DETAILED answer. Up to 1200 words. Cite 5+ TEV verses. DO NOT summarize.");
-                answerContent.innerHTML = marked.parse(long);
-                saveAnswer(currentQuestion, answerContent.innerHTML);
-            } catch {
-                answerContent.innerHTML += `<p style="color:var(--danger);margin-top:12px;font-weight:bold;">Sori, mi no save talem moa.</p>`;
-            } finally {
-                loading.style.display = 'none';
-            }
+        // === RANDOM QUESTIONS ===
+        const CACHE_KEY = 'randomQCache';
+        const getCache = () => JSON.parse(localStorage.getItem(CACHE_KEY) || '{"questions":[]}');
+        const saveCache = c => localStorage.setItem(CACHE_KEY, JSON.stringify(c));
+
+        async function fetchQuestions() {
+            const p = `Output EXACTLY 5 Bible questions in SIMPLE ENGLISH. One must relate to village life. NO BISLAMA. NO NUMBERS. Each on its own line ending with ?`;
+            const txt = await getAnswer(p);
+            return txt.split('\n').map(l => l.trim()).filter(l => l.endsWith('?') && l.length > 10).slice(0, 5);
+        }
+
+        const showQuestionButtons = qs => {
+            randomDiv.innerHTML = '';
+            qs.forEach(q => {
+                const b = document.createElement('button');
+                b.className = 'random-q-btn'; b.textContent = q;
+                b.onclick = () => {
+                    questionInput.value = q; questionInput.dispatchEvent(new Event('input'));
+                    randomDiv.style.display = 'none'; form.dispatchEvent(new Event('submit'));
+                };
+                randomDiv.appendChild(b);
+            });
+            randomDiv.style.display = 'block';
         };
 
         randomBtn.onclick = async () => {
-            randomBtn.textContent = 'Mi stap tingting...';
-            randomDiv.innerHTML = '<p style="color:#7f8c8d;font-size:0.9em;">Mi stap lukaotem kuestin...</p>';
-            randomDiv.style.display = 'block';
-
-            const prompt = `Generate EXACTLY 5 Bible questions in simple English for a 13-year-old. 
-One question should relate to village/island life (e.g. spirits, storms, family, fishing).
-Use ONLY this format — no extra text:
-1. Question one?
-2. Question two?
-3. Question three?
-4. Question four?
-5. Question five?`;
-
+            let c = getCache();
+            if (c.questions.length > 0) { showQuestionButtons(c.questions); saveCache({ questions: [] }); return; }
+            randomBtn.disabled = true; randomBtn.textContent = 'Mi stap lukaotem...';
             try {
-                const text = await callAI(prompt);
-                const lines = text.match(/\d+\.\s*.+\?/g) || [];
-                randomDiv.innerHTML = '';
-                if (lines.length >= 3) {
-                    lines.slice(0, 5).forEach(line => {
-                        const q = line.replace(/^\d+\.\s*/,'').trim();
-                        if (!q) return;
-                        const btn = document.createElement('button');
-                        btn.className = 'random-q-btn';
-                        btn.textContent = q;
-                        btn.onclick = () => {
-                            questionInput.value = q;
-                            questionInput.dispatchEvent(new Event('input'));
-                            randomDiv.innerHTML = ''; 
-                            randomDiv.style.display = 'none';
-                            randomBtn.textContent = 'Givim Kwestin';
-                            form.dispatchEvent(new Event('submit'));
-                        };
-                        randomDiv.appendChild(btn);
-                    });
-                } else throw new Error("Not enough questions");
-            } catch (err) {
-                randomDiv.innerHTML = '';
-                const fallback = [
-                    "From wanem Jisas i mas ded long kros?",
-                    "Hao mi save talem ol man long Baebol?",
-                    "Wanem mi save mekem bae mi no lus laef?",
-                    "Bae mi save talem Jisas long ol man we oli no wantem hem?",
-                    "From wanem Baebol i talem se God i lovem mi?"
-                ];
-                fallback.forEach(q => {
-                    const btn = document.createElement('button');
-                    btn.className = 'random-q-btn';
-                    btn.textContent = q;
-                    btn.onclick = () => {
-                        questionInput.value = q;
-                        questionInput.dispatchEvent(new Event('input'));
-                        randomDiv.innerHTML = ''; 
-                        randomDiv.style.display = 'none';
-                        randomBtn.textContent = 'Givim Kwestin';
-                        form.dispatchEvent(new Event('submit'));
-                    };
-                    randomDiv.appendChild(btn);
-                });
-                randomDiv.innerHTML += '<p style="font-size:0.8em;color:#7f8c8d;">(Mi yusum ol kuestin we mi save.)</p>';
+                const qs = await fetchQuestions();
+                if (qs.length >= 5) { showQuestionButtons(qs); saveCache({ questions: qs.slice(1) }); }
+            } catch {
+                randomDiv.innerHTML = `<p style="color:var(--danger);font-weight:bold;">Sore, mi no save karem kwestin.</p>`;
+                randomDiv.style.display = 'block';
             } finally {
-                randomBtn.textContent = 'Givim Kwestin';
+                randomBtn.disabled = false; randomBtn.textContent = 'Givim Kwestin';
             }
         };
 
-        questionInput.addEventListener('input', () => {
-            clearBtn.style.display = questionInput.value ? 'flex' : 'none';
-        });
+        // === EXPLAIN MORE ===
+        explainMoreBtn.onclick = async () => {
+            askBtn.disabled = true; askBtn.textContent = 'Wet long moa...';
+            try {
+                const long = await getAnswer(currentQuestion, true);
+                answerContent.innerHTML = marked.parse(long);
+                saveAnswer(currentQuestion, answerContent.innerHTML);
+            } catch {
+                answerContent.innerHTML += `<p style="color:var(--danger);">Sore, mi no save talem moa.</p>`;
+            } finally {
+                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+            }
+        };
+
+        // === INPUT & HISTORY ===
+        questionInput.addEventListener('input', () => { clearBtn.style.display = questionInput.value ? 'flex' : 'none'; });
         clearBtn.onclick = () => { questionInput.value = ''; clearBtn.style.display = 'none'; questionInput.focus(); };
 
         const history = JSON.parse(localStorage.getItem('bibleHistory') || '[]');
-        function saveAnswer(q, a) {
+        const saveAnswer = (q, a) => {
             history.unshift({ q, a, date: new Date().toLocaleString('en-GB') });
             if (history.length > 50) history.pop();
             localStorage.setItem('bibleHistory', JSON.stringify(history));
             updateHistoryBtn();
-        }
-        function updateHistoryBtn() {
+        };
+        const updateHistoryBtn = () => {
             const cnt = history.length;
             showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
             document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
-        }
+        };
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
-                const div = document.createElement('div');
-                div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
-                div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary);">${item.q}</p>
-                                 <p style="margin:4px 0 8px;font-size:0.9em;color:#7f8c8d;">${item.date}</p>
-                                 <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
-                div.onclick = () => {
-                    questionInput.value = item.q;
-                    questionInput.dispatchEvent(new Event('input'));
-                    answerContent.innerHTML = item.a;
-                    answerHeader.style.display = 'flex';
-                    answerDiv.style.display = 'block';
-                    welcomeVerse.style.display = 'none';
+                const d = document.createElement('div');
+                d.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
+                d.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary);">${item.q}</p>
+                             <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d;">${item.date}</p>
+                             <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
+                d.onclick = () => {
+                    questionInput.value = item.q; questionInput.dispatchEvent(new Event('input'));
+                    answerContent.innerHTML = item.a; answerHeader.style.display = 'flex';
+                    answerDiv.style.display = 'block'; welcomeVerse.style.display = 'none';
                     historyModal.style.display = 'none';
                 };
-                historyList.appendChild(div);
+                historyList.appendChild(d);
             });
             historyModal.style.display = 'flex';
         };
-        closeHistoryBtn.onclick = () => historyModal.style.display = 'none';
+        closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        function showWelcome() {
-            const dailyVerses = [
+        const showWelcome = () => {
+            const verses = [
                 { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
                 { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
                 { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
             ];
-            const v = dailyVerses[new Date().getDate() % dailyVerses.length];
+            const v = verses[new Date().getDate() % verses.length];
             welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
-                <p style="text-align:center;color:#7f8c8d;font-size:0.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
+                <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
                 Tajem blong askem kwestin...</p>`;
             welcomeVerse.style.display = 'block';
-        }
+        };
 
-        // === FAB ACTIONS ===
         shareFab.onclick = async () => {
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
-            const text = answerContent.innerText;
-            try { await navigator.share({ title: 'Baebol Kwestin', text }); }
-            catch { navigator.clipboard.writeText(text); alert('Copied!'); }
+            const txt = answerContent.innerText;
+            try { await navigator.share({ title: 'Baebol Kwestin', text: txt }); }
+            catch { navigator.clipboard.writeText(txt); alert('Copied!'); }
         };
 
         darkFab.onclick = () => {
             document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            sunIcon.style.display = isDark ? 'none' : 'block';
-            moonIcon.style.display = isDark ? 'block' : 'none';
-            // Icons auto-inherit --primary → blue in dark mode
+            const dark = document.body.classList.contains('dark-mode');
+            sunIcon.style.display = dark ? 'none' : 'block';
+            moonIcon.style.display = dark ? 'block' : 'none';
         };
 
-        // === INIT ===
-        showWelcome();
-        updateHistoryBtn();
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        }
+        showWelcome(); updateHistoryBtn();
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
     </script>
 </body>
 </html>
