@@ -95,9 +95,7 @@
             <svg id="sunIcon" viewBox="0 0 24 24" style="display:none;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41z"/></svg>
         </button>
     </div>
-
     <p class="subtitle">Askem eni kwestin long Baebol</p>
-
     <div class="card-wrapper">
         <div class="card">
             <form id="queryForm">
@@ -116,17 +114,14 @@
                 <div id="randomQuestions"></div>
             </form>
         </div>
-
         <div id="answer">
             <div id="answerHeader">
-                <button type="button" id="explainMoreBtn">Talem moa...</button>
+                <button type="button" id="explainMoreBtn">Mekem ansa i longfala lelebet...</button>
             </div>
             <div id="answerContent"></div>
         </div>
-
         <div id="welcomeVerse"></div>
     </div>
-
     <div id="historyModal">
         <div>
             <button type="button" id="closeHistoryBtn" class="clear-circle">x</button>
@@ -134,11 +129,9 @@
             <div id="historyList"></div>
         </div>
     </div>
-
     <footer class="footer">
         Mi, Ross Webb, mi mekem app ia (2.0). Mi prea se bae God i yusum app ia blo givhan long Kristim laef blong yu.
     </footer>
-
     <script>
         // === INSTALL PROMPT ===
         let deferredPrompt=null,installBtn=null;
@@ -160,7 +153,6 @@
         // === KEYS (base64 → atob) ===
         const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
         const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
-
         marked.setOptions({gfm:true,breaks:false,sanitize:false,headerIds:false});
 
         const form=document.getElementById('queryForm'),
@@ -183,13 +175,12 @@
               sunIcon=document.getElementById('sunIcon'),
               moonIcon=document.getElementById('moonIcon');
 
-        let currentQuestion='';
-        let isAutoSubmit = false;  // ← NEW FLAG
+        let currentQuestion = '';
+        let isAutoSubmit = false;
 
         // === SYSTEM PROMPT ===
-        const systemPrompt=`You are a kind Bible teacher in Vanuatu. 
+        const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
-
 Answers follow REFORMED theology. Do NOT contradict these truths (they need not appear in every answer):
 - God created everything and is sovereign.
 - Every person sins and needs forgiveness.
@@ -199,24 +190,17 @@ Answers follow REFORMED theology. Do NOT contradict these truths (they need not 
 - The Holy Spirit helps us obey and love others.
 - The Bible is God’s true Word.
 - Jesus will return to judge; believers go to heaven, unbelievers to hell (as the Bible teaches).
-
 **FORMAT EXACTLY LIKE THIS:**
-
+Do *NOT* start with an introductory greeting
 ## Main Idea
-
 ### Step 1: Do This
 - bullet points
 - keep short
-
 ### Step 2: Remember This
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
-
 **Romans 5:8** *"But God has shown us how much he loves us—it was while we were still sinners that Christ died for us!"*
-
 **Ephesians 2:8-9** *"For it is by God's grace that you have been saved through faith. It is not the result of your own efforts, but God's gift, so that no one can boast about it."*
-
 End with one short sentence of hope or encouragement.
-
 Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
 
         // === AI CALLS ===
@@ -228,10 +212,10 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                     'Authorization': `Bearer ${OR_KEY}`
                 },
                 body: JSON.stringify({
-                    model: 'mistralai/devstral-small-2505:free',
+                    model: "mistralai/devstral-small-2505:free",
                     messages: [
-                        { role: 'system', content: systemPrompt },
-                        { role: 'user', content: q }
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: q }
                     ],
                     max_tokens: 4000,
                     temperature: 0.7
@@ -261,9 +245,8 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         async function getAnswer(q, isExplainMore = false) {
             const fullQ = isExplainMore
-                ? q + "\n\nGive a FULL, DETAILED answer. Up to 1200 words. Cite 5+ TEV verses."
+                ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from TEV version of the Bible."
                 : q;
-
             try {
                 console.log("Trying Gemini (2.5-flash)...");
                 const gemini = await tryGemini(fullQ);
@@ -276,7 +259,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                     console.error("Gemini failed:", gemini.response.status, err);
                 }
             } catch (e) { console.error("Gemini network error:", e); }
-
             console.log("Falling back to OpenRouter (devstral)...");
             try {
                 const or = await tryOpenRouter(fullQ);
@@ -289,18 +271,16 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                     console.error("OpenRouter failed:", or.response.status, err);
                 }
             } catch (e) { console.error("OpenRouter network error:", e); }
-
-            return "Sore, mi no save talem. Gemini mo OpenRouter i no wok.";
+            return "Sore, mi no save mekem. Network nogat.";
         }
 
         // === SHARED SUBMIT LOGIC ===
-        const handleSubmit = async (q) => {
+const handleSubmit = async (q) => {
             if (!q) return;
             currentQuestion = q;
             askBtn.disabled = true; askBtn.textContent = 'Wet long ansa...';
             answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
             answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
-
             try {
                 const txt = await getAnswer(q);
                 answerContent.innerHTML = marked.parse(txt);
@@ -310,16 +290,17 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             } catch (err) {
                 answerContent.innerHTML = `<div class="error">Sore, mi no save ansa. ${err.message}</div>`;
                 answerDiv.style.display = 'block';
+                showWelcome();
             } finally {
                 askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-                isAutoSubmit = false;  // ← Reset flag
+                isAutoSubmit = false;
             }
         };
 
         // === FORM SUBMIT ===
         form.addEventListener('submit', async e => {
             e.preventDefault();
-            if (isAutoSubmit) return;  // ← Skip if auto-submitted
+            if (isAutoSubmit) return;
             const q = questionInput.value.trim();
             if (!q) return;
             await handleSubmit(q);
@@ -329,13 +310,11 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         const CACHE_KEY = 'randomQCache';
         const getCache = () => JSON.parse(localStorage.getItem(CACHE_KEY) || '{"questions":[]}');
         const saveCache = c => localStorage.setItem(CACHE_KEY, JSON.stringify(c));
-
         async function fetchQuestions() {
             const p = `Output EXACTLY 5 Bible questions in SIMPLE ENGLISH. One must relate to village life. NO BISLAMA. NO NUMBERS. Each on its own line ending with ?`;
             const txt = await getAnswer(p);
             return txt.split('\n').map(l => l.trim()).filter(l => l.endsWith('?') && l.length > 10).slice(0, 5);
         }
-
         const showQuestionButtons = qs => {
             randomDiv.innerHTML = '';
             qs.forEach(q => {
@@ -345,21 +324,28 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                     questionInput.value = q;
                     questionInput.dispatchEvent(new Event('input'));
                     randomDiv.style.display = 'none';
-                    isAutoSubmit = true;  // ← Mark as auto
+                    isAutoSubmit = true;
                     handleSubmit(q);
                 };
                 randomDiv.appendChild(b);
             });
             randomDiv.style.display = 'block';
         };
-
         randomBtn.onclick = async () => {
             let c = getCache();
-            if (c.questions.length > 0) { showQuestionButtons(c.questions); saveCache({ questions: [] }); return; }
+            if (c.questions.length >= 5) {
+                const rotated = [...c.questions.slice(1), c.questions[0]];
+                showQuestionButtons(rotated.slice(0, 5));
+                saveCache({ questions: rotated.slice(5) });
+                return;
+            }
             randomBtn.disabled = true; randomBtn.textContent = 'Mi stap lukaotem...';
             try {
                 const qs = await fetchQuestions();
-                if (qs.length >= 5) { showQuestionButtons(qs); saveCache({ questions: qs.slice(1) }); }
+                if (qs.length >= 5) {
+                    showQuestionButtons(qs.slice(0, 5));
+                    saveCache({ questions: qs.slice(5) });
+                }
             } catch {
                 randomDiv.innerHTML = `<p style="color:var(--danger);font-weight:bold;">Sore, mi no save karem kwestin.</p>`;
                 randomDiv.style.display = 'block';
@@ -370,13 +356,13 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         // === EXPLAIN MORE ===
         explainMoreBtn.onclick = async () => {
-            askBtn.disabled = true; askBtn.textContent = 'Wet long moa...';
+            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
             try {
                 const long = await getAnswer(currentQuestion, true);
                 answerContent.innerHTML = marked.parse(long);
                 saveAnswer(currentQuestion, answerContent.innerHTML);
             } catch {
-                answerContent.innerHTML += `<p style="color:var(--danger);">Sore, mi no save talem moa.</p>`;
+                answerContent.innerHTML += `<p style="color:var(--danger);">Sore, mi no karem ansa.</p>`;
             } finally {
                 askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
             }
@@ -386,26 +372,84 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         questionInput.addEventListener('input', () => { clearBtn.style.display = questionInput.value ? 'flex' : 'none'; });
         clearBtn.onclick = () => { questionInput.value = ''; clearBtn.style.display = 'none'; questionInput.focus(); };
 
-        const history = JSON.parse(localStorage.getItem('bibleHistory') || '[]');
-        const saveAnswer = (q, a) => {
-            history.unshift({ q, a, date: new Date().toLocaleString('en-GB') });
-            if (history.length > 50) history.pop();
-            localStorage.setItem('bibleHistory', JSON.stringify(history));
-            updateHistoryBtn();  // ← Fixed: now called
+        // === EXTRACT VERSE (DEFINED FIRST) ===
+        const extractVerse = (html) => {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            const strongs = div.querySelectorAll('strong');
+            for (let s of strongs) {
+                const ref = s.textContent.trim();
+                if (/^[A-Za-z]+\s+\d+:\d+/.test(ref)) {
+                    let em = s.nextElementSibling;
+                    while (em && em.tagName !== 'EM') em = em.nextElementSibling;
+                    if (em) {
+                        const text = em.textContent.replace(/^[\s"“]+|[\s"”]+$/g, '').trim();
+                        return { ref, text };
+                    }
+                }
+            }
+            return null;
         };
+
+        // === LOAD + MIGRATE HISTORY ===
+        const raw = localStorage.getItem('bibleHistory');
+        let history = raw ? JSON.parse(raw) : [];
+
+        // Migrate old items
+        history = history.map(item => {
+            if (item.verse) return item;
+            const v = extractVerse(item.a);
+            return { ...item, verse: v };
+        }).slice(0, 50);
+
+        // Save clean version
+        localStorage.setItem('bibleHistory', JSON.stringify(history));
+
+        const saveAnswer = (q, a) => {
+            const verse = extractVerse(a);
+            const newItem = { q, a, date: new Date().toLocaleString('en-GB'), verse };
+            const updated = [newItem, ...history].slice(0, 50);
+            localStorage.setItem('bibleHistory', JSON.stringify(updated));
+            history.splice(0, history.length, ...updated);
+            updateHistoryBtn();
+            showWelcome();
+        };
+
         const updateHistoryBtn = () => {
             const cnt = history.length;
             showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
             document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
         };
+
+        const showWelcome = () => {
+            welcomeVerse.style.display = 'none';
+            if (history.length > 0 && history[0].verse) {
+                const v = history[0].verse;
+                welcomeVerse.innerHTML = `
+                    <strong>${v.ref}</strong><br>
+                    <em>${v.text}</em>`;
+            } else {
+                const verses = [
+                    { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
+                    { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
+                    { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
+                ];
+                const v = verses[new Date().getDate() % verses.length];
+                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
+                    <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
+                    Tap to ask a question...</p>`;
+            }
+            welcomeVerse.style.display = 'block';
+        };
+
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
                 const d = document.createElement('div');
                 d.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
                 d.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary);">${item.q}</p>
-                             <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d;">${item.date}</p>
-                             <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
+                               <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d;">${item.date}</p>
+                               <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
                 d.onclick = () => {
                     questionInput.value = item.q; questionInput.dispatchEvent(new Event('input'));
                     answerContent.innerHTML = item.a; answerHeader.style.display = 'flex';
@@ -416,21 +460,9 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             });
             historyModal.style.display = 'flex';
         };
+
         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-
-        const showWelcome = () => {
-            const verses = [
-                { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
-                { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
-                { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
-            ];
-            const v = verses[new Date().getDate() % verses.length];
-            welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
-                <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
-                Tajem blong askem kwestin...</p>`;
-            welcomeVerse.style.display = 'block';
-        };
 
         shareFab.onclick = async () => {
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
@@ -446,8 +478,10 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             moonIcon.style.display = dark ? 'none' : 'block';
         };
 
-        showWelcome(); 
-        updateHistoryBtn();  // ← Fixed: called on load
+        // === INITIAL LOAD ===
+        updateHistoryBtn();
+        showWelcome();
+
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
     </script>
 </body>
