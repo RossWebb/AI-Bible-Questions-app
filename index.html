@@ -378,46 +378,47 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             randomDiv.style.display = 'block';
         };
 
+        // === DEBUG TEST: GIVIM KWESTIN (hardcoded, no cache) ===
         randomBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            let c = getCache();
+            console.log("DEBUG: CLICKED! e.preventDefault() ran");
 
-            if (c.general.length === 0 && c.animism.length === 0) {
-                c.animism = [...ANIMISM_SEED];
-                c.general = [...GENERAL_SEED];
-                c.used = [];
-                saveCache(c);
-            }
+            const testQs = [
+                "Test 1: What is the greatest commandment?",
+                "Test 2: Why does the Bible say not to talk to dead people?",
+                "Test 3: How can I know God loves me?",
+                "Test 4: What happens when we pray?",
+                "Test 5: Why did Jesus die?"
+            ];
 
-            if (c.general.length === 0 && c.animism.length === 0) {
-                showQuestionButtons(GENERAL_SEED.slice(0, 5));
-                return;
-            }
+            console.log("DEBUG: Clearing randomDiv and creating test buttons");
+            randomDiv.innerHTML = '';
 
-            const five = [];
-            let used = c.used || [];
+            testQs.forEach(q => {
+                const b = document.createElement('button');
+                b.className = 'random-q-btn';
+                b.textContent = q;
+                b.style.margin = '8px 0';
+                b.style.display = 'block';
+                b.style.width = '100%';
+                b.onclick = () => {
+                    console.log("DEBUG: Test question clicked:", q);
+                    questionInput.value = q;
+                    questionInput.dispatchEvent(new Event('input'));
+                    randomDiv.style.display = 'none';
+                    // Fake answer to prove UI works
+                    answerContent.innerHTML = `<p><strong>${q}</strong></p><p style="color:green;">UI TEST PASSED — This is a fake answer. The real AI will replace this.</p>`;
+                    answerHeader.style.display = 'flex';
+                    answerDiv.style.display = 'block';
+                    welcomeVerse.style.display = 'none';
+                };
+                randomDiv.appendChild(b);
+            });
 
-            if (c.animism.length > 0) {
-                const i = Math.floor(Math.random() * c.animism.length);
-                const q = c.animism.splice(i, 1)[0];
-                five.push(q);
-                used = used.filter(x => x !== q);
-            }
+            console.log("DEBUG: Setting randomDiv display = block");
+            randomDiv.style.display = 'block';
 
-            while (five.length < 5 && c.general.length > 0) {
-                let i, q;
-                do {
-                    i = Math.floor(Math.random() * c.general.length);
-                    q = c.general[i];
-                } while (used.includes(q) && c.general.length > used.length);
-                c.general.splice(i, 1);
-                five.push(q);
-                used = used.filter(x => x !== q);
-            }
-
-            c.used = [...five, ...used].slice(0, 10);
-            saveCache(c);
-            showQuestionButtons(five);
+            console.log("DEBUG: TEST COMPLETE — Do you see 5 buttons?");
         });
 
         // === REST OF CODE (unchanged) ===
