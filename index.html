@@ -305,25 +305,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             await handleSubmit(q);
         });
 
-        // === RANDOM QUESTIONS — SAFE CACHE ===
-        const CACHE_KEY = 'randomQCache';
-        const getCache = () => {
-            try {
-                const raw = localStorage.getItem(CACHE_KEY);
-                return raw ? JSON.parse(raw) : { general: [], animism: [], used: [] };
-            } catch (e) {
-                console.warn("localStorage blocked. Using fresh cache.");
-                return { general: [], animism: [], used: [] };
-            }
-        };
-        const saveCache = c => {
-            try {
-                localStorage.setItem(CACHE_KEY, JSON.stringify(c));
-            } catch (e) {
-                console.warn("Cannot save to localStorage (blocked).");
-            }
-        };
-
+        // === RANDOM QUESTIONS SEEDS ===
         const ANIMISM_SEED = [
             "Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
@@ -360,6 +342,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             "What does it mean to be born again?"
         ];
 
+        // === SHOW QUESTION BUTTONS ===
         const showQuestionButtons = qs => {
             randomDiv.innerHTML = '';
             qs.forEach(q => {
@@ -378,50 +361,63 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             randomDiv.style.display = 'block';
         };
 
-        // === DEBUG TEST: GIVIM KWESTIN (hardcoded, no cache) ===
+        // === GIVIM KWESTIN — FINAL WORKING VERSION ===
         randomBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log("DEBUG: CLICKED! e.preventDefault() ran");
 
-            const testQs = [
-                "Test 1: What is the greatest commandment?",
-                "Test 2: Why does the Bible say not to talk to dead people?",
-                "Test 3: How can I know God loves me?",
-                "Test 4: What happens when we pray?",
-                "Test 5: Why did Jesus die?"
-            ];
+            // SAFE CACHE WITH FALLBACK
+            let c;
+            try {
+                const raw = localStorage.getItem('randomQCache');
+                c = raw ? JSON.parse(raw) : { general: [], animism: [], used: [] };
+            } catch (err) {
+                console.warn("localStorage blocked or corrupt. Using fresh cache.");
+                c = { general: [], animism: [], used: [] };
+            }
 
-            console.log("DEBUG: Clearing randomDiv and creating test buttons");
-            randomDiv.innerHTML = '';
+            // REFILL IF EMPTY
+            if (c.general.length === 0 && c.animism.length === 0) {
+                c.animism = [...ANIMISM_SEED];
+                c.general = [...GENERAL_SEED];
+                c.used = [];
+            }
 
-            testQs.forEach(q => {
-                const b = document.createElement('button');
-                b.className = 'random-q-btn';
-                b.textContent = q;
-                b.style.margin = '8px 0';
-                b.style.display = 'block';
-                b.style.width = '100%';
-                b.onclick = () => {
-                    console.log("DEBUG: Test question clicked:", q);
-                    questionInput.value = q;
-                    questionInput.dispatchEvent(new Event('input'));
-                    randomDiv.style.display = 'none';
-                    // Fake answer to prove UI works
-                    answerContent.innerHTML = `<p><strong>${q}</strong></p><p style="color:green;">UI TEST PASSED — This is a fake answer. The real AI will replace this.</p>`;
-                    answerHeader.style.display = 'flex';
-                    answerDiv.style.display = 'block';
-                    welcomeVerse.style.display = 'none';
-                };
-                randomDiv.appendChild(b);
-            });
+            const five = [];
+            let used = c.used || [];
 
-            console.log("DEBUG: Setting randomDiv display = block");
-            randomDiv.style.display = 'block';
+            // PICK 1 ANIMISM IF AVAILABLE
+            if (c.animism.length > 0) {
+                const i = Math.floor(Math.random() * c.animism.length);
+                const q = c.animism.splice(i, 1)[0];
+                five.push(q);
+                used = used.filter(x => x !== q);
+            }
 
-            console.log("DEBUG: TEST COMPLETE — Do you see 5 buttons?");
+            // PICK 4 MORE FROM GENERAL (avoid recent)
+            while (five.length < 5 && c.general.length > 0) {
+                let i, q;
+                do {
+                    i = Math.floor(Math.random() * c.general.length);
+                    q = c.general[i];
+                } while (used.includes(q) && c.general.length > used.length);
+                c.general.splice(i, 1);
+                five.push(q);
+                used = used.filter(x => x !== q);
+            }
+
+            // SAVE STATE
+            c.used = [...five, ...used].slice(0, 10);
+            try {
+                localStorage.setItem('randomQCache', JSON.stringify(c));
+            } catch (err) {
+                console.warn("Could not save cache:", err);
+            }
+
+            // SHOW BUTTONS
+            showQuestionButtons(five);
         });
 
-        // === REST OF CODE (unchanged) ===
+        // === EXPLAIN MORE ===
         explainMoreBtn.onclick = async () => {
             askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
             try {
@@ -435,6 +431,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         };
 
+        // === CLEAR INPUT ===
         questionInput.addEventListener('input', () => { 
             clearBtn.style.display = questionInput.value ? 'flex' : 'none'; 
         });
@@ -444,6 +441,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             questionInput.focus(); 
         };
 
+        // === HISTORY & VERSE EXTRACTION ===
         const extractVerse = (html) => {
             const div = document.createElement('div');
             div.innerHTML = html;
@@ -462,21 +460,24 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             return null;
         };
 
-        const raw = localStorage.getItem('bibleHistory');
-        let history = raw ? JSON.parse(raw) : [];
+        let history = [];
+        try {
+            const raw = localStorage.getItem('bibleHistory');
+            history = raw ? JSON.parse(raw) : [];
+        } catch (e) {}
+
         history = history.map(item => {
             if (item.verse) return item;
             const v = extractVerse(item.a);
             return { ...item, verse: v };
         }).slice(0, 50);
-        try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
 
         const saveAnswer = (q, a) => {
             const verse = extractVerse(a);
             const newItem = { q, a, date: new Date().toLocaleString('en-GB'), verse };
             const updated = [newItem, ...history].slice(0, 50);
             try { localStorage.setItem('bibleHistory', JSON.stringify(updated)); } catch(e) {}
-            history.splice(0, history.length, ...updated);
+            history = updated;
             updateHistoryBtn();
             showWelcome();
         };
@@ -499,13 +500,14 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                     { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
                 ];
                 const v = verses[new Date().getDate() % verses.length];
-                welcomeVerse.innerHTML = `<strong>$$ {v.ref}</strong><br><em> $${v.text}</em>
+                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
                     <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
                     Tap to ask a question...</p>`;
             }
             welcomeVerse.style.display = 'block';
         };
 
+        // === HISTORY MODAL ===
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
@@ -530,6 +532,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
+        // === SHARE & DARK MODE ===
         shareFab.onclick = async () => {
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
             const txt = answerContent.innerText;
@@ -544,6 +547,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             moonIcon.style.display = dark ? 'none' : 'block';
         };
 
+        // === INIT ===
         updateHistoryBtn();
         showWelcome();
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
