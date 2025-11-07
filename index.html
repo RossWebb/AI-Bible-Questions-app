@@ -214,11 +214,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 },
                 body: JSON.stringify({
                     model: "mistralai/devstral-small-2505:free",
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: q }
-                    ],
-                    max_tokens: 4000,
+Pursuant: 4000,
                     temperature: 0.7
                 })
             });
@@ -247,33 +243,27 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from TEV version of the Bible."
                 : q;
             try {
-                console.log("Trying Gemini (2.5-flash)...");
+                console.log("Trying Gemini...");
                 const gemini = await tryGemini(fullQ);
                 if (gemini.response.ok) {
                     const data = await gemini.response.json();
                     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) { console.log("Gemini succeeded"); return text; }
-                } else {
-                    const err = await gemini.response.text();
-                    console.error("Gemini failed:", gemini.response.status, err);
+                    if (text) return text;
                 }
-            } catch (e) { console.error("Gemini network error:", e); }
-            console.log("Falling back to OpenRouter (devstral)...");
+            } catch (e) {}
+            console.log("Falling back to OpenRouter...");
             try {
                 const or = await tryOpenRouter(fullQ);
                 if (or.response.ok) {
                     const data = await or.response.json();
                     const text = data.choices?.[0]?.message?.content;
-                    if (text) { console.log("OpenRouter succeeded"); return text; }
-                } else {
-                    const err = await or.response.text();
-                    console.error("OpenRouter failed:", or.response.status, err);
+                    if (text) return text;
                 }
-            } catch (e) { console.error("OpenRouter network error:", e); }
+            } catch (e) {}
             return "Sore, mi no save mekem. Network nogat.";
         }
 
-        // === SHARED SUBMIT LOGIC ===
+        // === HANDLE SUBMIT ===
         const handleSubmit = async (q) => {
             if (!q) return;
             currentQuestion = q;
@@ -287,7 +277,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 answerDiv.style.display = 'block';
                 saveAnswer(q, answerContent.innerHTML);
             } catch (err) {
-                answerContent.innerHTML = `<div class="error">Sore, mi no save ansa. ${err.message}</div>`;
+                answerContent.innerHTML = `<div class="error">Sore, mi no save ansa.</div>`;
                 answerDiv.style.display = 'block';
                 showWelcome();
             } finally {
@@ -297,15 +287,15 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         };
 
         // === FORM SUBMIT ===
-        form.addEventListener('submit', async e => {
+        form.addEventListener('submit', e => {
             e.preventDefault();
             if (isAutoSubmit) return;
             const q = questionInput.value.trim();
             if (!q) return;
-            await handleSubmit(q);
+            handleSubmit(q);
         });
 
-        // === RANDOM QUESTIONS SEEDS ===
+        // === SEEDS ===
         const ANIMISM_SEED = [
             "Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
@@ -342,7 +332,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             "What does it mean to be born again?"
         ];
 
-        // === SHOW QUESTION BUTTONS ===
+        // === SHOW BUTTONS ===
         const showQuestionButtons = qs => {
             randomDiv.innerHTML = '';
             qs.forEach(q => {
@@ -361,18 +351,25 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             randomDiv.style.display = 'block';
         };
 
-        // === GIVIM KWESTIN — FINAL WORKING VERSION ===
-        randomBtn.addEventListener('click', (e) => {
+        // === GIVIM KWESTIN — BULLETPROOF ===
+        randomBtn.addEventListener('click', e => {
             e.preventDefault();
 
-            // SAFE CACHE WITH FALLBACK
-            let c;
+            // BULLETPROOF: c is ALWAYS a valid object
+            let c = { general: [], animism: [], used: [] };
+
             try {
                 const raw = localStorage.getItem('randomQCache');
-                c = raw ? JSON.parse(raw) : { general: [], animism: [], used: [] };
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        c.general = Array.isArray(parsed.general) ? parsed.general : [];
+                        c.animism = Array.isArray(parsed.animism) ? parsed.animism : [];
+                        c.used = Array.isArray(parsed.used) ? parsed.used : [];
+                    }
+                }
             } catch (err) {
-                console.warn("localStorage blocked or corrupt. Using fresh cache.");
-                c = { general: [], animism: [], used: [] };
+                console.warn("Cache error. Starting fresh.");
             }
 
             // REFILL IF EMPTY
@@ -383,9 +380,9 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
 
             const five = [];
-            let used = c.used || [];
+            let used = Array.isArray(c.used) ? c.used : [];
 
-            // PICK 1 ANIMISM IF AVAILABLE
+            // 1 ANIMISM
             if (c.animism.length > 0) {
                 const i = Math.floor(Math.random() * c.animism.length);
                 const q = c.animism.splice(i, 1)[0];
@@ -393,27 +390,25 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 used = used.filter(x => x !== q);
             }
 
-            // PICK 4 MORE FROM GENERAL (avoid recent)
+            // 4 MORE FROM GENERAL
             while (five.length < 5 && c.general.length > 0) {
-                let i, q;
-                do {
-                    i = Math.floor(Math.random() * c.general.length);
-                    q = c.general[i];
-                } while (used.includes(q) && c.general.length > used.length);
+                const i = Math.floor(Math.random() * c.general.length);
+                const q = c.general[i];
+                if (used.includes(q)) {
+                    c.general.splice(i, 1);
+                    continue;
+                }
                 c.general.splice(i, 1);
                 five.push(q);
                 used = used.filter(x => x !== q);
             }
 
-            // SAVE STATE
+            // SAVE
             c.used = [...five, ...used].slice(0, 10);
             try {
                 localStorage.setItem('randomQCache', JSON.stringify(c));
-            } catch (err) {
-                console.warn("Could not save cache:", err);
-            }
+            } catch (e) {}
 
-            // SHOW BUTTONS
             showQuestionButtons(five);
         });
 
@@ -431,7 +426,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         };
 
-        // === CLEAR INPUT ===
+        // === INPUT CLEAR ===
         questionInput.addEventListener('input', () => { 
             clearBtn.style.display = questionInput.value ? 'flex' : 'none'; 
         });
@@ -441,8 +436,14 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             questionInput.focus(); 
         };
 
-        // === HISTORY & VERSE EXTRACTION ===
-        const extractVerse = (html) => {
+        // === HISTORY ===
+        let history = [];
+        try {
+            const raw = localStorage.getItem('bibleHistory');
+            history = raw ? JSON.parse(raw) : [];
+        } catch (e) {}
+
+        const extractVerse = html => {
             const div = document.createElement('div');
             div.innerHTML = html;
             const strongs = div.querySelectorAll('strong');
@@ -451,33 +452,17 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 if (/^[A-Za-z]+\s+\d+:\d+/.test(ref)) {
                     let em = s.nextElementSibling;
                     while (em && em.tagName !== 'EM') em = em.nextElementSibling;
-                    if (em) {
-                        const text = em.textContent.replace(/^[\s"“]+|[\s"”]+$/g, '').trim();
-                        return { ref, text };
-                    }
+                    if (em) return { ref, text: em.textContent.replace(/^[\s"“]+|[\s"”]+$/g, '').trim() };
                 }
             }
             return null;
         };
 
-        let history = [];
-        try {
-            const raw = localStorage.getItem('bibleHistory');
-            history = raw ? JSON.parse(raw) : [];
-        } catch (e) {}
-
-        history = history.map(item => {
-            if (item.verse) return item;
-            const v = extractVerse(item.a);
-            return { ...item, verse: v };
-        }).slice(0, 50);
-
         const saveAnswer = (q, a) => {
             const verse = extractVerse(a);
             const newItem = { q, a, date: new Date().toLocaleString('en-GB'), verse };
-            const updated = [newItem, ...history].slice(0, 50);
-            try { localStorage.setItem('bibleHistory', JSON.stringify(updated)); } catch(e) {}
-            history = updated;
+            history = [newItem, ...history].slice(0, 50);
+            try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
             updateHistoryBtn();
             showWelcome();
         };
@@ -507,7 +492,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             welcomeVerse.style.display = 'block';
         };
 
-        // === HISTORY MODAL ===
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
@@ -532,7 +516,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        // === SHARE & DARK MODE ===
         shareFab.onclick = async () => {
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
             const txt = answerContent.innerText;
@@ -547,7 +530,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             moonIcon.style.display = dark ? 'none' : 'block';
         };
 
-        // === INIT ===
         updateHistoryBtn();
         showWelcome();
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
