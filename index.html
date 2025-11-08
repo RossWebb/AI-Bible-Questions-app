@@ -2,57 +2,41 @@
 <html lang="bi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baebol Kwestin</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="BibleQ192.png" sizes="192x192">
-    <link rel="apple-touch-icon" href="BibleQ192.png">
-    <meta name="theme-color" content="#1a5276">
     <style>
-        :root{
-            --bg:#f8fbff;--card:#ffffff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;
-            --success:#27ae60;--warning:#e67e22;--danger:#e74c3c;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);
-        }
-        .dark-mode{
-            --bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;
-            --success:#66BB6A;--warning:#FF8A65;--danger:#EF5350;--border:#444;--shadow:rgba(0,0,0,0.3);
-        }
+        :root{--bg:#f8fbff;--card:#fff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);--danger:#e74c3c}
+        .dark-mode{--bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;--border:#444;--shadow:rgba(0,0,0,0.3)}
         *{box-sizing:border-box;margin:0;padding:0}
-        html,body{height:100%;font-family:Georgia,serif;background:var(--bg);color:var(--text)}
-        body{display:flex;flex-direction:column;max-width:800px;margin:0 auto;padding:12px;font-size:17px;line-height:1.7}
-        .header{position:relative;text-align:center;padding:16px 56px 8px}
-        .header h1{color:var(--primary);font-family:Arial,sans-serif;font-size:1.8em;line-height:.5;margin:0}
-        .fab{position:absolute;top:16px;width:48px;height:48px;border-radius:50%;background:var(--card);
-            border:1px solid var(--border);box-shadow:0 3px 8px var(--shadow);display:flex;align-items:center;
-            justify-content:center;cursor:pointer;transition:transform .2s,box-shadow .2s;z-index:10}
-        .fab:hover{transform:scale(1.1);box-shadow:0 5px 12px var(--shadow)}
+        body{font-family:Georgia,serif;background:var(--bg);color:var(--text);padding:12px;max-width:800px;margin:auto;display:flex;flex-direction:column;min-height:100vh}
+        .header{position:relative;text-align:center;padding:16px 56px 4px}
+        h1{color:var(--primary);font-size:1.8em;margin:0;line-height:1.2}
+        .fab{
+            position:absolute;top:16px;width:48px;height:48px;border-radius:50%;
+            background:var(--card);border:1px solid var(--border);box-shadow:0 3px 8px var(--shadow);
+            display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;
+        }
         .fab svg{width:28px;height:28px;fill:var(--primary)}
         #shareFab{left:8px}#darkFab{right:8px}
         .subtitle{text-align:center;font-style:italic;color:#5d6d7e;margin:2px 0 16px;font-size:1em}
-        .card-wrapper{flex:1;display:flex;flex-direction:column;gap:16px;padding:8px 0}
-        .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 6px 20px var(--shadow);border:1px solid var(--border)}
-        label{display:block;font-weight:bold;color:var(--primary);margin-bottom:8px;font-size:1.1em}
+        .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 6px 20px var(--shadow);border:1px solid var(--border);margin-bottom:16px}
+        label{display:block;font-weight:bold;color:var(--primary);margin-bottom:8px}
         .input-wrapper{position:relative}
-        textarea{width:100%;padding:12px 36px 12px 12px;border:1px solid #aed6f1;border-radius:10px;
-            font-size:16px;min-height:90px;resize:vertical;font-family:inherit}
-        .clear-circle{position:absolute;background:var(--danger);color:white;border:none;width:20px;height:20px;
-            border-radius:50%;font-size:13px;font-weight:bold;cursor:pointer;display:flex;align-items:center;
-            justify-content:center;padding:0;line-height:1}
-        #clearBtn{top:6px;right:6px;display:none}#closeHistoryBtn{top:8px;right:8px}
+        textarea{width:100%;padding:12px 36px 12px 12px;border:1px solid #aed6f1;border-radius:10px;font-size:16px;min-height:90px;resize:vertical}
+        .clear-circle{
+            position:absolute;top:6px;right:6px;background:var(--danger);color:white;border:none;
+            width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:bold;cursor:pointer;
+            display:none;align-items:center;justify-content:center;line-height:1;
+        }
         .btn-row{display:flex;gap:10px;margin-top:8px}
-        button{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:bold;
-            cursor:pointer;transition:.2s;box-shadow:0 3px 6px var(--shadow)}
-        #askBtn{background:#2980b9;color:white}#askBtn:hover{background:#1a5276}
-        #randomBtn{background:#9b59b6;color:white}#randomBtn:hover{background:#8e44ad}
-        #randomQuestions{margin-top:12px;display:none;text-align:center}
-        .random-q-btn{display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
-            padding:14px;border-radius:12px;font-size:15px;text-align:left;cursor:pointer;
-            box-shadow:0 3px 8px var(--shadow);transition:.2s;font-weight:500}
-        .random-q-btn:hover{background:#2980b9;transform:translateY(-2px);box-shadow:0 5px 12px var(--shadow)}
-        #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);
-            max-height:60vh;overflow-y:auto;display:none}
+        button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+        #askBtn{background:#2980b9;color:white}#randomBtn{background:#9b59b6;color:white}
+        #randomQuestions{margin-top:12px;display:none}
+        .random-q-btn{display:block;width:100%;margin:8px 0;background:var(--accent);color:white;padding:14px;border-radius:12px;cursor:pointer;font-weight:500}
+        .random-q-btn:hover{background:#2980b9}
+        #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);display:none;max-height:60vh;overflow-y:auto}
         #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
-        #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px;font-weight:normal}
+        #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px}
         #answerContent{line-height:1.8}
         #answerContent h2{font-size:1.5em;color:var(--primary);margin:1.2em 0 .4em;border-bottom:2px solid var(--accent);padding-bottom:6px}
         #answerContent h3{font-size:1.25em;color:var(--primary);margin:.2em 0 .4em;font-weight:600}
@@ -62,20 +46,18 @@
         #answerContent em::after{content:'"';color:var(--accent);font-weight:bold}
         #answerContent ul{margin:.5rem 0 1rem;padding-left:1.2rem;list-style:disc}
         #answerContent li{margin:.3rem 0}
-        #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:none}
+        #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
         #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
         #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:1.2rem;position:relative}
-        #welcomeVerse em::before{content:'"';color:var(--accent);left:0}
+        #welcomeVerse em::before{content:'"';color:var(--accent);left:0;position:absolute}
         #welcomeVerse em::after{content:'"';color:var(--accent)}
-        #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);
-            z-index:100;justify-content:center;align-items:center}
-        #historyModal>div{background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;
-            overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative}
-        .footer{text-align:center;color:#95a5a6;font-size:.85em;padding:12px 0;background:var(--card);
-            border-top:1px solid var(--border);flex-shrink:0}
-        .error{background:#fdf2f2;border:1px solid var(--danger);color:#c0392b;padding:14px;border-radius:8px;
-            text-align:center;font-weight:bold}
-        @keyframes flash{0%,100%{background:#D30000}50%{background:#FF3333}}
+        #historyBtn{margin-top:12px;text-align:center;display:none}
+        #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
+        #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
+        #historyModal>div{background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative}
+        #closeHistoryBtn{position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .footer{text-align:center;color:#95a5a6;font-size:.85em;padding:12px;background:var(--card);border-top:1px solid var(--border)}
+        .error{background:#fdf2f2;border:1px solid var(--danger);color:#c0392b;padding:14px;border-radius:8px;text-align:center;font-weight:bold}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -84,92 +66,78 @@
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
         </button>
-        <h1>Baebol Kwestin</h1>
         <button id="darkFab" class="fab" title="Dark Mode">
-            <svg id="moonIcon" viewBox="0 0 24 24" style="display:block;"><path d="M12 1c-6.07 0-11 5.43-11 11s4.93 11 11 11 11-4.93 11-11-4.93-11-11-11zm-0 18c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z"/></svg>
-            <svg id="sunIcon" viewBox="0 0 24 24" style="display:none;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zM6.35 6.35l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41L7.76 4.94c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73l1.41 1.41c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.41-1.41c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM17.66 6.34c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41zM6.34 17.66c-.39-.39-1.02-.39-1.41 0l-1.41 1.41c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.41-1.41c-.39-.39.39-1.02 0-1.41z"/></svg>
+            <svg id="moon" viewBox="0 0 24 24"><path d="M12 1c-6.07 0-11 5.43-11 11s4.93 11 11 11 11-4.93 11-11-4.93-11-11-11zm-0 18c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z"/></svg>
+            <svg id="sun" viewBox="0 0 24 24" style="display:none"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/></svg>
         </button>
+        <h1>Baebol Kwestin</h1>
     </div>
     <p class="subtitle">Askem eni kwestin long Baebol</p>
-    <div class="card-wrapper">
-        <div class="card">
-            <form id="queryForm">
-                <label for="question">Raetem kwestin blong yu:</label>
-                <div class="input-wrapper">
-                    <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?" rows="3"></textarea>
-                    <button type="button" id="clearBtn" class="clear-circle">x</button>
-                </div>
-                <div class="btn-row">
-                    <button type="submit" id="askBtn">Askem Baebol</button>
-                    <button type="button" id="randomBtn">Givim Kwestin</button>
-                </div>
-                <div id="historyBtn" style="margin-top:12px;text-align:center;display:none;">
-                    <button type="button" id="showHistoryBtn" style="background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold;">Ol kwestin we yu askem finis (0)</button>
-                </div>
-                <div id="randomQuestions"></div>
-            </form>
-        </div>
-        <div id="answer">
-            <div id="answerHeader">
-                <button type="button" id="explainMoreBtn">Mekem ansa i longfala lelebet...</button>
+
+    <div class="card">
+        <form id="queryForm">
+            <label>Raetem kwestin blong yu:</label>
+            <div class="input-wrapper">
+                <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?"></textarea>
+                <button type="button" id="clearBtn" class="clear-circle">x</button>
             </div>
-            <div id="answerContent"></div>
-        </div>
-        <div id="welcomeVerse"></div>
+            <div class="btn-row">
+                <button type="submit" id="askBtn">Askem Baebol</button>
+                <button type="button" id="randomBtn">Givim Kwestin</button>
+            </div>
+            <div id="historyBtn"><button type="button" id="showHistoryBtn">Ol kwestin (0)</button></div>
+            <div id="randomQuestions"></div>
+        </form>
     </div>
+
+    <div id="answer">
+        <div id="answerHeader">
+            <button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
+        </div>
+        <div id="answerContent"></div>
+    </div>
+
+    <div id="welcomeVerse"></div>
+
     <div id="historyModal">
         <div>
-            <button type="button" id="closeHistoryBtn" class="clear-circle">x</button>
-            <h3 style="margin:0 0 12px 0;color:var(--primary);text-align:center;">Ol kwestin we yu askem finis</h3>
+            <button id="closeHistoryBtn">x</button>
+            <h3 style="margin:0 0 12px;color:var(--primary);text-align:center">Ol Kwestin We Yu Askem Finis</h3>
             <div id="historyList"></div>
         </div>
     </div>
+
     <footer class="footer">
-        Mi, Ross Webb, mi mekem app ia (2.0). Mi prea se bae God i yusum app ia blo givhan long Kristin laef blong yu.
+        Mi, Ross Webb, mi mekem app ia (2.0).
     </footer>
 
     <script>
-        // === INSTALL PROMPT ===
-        let deferredPrompt=null,installBtn=null;
-        window.addEventListener('beforeinstallprompt',e=>{
-            e.preventDefault();deferredPrompt=e;
-            if(installBtn)installBtn.remove();
-            installBtn=document.createElement('button');
-            installBtn.textContent='Instolem Baebol Kwestin app ia';
-            installBtn.style.cssText=`
-                position:fixed;bottom:30%;left:50%;transform:translateX(-50%);
-                background:#D30000;color:white;padding:16px 20px;border:none;
-                border-radius:16px;font-weight:bold;font-size:18px;z-index:1000;
-                animation:flash .8s infinite;box-shadow:0 4px 12px rgba(0,0,0,.3);
-                min-width:240px;text-align:center`;
-            installBtn.onclick=()=>{installBtn.remove();deferredPrompt.prompt();deferredPrompt=null;};
-            document.body.appendChild(installBtn);
-        });
-
         // === KEYS ===
         const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
         const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
-        marked.setOptions({gfm:true,breaks:false,sanitize:false,headerIds:false});
 
-        const form=document.getElementById('queryForm'),
-              questionInput=document.getElementById('question'),
-              askBtn=document.getElementById('askBtn'),
-              randomBtn=document.getElementById('randomBtn'),
-              answerDiv=document.getElementById('answer'),
-              answerHeader=document.getElementById('answerHeader'),
-              answerContent=document.getElementById('answerContent'),
-              explainMoreBtn=document.getElementById('explainMoreBtn'),
-              randomDiv=document.getElementById('randomQuestions'),
-              clearBtn=document.getElementById('clearBtn'),
-              showHistoryBtn=document.getElementById('showHistoryBtn'),
-              historyModal=document.getElementById('historyModal'),
-              historyList=document.getElementById('historyList'),
-              closeHistoryBtn=document.getElementById('closeHistoryBtn'),
-              welcomeVerse=document.getElementById('welcomeVerse'),
-              shareFab=document.getElementById('shareFab'),
-              darkFab=document.getElementById('darkFab'),
-              sunIcon=document.getElementById('sunIcon'),
-              moonIcon=document.getElementById('moonIcon');
+        marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+
+        // === ELEMENTS ===
+        const shareFab = document.getElementById('shareFab');
+        const darkFab = document.getElementById('darkFab');
+        const moon = document.getElementById('moon');
+        const sun = document.getElementById('sun');
+        const form = document.getElementById('queryForm');
+        const questionInput = document.getElementById('question');
+        const askBtn = document.getElementById('askBtn');
+        const randomBtn = document.getElementById('randomBtn');
+        const randomDiv = document.getElementById('randomQuestions');
+        const answerDiv = document.getElementById('answer');
+        const answerHeader = document.getElementById('answerHeader');
+        const answerContent = document.getElementById('answerContent');
+        const explainMoreBtn = document.getElementById('explainMoreBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const showHistoryBtn = document.getElementById('showHistoryBtn');
+        const welcomeVerse = document.getElementById('welcomeVerse');
+        const historyModal = document.getElementById('historyModal');
+        const historyList = document.getElementById('historyList');
+        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
 
         let currentQuestion = '';
         let isAutoSubmit = false;
@@ -177,7 +145,7 @@
         // === SYSTEM PROMPT ===
         const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
-Answers follow REFORMED theology. Do NOT contradict these truths (they need not appear in every answer):
+Answers follow REFORMED theology. Do NOT contradict these truths:
 - God created everything and is sovereign.
 - Every person sins and needs forgiveness.
 - Jesus, God’s Son, died on the cross to pay for sin.
@@ -200,7 +168,7 @@ End with one short sentence of hope or encouragement.
 Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
 
         // === AI CALLS ===
-        async function tryOpenRouter(q){
+        async function tryOpenRouter(q) {
             const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
                 method: 'POST',
                 headers: {
@@ -219,7 +187,8 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             });
             return { response: res, source: 'OpenRouter' };
         }
-        async function tryGemini(q){
+
+        async function tryGemini(q) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
             const res = await fetch(url, {
                 method: 'POST',
@@ -237,55 +206,62 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             });
             return { response: res, source: 'Gemini' };
         }
+
         async function getAnswer(q, isExplainMore = false) {
             const fullQ = isExplainMore
                 ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from TEV version of the Bible."
                 : q;
+
             try {
-                console.log("Trying Gemini...");
                 const gemini = await tryGemini(fullQ);
                 if (gemini.response.ok) {
                     const data = await gemini.response.json();
                     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) return text;
+                    if (text) return { text, source: 'Gemini' };
                 }
             } catch (e) {}
-            console.log("Falling back to OpenRouter...");
+
             try {
                 const or = await tryOpenRouter(fullQ);
                 if (or.response.ok) {
                     const data = await or.response.json();
                     const text = data.choices?.[0]?.message?.content;
-                    if (text) return text;
+                    if (text) return { text, source: 'OpenRouter' };
                 }
             } catch (e) {}
-            return "Sore, mi no save mekem. Network nogat.";
+
+            return { text: "Sore, mi no karem ansa. Trae bakegen lelebet.", source: 'none' };
         }
 
-        // === HANDLE SUBMIT ===
+        // === SUBMIT ===
         const handleSubmit = async (q) => {
             if (!q) return;
             currentQuestion = q;
             askBtn.disabled = true; askBtn.textContent = 'Wet long ansa...';
             answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
             answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
-            try {
-                const txt = await getAnswer(q);
-                answerContent.innerHTML = marked.parse(txt);
+
+            const result = await getAnswer(q);
+            if (result.source !== 'none') {
+                answerContent.innerHTML = marked.parse(result.text);
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
-                saveAnswer(q, answerContent.innerHTML);
-            } catch (err) {
-                answerContent.innerHTML = `<div class="error">Sore, mi no save ansa.</div>`;
+
+                // EXTRACT FIRST BIBLE VERSE
+                const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+                const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+
+                saveAnswer(q, answerContent.innerHTML, verse);
+            } else {
+                answerContent.innerHTML = `<div class="error">${result.text}</div>`;
                 answerDiv.style.display = 'block';
                 showWelcome();
-            } finally {
-                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-                isAutoSubmit = false;
             }
+
+            askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+            isAutoSubmit = false;
         };
 
-        // === FORM SUBMIT ===
         form.addEventListener('submit', e => {
             e.preventDefault();
             if (isAutoSubmit) return;
@@ -294,47 +270,25 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             handleSubmit(q);
         });
 
-        // === SEEDS ===
+        // === QUESTIONS (1 ANIMISM + 4 GENERAL) ===
         const ANIMISM_SEED = [
             "Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
-            "Is it right for a pastor or any Christian to find out things using 'kastom'?,
             "Is it wrong to use kastom medicine with Bible prayers?",
-            "What does the Bible say about people who see spirits?",
-            "Can a Christian go to a kastom dance?",
             "What does the Bible say about nakaimas?",
-            "Is it okay to burn a house where someone died?",
-            "Can a Christian use love magic?",
-            "What does the Bible say about dreams from spirits?",
-            "Is it wrong to pay bride price?",
-            "Can spirits follow you if you move villages?",
-            "What happens to the spirit of a dead person when he dies?",
-            "Can I do 'kastom' to send the spirit of a dead person away?",
-            "What does the Bible say about tabu places?",
-            "Is it okay to eat food offered to spirits?",
-            "Can a Christian wear 'kastom' clothes to church?",
-            "What does the Bible say about people who do sorcery?",
-            "Is it wrong to go to a 'kastom' healer?",
-            "Can Christians dance in 'kastom' ceremonies?",
-            "What does the Bible say about ancestors watching us?",
-            "Is it okay to keep 'kastom' carvings in the house?",
-            "Can a Christian marry someone from another church?"
+            "Can a Christian go to a kastom dance?"
         ];
-
         const GENERAL_SEED = [
             "What is the greatest commandment?",
             "How can I know God loves me?",
             "Why did Jesus have to die?",
             "What happens when we pray?",
             "How should Christians treat enemies?",
-            "What does the Bible say about forgiveness?",
-            "How can I be saved?",
-            "What is the fruit of the Spirit?",
-            "Why do we need the Holy Spirit?",
-            "What does it mean to be born again?"
+            "What does it mean to be born again?",
+            "Why do we baptize babies?",
+            "What is the Lord’s Supper?"
         ];
 
-        // === SHOW BUTTONS ===
         const showQuestionButtons = qs => {
             randomDiv.innerHTML = '';
             qs.forEach(q => {
@@ -353,26 +307,20 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             randomDiv.style.display = 'block';
         };
 
-        // === GIVIM KWESTIN — BULLETPROOF, NO CRASH, NO DEPLETION ===
-        randomBtn.addEventListener('click', e => {
-            e.preventDefault();
-
+        randomBtn.onclick = () => {
             let c = { general: [], animism: [], used: [] };
             try {
                 const raw = localStorage.getItem('randomQCache');
                 if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && typeof parsed === 'object') {
-                        c.general = Array.isArray(parsed.general) ? parsed.general : [];
-                        c.animism = Array.isArray(parsed.animism) ? parsed.animism : [];
-                        c.used = Array.isArray(parsed.used) ? parsed.used : [];
+                    const p = JSON.parse(raw);
+                    if (p && typeof p === 'object') {
+                        c.general = Array.isArray(p.general) ? p.general : [];
+                        c.animism = Array.isArray(p.animism) ? p.animism : [];
+                        c.used = Array.isArray(p.used) ? p.used : [];
                     }
                 }
-            } catch (err) {
-                console.warn("Cache error. Starting fresh.");
-            }
+            } catch (e) {}
 
-            // REFILL IF EMPTY
             if (c.general.length === 0 && c.animism.length === 0) {
                 c.animism = [...ANIMISM_SEED];
                 c.general = [...GENERAL_SEED];
@@ -380,9 +328,8 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
 
             const five = [];
-            let used = Array.isArray(c.used) ? c.used : [];
+            let used = c.used;
 
-            // 1 ANIMISM
             if (c.animism.length > 0) {
                 const i = Math.floor(Math.random() * c.animism.length);
                 const q = c.animism.splice(i, 1)[0];
@@ -390,89 +337,48 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 used = used.filter(x => x !== q);
             }
 
-            // 4 GENERAL
             while (five.length < 5 && c.general.length > 0) {
                 const i = Math.floor(Math.random() * c.general.length);
                 const q = c.general[i];
-                if (used.includes(q)) {
-                    c.general.splice(i, 1);
-                    continue;
-                }
+                if (used.includes(q)) { c.general.splice(i, 1); continue; }
                 c.general.splice(i, 1);
                 five.push(q);
                 used = used.filter(x => x !== q);
             }
 
-            // AUTO-REFILL IF NEEDED
-            if (five.length < 5) {
-                c.animism = [...ANIMISM_SEED];
-                c.general = [...GENERAL_SEED];
-                c.used = [];
-                while (five.length < 5 && (c.animism.length > 0 || c.general.length > 0)) {
-                    const pool = c.animism.length > 0 ? c.animism : c.general;
-                    const i = Math.floor(Math.random() * pool.length);
-                    const q = pool.splice(i, 1)[0];
-                    if (!five.includes(q)) five.push(q);
-                }
-            }
-
             c.used = [...five, ...used].slice(0, 10);
-            try {
-                localStorage.setItem('randomQCache', JSON.stringify(c));
-            } catch (e) {}
+            try { localStorage.setItem('randomQCache', JSON.stringify(c)); } catch(e) {}
 
             showQuestionButtons(five);
-        });
+        };
 
-        // === EXPLAIN MORE ===
-        explainMoreBtn.onclick = async () => {
-            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-            try {
-                const long = await getAnswer(currentQuestion, true);
-                answerContent.innerHTML = marked.parse(long);
-                saveAnswer(currentQuestion, answerContent.innerHTML);
-            } catch {
-                answerContent.innerHTML += `<p style="color:var(--danger);">Sore, mi no karem ansa.</p>`;
-            } finally {
-                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+        // === SHARE ===
+        shareFab.onclick = async () => {
+            if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
+            const text = answerContent.innerText;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'Baebol Kwestin', text });
+                } catch (e) {
+                    navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+                }
+            } else {
+                navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
             }
         };
 
-        // === INPUT CLEAR ===
-        questionInput.addEventListener('input', () => { 
-            clearBtn.style.display = questionInput.value ? 'flex' : 'none'; 
-        });
-        clearBtn.onclick = () => { 
-            questionInput.value = ''; 
-            clearBtn.style.display = 'none'; 
-            questionInput.focus(); 
-        };
-
-        // === HISTORY ===
+        // === HISTORY & WELCOME VERSE (CLEAN & DYNAMIC) ===
         let history = [];
         try {
             const raw = localStorage.getItem('bibleHistory');
-            history = raw ? JSON.parse(raw) : [];
+            if (raw) {
+                history = JSON.parse(raw).filter(item => item && item.q && item.a);
+            }
         } catch (e) {}
 
-        const extractVerse = html => {
-            const div = document.createElement('div');
-            div.innerHTML = html;
-            const strongs = div.querySelectorAll('strong');
-            for (let s of strongs) {
-                const ref = s.textContent.trim();
-                if (/^[A-Za-z]+\s+\d+:\d+/.test(ref)) {
-                    let em = s.nextElementSibling;
-                    while (em && em.tagName !== 'EM') em = em.nextElementSibling;
-                    if (em) return { ref, text: em.textContent.replace(/^[\s"“]+|[\s"”]+$/g, '').trim() };
-                }
-            }
-            return null;
-        };
-
-        const saveAnswer = (q, a) => {
-            const verse = extractVerse(a);
-            const newItem = { q, a, date: new Date().toLocaleString('en-GB'), verse };
+        const saveAnswer = (q, a, verse) => {
+            const newItem = { q, a, date: new Date().toLocaleString('en-GB') };
+            if (verse) newItem.verse = verse;
             history = [newItem, ...history].slice(0, 50);
             try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
             updateHistoryBtn();
@@ -487,19 +393,22 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         const showWelcome = () => {
             welcomeVerse.style.display = 'none';
+
+            // 1. Use last answer's verse (if exists)
             if (history.length > 0 && history[0].verse) {
                 const v = history[0].verse;
                 welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
             } else {
+                // 2. Daily rotation
                 const verses = [
                     { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
                     { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." },
-                    { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." }
+                    { ref: "Psalm 23:1", text: "The Lord is my shepherd; I have everything I need." },
+                    { ref: "Matthew 11:28", text: "Come to me, all of you who are tired from carrying heavy loads, and I will give you rest." }
                 ];
-                const v = verses[new Date().getDate() % verses.length];
-                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>
-                    <p style="text-align:center;color:#7f8c8d;font-size:.9em;margin:16px 0 0;cursor:pointer;" onclick="document.getElementById('question').focus();">
-                    Tap to ask a question...</p>`;
+                const day = new Date().getDate();
+                const v = verses[day % verses.length];
+                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
             }
             welcomeVerse.style.display = 'block';
         };
@@ -507,45 +416,62 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
-                const d = document.createElement('div');
-                d.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
-                d.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary);">${item.q}</p>
-                               <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d;">${item.date}</p>
-                               <div style="font-size:15px;line-height:1.7;">${item.a}</div>`;
-                d.onclick = () => {
-                    questionInput.value = item.q; 
+                const div = document.createElement('div');
+                div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
+                div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
+                                 <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
+                                 <div style="font-size:15px;line-height:1.7">${item.a}</div>`;
+                div.onclick = () => {
+                    questionInput.value = item.q;
                     questionInput.dispatchEvent(new Event('input'));
-                    answerContent.innerHTML = item.a; 
+                    answerContent.innerHTML = item.a;
                     answerHeader.style.display = 'flex';
-                    answerDiv.style.display = 'block'; 
+                    answerDiv.style.display = 'block';
                     welcomeVerse.style.display = 'none';
                     historyModal.style.display = 'none';
                 };
-                historyList.appendChild(d);
+                historyList.appendChild(div);
             });
             historyModal.style.display = 'flex';
         };
+
         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        shareFab.onclick = async () => {
-            if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
-            const txt = answerContent.innerText;
-            try { await navigator.share({ title: 'Baebol Kwestin', text: txt }); }
-            catch { navigator.clipboard.writeText(txt); alert('Copied!'); }
+        // === EXPLAIN MORE ===
+        explainMoreBtn.onclick = async () => {
+            askBtn.disabled = true; askBtn.textContent = 'Wet...';
+            const result = await getAnswer(currentQuestion, true);
+            if (result.source !== 'none') {
+                answerContent.innerHTML = marked.parse(result.text);
+                const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+                const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+                saveAnswer(currentQuestion, answerContent.innerHTML, verse);
+            }
+            askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
         };
 
+        // === UI ===
         darkFab.onclick = () => {
             document.body.classList.toggle('dark-mode');
-            const dark = document.body.classList.contains('dark-mode');
-            sunIcon.style.display = dark ? 'block' : 'none';
-            moonIcon.style.display = dark ? 'none' : 'block';
+            const isDark = document.body.classList.contains('dark-mode');
+            moon.style.display = isDark ? 'none' : 'block';
+            sun.style.display = isDark ? 'block' : 'none';
+        };
+
+        questionInput.addEventListener('input', () => {
+            clearBtn.style.display = questionInput.value ? 'flex' : 'none';
+        });
+        clearBtn.onclick = () => {
+            questionInput.value = '';
+            clearBtn.style.display = 'none';
+            questionInput.focus();
         };
 
         updateHistoryBtn();
         showWelcome();
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+
+        console.log("WELCOME VERSE CLEAN. NO PLACEHOLDERS. READY FOR DEPLOY.");
     </script>
 </body>
 </html>
-
