@@ -32,7 +32,11 @@
         button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
         #askBtn{background:#2980b9;color:white}#randomBtn{background:#9b59b6;color:white}
         #randomQuestions{margin-top:12px;display:none}
-        .random-q-btn{display:block;width:100%;margin:8px 0;background:var(--accent);color:white;padding:14px;border-radius:12px;cursor:pointer;font-weight:500}
+        .random-q-btn{
+            display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
+            padding:14px;border-radius:12px;cursor:pointer;font-weight:500;text-align:center;
+            font-size:16px;line-height:1.4;max-height:60px;overflow:hidden;
+        }
         .random-q-btn:hover{background:#2980b9}
         #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);display:none;max-height:60vh;overflow-y:auto}
         #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
@@ -54,7 +58,10 @@
         #historyBtn{margin-top:12px;text-align:center;display:none}
         #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
         #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
-        #historyModal>div{background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative}
+        #historyModal>div{
+            background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;
+            overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
+        }
         #closeHistoryBtn{
             position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
             width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
@@ -65,6 +72,7 @@
             padding:12px;background:var(--card);border-top:1px solid var(--border);
         }
         .error{background:#fdf2f2;border:1px solid var(--danger);color:#c0392b;padding:14px;border-radius:8px;text-align:center;font-weight:bold}
+        .loading{color:var(--primary);font-style:italic;text-align:center;margin:12px 0}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -254,7 +262,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
 
-                // EXTRACT FIRST VERSE FROM AI
                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 
@@ -277,7 +284,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             handleSubmit(q);
         });
 
-        // === AI-GENERATED QUESTIONS (TOP-UP) ===
+        // === CLEAN AI QUESTION GENERATOR (NO SIDE EFFECTS) ===
         const ANIMISM_SEED = [
             "Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
@@ -298,31 +305,42 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         const generateAIQuestion = async (type) => {
             const prompt = type === 'animism'
-                ? "Give one short Bible question about animism or kastom beliefs in Vanuatu. Only the question."
-                : "Give one short Bible question about Christian faith. Only the question.";
+                ? "Give ONE short Bible question about animism or kastom in Vanuatu. ONLY the question. No quotes. No extra text."
+                : "Give ONE short Bible question about Christian faith. ONLY the question. No quotes. No extra text.";
             const result = await getAnswer(prompt);
-            return result.source !== 'none' ? result.text.trim().replace(/.*?:\s*/, '').replace(/"/g, '') : null;
+            if (result.source === 'none') return null;
+            let q = result.text.trim();
+            q = q.replace(/^[^?]*\?/, '').trim(); // strip any prefix
+            q = q.replace(/^["']|["']$/g, '');     // strip quotes
+            return q && q.includes('?') ? q : null;
         };
 
-        const showQuestionButtons = qs => {
-            randomDiv.innerHTML = '';
-            qs.forEach(q => {
-                const b = document.createElement('button');
-                b.className = 'random-q-btn';
-                b.textContent = q;
-                b.onclick = () => {
-                    questionInput.value = q;
-                    questionInput.dispatchEvent(new Event('input'));
-                    randomDiv.style.display = 'none';
-                    isAutoSubmit = true;
-                    handleSubmit(q);
-                };
-                randomDiv.appendChild(b);
-            });
+        const showQuestionButtons = (qs) => {
+            randomDiv.innerHTML = '<div class="loading">Wet... mi stap mekem ol kwestin...</div>';
             randomDiv.style.display = 'block';
+
+            setTimeout(() => {
+                randomDiv.innerHTML = '';
+                qs.forEach(q => {
+                    const b = document.createElement('button');
+                    b.className = 'random-q-btn';
+                    b.textContent = q;
+                    b.onclick = () => {
+                        questionInput.value = q;
+                        questionInput.dispatchEvent(new Event('input'));
+                        randomDiv.style.display = 'none';
+                        isAutoSubmit = true;
+                        handleSubmit(q);
+                    };
+                    randomDiv.appendChild(b);
+                });
+            }, 300);
         };
 
         randomBtn.onclick = async () => {
+            randomBtn.disabled = true;
+            randomBtn.textContent = 'Wet...';
+
             let c = { general: [], animism: [], used: [] };
             try {
                 const raw = localStorage.getItem('randomQCache');
@@ -358,12 +376,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
 
             // 4 GENERAL
-            while (five.length < 5) {
-                if (c.general.length === 0) {
-                    const q = await generateAIQuestion('general');
-                    if (q) c.general.push(q);
-                    else break;
-                }
+            while (five.length < 5 && c.general.length > 0) {
                 const i = Math.floor(Math.random() * c.general.length);
                 const q = c.general[i];
                 if (used.includes(q)) { c.general.splice(i, 1); continue; }
@@ -372,10 +385,22 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 used = used.filter(x => x !== q);
             }
 
+            // Top up general if needed
+            while (five.length < 5) {
+                const q = await generateAIQuestion('general');
+                if (!q) break;
+                if (!used.includes(q)) {
+                    five.push(q);
+                    used = used.filter(x => x !== q);
+                }
+            }
+
             c.used = [...five, ...used].slice(0, 10);
             try { localStorage.setItem('randomQCache', JSON.stringify(c)); } catch(e) {}
 
             showQuestionButtons(five);
+            randomBtn.disabled = false;
+            randomBtn.textContent = 'Givim Kwestin';
         };
 
         // === SHARE ===
@@ -383,23 +408,18 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
             const text = answerContent.innerText;
             if (navigator.share) {
-                try {
-                    await navigator.share({ title: 'Baebol Kwestin', text });
-                } catch (e) {
-                    navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
-                }
+                try { await navigator.share({ title: 'Baebol Kwestin', text }); }
+                catch { navigator.clipboard.writeText(text).then(() => alert('Copied!')); }
             } else {
-                navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard!'));
+                navigator.clipboard.writeText(text).then(() => alert('Copied!'));
             }
         };
 
-        // === HISTORY & WELCOME VERSE (LAST AI VERSE) ===
+        // === HISTORY & WELCOME VERSE ===
         let history = [];
         try {
             const raw = localStorage.getItem('bibleHistory');
-            if (raw) {
-                history = JSON.parse(raw).filter(item => item && item.q && item.a);
-            }
+            if (raw) history = JSON.parse(raw).filter(i => i && i.q && i.a);
         } catch (e) {}
 
         const saveAnswer = (q, a, verse) => {
@@ -419,14 +439,13 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         const showWelcome = () => {
             welcomeVerse.style.display = 'none';
-
             if (history.length > 0 && history[0].verse) {
                 const v = history[0].verse;
                 welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
             } else {
                 const verses = [
-                    { ref: "John 3:16", text: "For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life." },
-                    { ref: "Romans 8:28", text: "We know that in all things God works for good with those who love him, those whom he has called according to his purpose." }
+                    { ref: "John 3:16", text: "For God loved the world so much..." },
+                    { ref: "Romans 8:28", text: "We know that in all things God works..." }
                 ];
                 const v = verses[new Date().getDate() % verses.length];
                 welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
@@ -434,7 +453,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             welcomeVerse.style.display = 'block';
         };
 
-        // === MODAL: FLOAT X + SWIPE TO CLOSE ===
         showHistoryBtn.onclick = () => {
             historyList.innerHTML = '';
             history.forEach(item => {
@@ -460,17 +478,14 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
         historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-        // SWIPE TO CLOSE
         let touchStartX = 0;
         historyModal.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
         historyModal.addEventListener('touchend', e => {
-            const touchEndX = e.changedTouches[0].clientX;
-            if (Math.abs(touchEndX - touchStartX) > 100) {
+            if (Math.abs(e.changedTouches[0].clientX - touchStartX) > 100) {
                 historyModal.style.display = 'none';
             }
         });
 
-        // === EXPLAIN MORE ===
         explainMoreBtn.onclick = async () => {
             askBtn.disabled = true; askBtn.textContent = 'Wet...';
             const result = await getAnswer(currentQuestion, true);
@@ -503,7 +518,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         updateHistoryBtn();
         showWelcome();
 
-        console.log("ALL 5 FIXED. WELCOME VERSE = LAST AI VERSE. AI QUESTIONS. STICKY FOOTER. SWIPE CLOSE.");
+        console.log("CLEAN. FAST. RED X FLOATS. BUTTONS SHOW ONLY QUESTION.");
     </script>
 </body>
 </html>
