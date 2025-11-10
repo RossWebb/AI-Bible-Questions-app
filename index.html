@@ -48,6 +48,9 @@
         #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
         #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px}
         #answerContent{line-height:1.8;font-size:15px}
+        /* BULLET INDENT FIX */
+        #answerContent ul, #answerContent ol { padding-left: 1.5em; margin: 0.5em 0; }
+        #answerContent li { margin-bottom: 0.3em; }
         #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
         #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
         #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:1.2rem;position:relative}
@@ -134,7 +137,7 @@
     </div>
 
     <footer class="footer">
-        Mi, Ross Webb, mi mekem app ia (2.0).
+        Ross Webb i mekem app ia (2.0).
     </footer>
 
     <script>
@@ -193,7 +196,7 @@ Do *NOT* start with an introductory greeting
 End with one short sentence of hope or encouragement.
 Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
 
-        // === AI CALLS WITH TIMEOUT ===
+        // === FETCH WITH TIMEOUT ===
         async function fetchWithTimeout(url, options = {}, timeout = 10000) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), timeout);
@@ -207,6 +210,34 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         }
 
+        // === FAST QUESTION GENERATOR (50 tokens) ===
+        async function getQuestion(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
+            try {
+                const res = await fetchWithTimeout(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { maxOutputTokens: 50, temperature: 0.8 }
+                    })
+                }, 8000);
+
+                if (!res.ok) return null;
+                const data = await res.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) return null;
+
+                let q = text.trim();
+                q = q.replace(/^[^?]*\?/, '').trim();
+                q = q.replace(/^["']|["']$/g, '');
+                return q && q.includes('?') ? q : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // === ANSWER GENERATOR ===
         async function tryOpenRouter(q) {
             try {
                 const res = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
@@ -280,7 +311,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         const handleSubmit = async (q) => {
             if (!q) return;
             currentQuestion = q;
-            askBtn.disabled = true; askBtn.textContent = 'Wet long ansa...';
+            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
             answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
             answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
 
@@ -312,13 +343,28 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             handleSubmit(q);
         });
 
-        // === AI QUESTIONS: 1 ANIMISM + 4 GENERAL (CACHED) ===
+        // === AI QUESTIONS: 1 ANIMISM + 4 FRESH AI ===
         const ANIMISM_SEED = [
             "Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
             "Is it wrong to use kastom medicine with Bible prayers?",
+            "What does the Bible say about people who see spirits?",
+            "Can a Christian go to a kastom dance?",
             "What does the Bible say about nakaimas?",
-            "Can a Christian go to a kastom dance?"
+            "Is it okay to burn a house where someone died?",
+            "Can a Christian use love magic?",
+            "What does the Bible say about dreams from spirits?",
+            "Is it wrong to pay bride price with kastom money?",
+            "Can spirits follow you if you move villages?",
+            "What does the Bible say about tabu places?",
+            "Is it okay to eat food offered to spirits?",
+            "Can a Christian wear kastom clothes to church?",
+            "What does the Bible say about people who do poison?",
+            "Is it wrong to go to a kastom healer?",
+            "Can Christians dance in kastom ceremonies?",
+            "What does the Bible say about ancestors watching us?",
+            "Is it okay to keep kastom carvings in the house?",
+            "Can a Christian marry someone who follows kastom?"
         ];
 
         const AI_QUESTION_CACHE = { general: [], animism: [], used: [] };
@@ -350,12 +396,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
 
         const generateSingleAIQuestion = async () => {
             const prompt = "Give ONE short Bible question about Christian faith. ONLY the question. No quotes. No extra text.";
-            const result = await getAnswer(prompt);
-            if (result.source === 'none') return null;
-            let q = result.text.trim();
-            q = q.replace(/^[^?]*\?/, '').trim();
-            q = q.replace(/^["']|["']$/g, '');
-            return q && q.includes('?') ? q : null;
+            return await getQuestion(prompt);
         };
 
         const showQuestionButtons = (qs) => {
@@ -383,6 +424,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             const five = [];
             const used = [...AI_QUESTION_CACHE.used];
 
+            // 1 ANIMISM
             if (AI_QUESTION_CACHE.animism.length > 0) {
                 const i = Math.floor(Math.random() * AI_QUESTION_CACHE.animism.length);
                 const q = AI_QUESTION_CACHE.animism.splice(i, 1)[0];
@@ -390,6 +432,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 used.push(q);
             }
 
+            // 4 FRESH AI
             while (five.length < 5 && AI_QUESTION_CACHE.general.length > 0) {
                 const i = Math.floor(Math.random() * AI_QUESTION_CACHE.general.length);
                 const q = AI_QUESTION_CACHE.general.splice(i, 1)[0];
@@ -399,30 +442,31 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 }
             }
 
-            if (five.length < 5) {
-                randomDiv.innerHTML = '<div class="loading">No internet. Using seed questions...</div>';
-                const fallback = ANIMISM_SEED.slice(0, 5);
-                setTimeout(() => showQuestionButtons(fallback), 500);
-            } else {
-                showQuestionButtons(five);
-            }
-
+            // REFILL CACHE
             setTimeout(async () => {
                 while (AI_QUESTION_CACHE.general.length < 10) {
                     const q = await generateSingleAIQuestion();
-                    if (q && !AI_QUESTION_CACHE.used.includes(q)) {
+                    if (q && !used.includes(q)) {
                         AI_QUESTION_CACHE.general.push(q);
                     } else break;
                 }
                 try { localStorage.setItem('aiQuestionCache', JSON.stringify(AI_QUESTION_CACHE)); } catch(e) {}
             }, 100);
 
+            // SHOW
+            if (five.length === 0) {
+                randomDiv.innerHTML = '<div class="loading">No internet. Using seed...</div>';
+                setTimeout(() => showQuestionButtons(ANIMISM_SEED.slice(0,5)), 500);
+            } else {
+                showQuestionButtons(five);
+            }
+
             AI_QUESTION_CACHE.used = used.slice(0, 10);
             randomBtn.disabled = false;
             randomBtn.textContent = 'Givim Kwestin';
         };
 
-        // === SHARE ===
+        // === SHARE, HISTORY, UI, PWA ===
         shareFab.onclick = async () => {
             if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
             const text = answerContent.innerText;
@@ -434,7 +478,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         };
 
-        // === HISTORY & WELCOME VERSE ===
         let history = [];
         try {
             const raw = localStorage.getItem('bibleHistory');
@@ -506,7 +549,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         });
 
         explainMoreBtn.onclick = async () => {
-            askBtn.disabled = true; askBtn.textContent = 'Wet...';
+            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
             const result = await getAnswer(currentQuestion, true);
             if (result.source !== 'none') {
                 answerContent.innerHTML = marked.parse(result.text);
@@ -517,7 +560,6 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
         };
 
-        // === UI ===
         darkFab.onclick = () => {
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
@@ -534,10 +576,9 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             questionInput.focus();
         };
 
-        // === PWA INSTALL: FLASHING RED + iOS SUPPORT ===
+        // === PWA INSTALL ===
         let deferredPrompt;
         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isAndroid = /Android/.test(navigator.userAgent);
 
         window.addEventListener('beforeinstallprompt', e => {
             if (!isIOS) {
@@ -545,7 +586,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 deferredPrompt = e;
                 const btn = document.createElement('button');
                 btn.id = 'installBtn';
-                btn.textContent = 'Install App';
+                btn.textContent = 'Instolem Baebol Kwestin app ia';
                 btn.onclick = () => {
                     btn.style.display = 'none';
                     deferredPrompt.prompt();
@@ -558,15 +599,13 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             }
         });
 
-        // iOS: Show instruction
         if (isIOS && !window.navigator.standalone) {
             const iosBtn = document.createElement('div');
             iosBtn.id = 'iosInstall';
-            iosBtn.innerHTML = 'Tap <strong>Share</strong> → <strong>Add to Home Screen</strong>';
+            iosBtn.innerHTML = 'Tap <strong>Share</strong> → <strong>Add to Home Screen</strong> blong instolem app';
             document.body.appendChild(iosBtn);
         }
 
-        // === SERVICE WORKER ===
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
@@ -576,7 +615,7 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
         showWelcome();
         preloadAIQuestions();
 
-        console.log("RED X FLOATS. 5 QUESTIONS. NO HANG. FLASHING INSTALL. iOS + ANDROID.");
+        console.log("RED X FLOATS. 1+4 FRESH. BULLETS INDENTED. GEMINI 2.5. DONE.");
     </script>
 </body>
 </html>
