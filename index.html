@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,14 +41,13 @@
         .random-q-btn{
             display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
             padding:14px;border-radius:12px;cursor:pointer;font-weight:500;text-align:center;
-            font-size:15px;line-height:1.4;max-height:60px;overflow:hidden;
+            font-size:15px;line-height:1.4;
         }
         .random-q-btn:hover{background:#2980b9}
         #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);display:none;max-height:60vh;overflow-y:auto}
         #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
         #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px}
         #answerContent{line-height:1.8;font-size:15px}
-        /* BULLET INDENT FIX */
         #answerContent ul, #answerContent ol { padding-left: 1.5em; margin: 0.5em 0; }
         #answerContent li { margin-bottom: 0.3em; }
         #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
@@ -64,33 +63,20 @@
             overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
         }
         #closeHistoryBtn{
-            position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
+            position:sticky;top:8px;right:8px;background:var(--danger);color:white;border:none;
             width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;z-index:11;
+            display:flex;align-items:center;justify-content:center;float:right;margin-bottom:8px;z-index:999;
         }
         .footer{
             margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
             padding:12px;background:var(--card);border-top:1px solid var(--border);
         }
-        .error{background:#fdf2f2;border:1px solid var(--danger);color:#c0392b;padding:14px;border-radius:8px;text-align:center;font-weight:bold}
-        .loading{color:var(--primary);font-style:italic;text-align:center;margin:12px 0;font-size:15px}
-        /* FLASHING INSTALL BUTTON */
-        #installBtn{
-            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-            background:#e74c3c;color:white;padding:14px 20px;border-radius:12px;
-            font-weight:bold;z-index:1000;box-shadow:0 4px 12px rgba(231,76,60,.5);
-            animation:flash 1.5s infinite;border:none;cursor:pointer;
-        }
-        @keyframes flash{0%,100%{background:#e74c3c}50%{background:#c0392b}}
-        #iosInstall{
-            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-            background:#1a5276;color:white;padding:14px 20px;border-radius:12px;
-            font-weight:bold;z-index:1000;text-align:center;max-width:90%;
-        }
+        #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+
     <div class="header">
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
@@ -116,6 +102,7 @@
             </div>
             <div id="historyBtn"><button type="button" id="showHistoryBtn">Ol kwestin (0)</button></div>
             <div id="randomQuestions"></div>
+            <div id="debug"></div>
         </form>
     </div>
 
@@ -137,44 +124,61 @@
     </div>
 
     <footer class="footer">
-        Ross Webb i mekem app ia (2.0).
+        Ross Webb i mekem app ia (2.0) — 12 Nov 2025
     </footer>
 
     <script>
-        // === KEYS ===
-        const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
-        const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
+        document.addEventListener('DOMContentLoaded', () => {
 
-        marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+            // === KEYS ===
+            const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
+            const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
 
-        // === ELEMENTS ===
-        const shareFab = document.getElementById('shareFab');
-        const darkFab = document.getElementById('darkFab');
-        const moon = document.getElementById('moon');
-        const sun = document.getElementById('sun');
-        const form = document.getElementById('queryForm');
-        const questionInput = document.getElementById('question');
-        const askBtn = document.getElementById('askBtn');
-        const randomBtn = document.getElementById('randomBtn');
-        const randomDiv = document.getElementById('randomQuestions');
-        const answerDiv = document.getElementById('answer');
-        const answerHeader = document.getElementById('answerHeader');
-        const answerContent = document.getElementById('answerContent');
-        const explainMoreBtn = document.getElementById('explainMoreBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const showHistoryBtn = document.getElementById('showHistoryBtn');
-        const welcomeVerse = document.getElementById('welcomeVerse');
-        const historyModal = document.getElementById('historyModal');
-        const historyList = document.getElementById('historyList');
-        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+            marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
-        let currentQuestion = '';
-        let isAutoSubmit = false;
+            // === ELEMENTS ===
+            const darkFab = document.getElementById('darkFab');
+            const moon = document.getElementById('moon');
+            const sun = document.getElementById('sun');
+            const form = document.getElementById('queryForm');
+            const questionInput = document.getElementById('question');
+            const askBtn = document.getElementById('askBtn');
+            const randomBtn = document.getElementById('randomBtn');
+            const randomDiv = document.getElementById('randomQuestions');
+            const answerDiv = document.getElementById('answer');
+            const answerHeader = document.getElementById('answerHeader');
+            const answerContent = document.getElementById('answerContent');
+            const explainMoreBtn = document.getElementById('explainMoreBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const showHistoryBtn = document.getElementById('showHistoryBtn');
+            const welcomeVerse = document.getElementById('welcomeVerse');
+            const historyModal = document.getElementById('historyModal');
+            const historyList = document.getElementById('historyList');
+            const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+            const debugDiv = document.getElementById('debug');
 
-        // === SYSTEM PROMPT ===
-        const systemPrompt = `You are a kind Bible teacher in Vanuatu.
+            let currentQuestion = '';
+            let isAutoSubmit = false;
+
+            // === DARK MODE ===
+            darkFab.onclick = () => {
+                document.body.classList.toggle('dark-mode');
+                const isDark = document.body.classList.contains('dark-mode');
+                moon.style.display = isDark ? 'none' : 'block';
+                sun.style.display = isDark ? 'block' : 'none';
+                localStorage.setItem('darkMode', isDark);
+            };
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                moon.style.display = 'none';
+                sun.style.display = 'block';
+            }
+
+            // === SYSTEM PROMPT ===
+            const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
-Answers follow REFORMED theology. Do NOT contradict these truths:
+Answers follow solid REFORMED theology. 
+Do NOT contradict these truths:
 - God created everything and is sovereign.
 - Every person sins and needs forgiveness.
 - Jesus, God’s Son, died on the cross to pay for sin.
@@ -190,133 +194,117 @@ Do *NOT* start with an introductory greeting
 - bullet points
 - keep short
 ### Step 2: Remember This
+Followed by at least 3 supporting verses, each on a new line, from NIrV version of the Bible styled like this:
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
-**Romans 5:8** *"But God has shown us how much he loves us—it was while we were still sinners that Christ died for us!"*
-**Ephesians 2:8-9** *"For it is by God's grace that you have been saved through faith. It is not the result of your own efforts, but God's gift, so that no one can boast about it."*
+
 End with one short sentence of hope or encouragement.
-Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kind.`;
+Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
 
-        // === FETCH WITH TIMEOUT ===
-        async function fetchWithTimeout(url, options = {}, timeout = 10000) {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), timeout);
-            try {
-                const res = await fetch(url, { ...options, signal: controller.signal });
-                clearTimeout(id);
-                return res;
-            } catch (e) {
-                clearTimeout(id);
-                throw e;
-            }
-        }
-
-        // === FAST QUESTION GENERATOR (50 tokens) ===
-        async function getQuestion(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-            try {
-                const res = await fetchWithTimeout(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
-                        generationConfig: { maxOutputTokens: 50, temperature: 0.8 }
-                    })
-                }, 8000);
-
-                if (!res.ok) return null;
-                const data = await res.json();
-                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (!text) return null;
-
-                let q = text.trim();
-                q = q.replace(/^[^?]*\?/, '').trim();
-                q = q.replace(/^["']|["']$/g, '');
-                return q && q.includes('?') ? q : null;
-            } catch (e) {
-                return null;
-            }
-        }
-
-        // === ANSWER GENERATOR ===
-        async function tryOpenRouter(q) {
-            try {
-                const res = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OR_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "mistralai/devstral-small-2505:free",
-                        messages: [
-                            { role: "system", content: systemPrompt },
-                            { role: "user", content: q }
-                        ],
-                        max_tokens: 4000,
-                        temperature: 0.7
-                    })
-                });
-                return { response: res, source: 'OpenRouter' };
-            } catch (e) { return { response: null, source: 'none' }; }
-        }
-
-        async function tryGemini(q) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
-            try {
-                const res = await fetchWithTimeout(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + q }] }],
-                        generationConfig: { maxOutputTokens: 8192, temperature: 0.7 },
-                        safetySettings: [
-                            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-                        ]
-                    })
-                });
-                return { response: res, source: 'Gemini' };
-            } catch (e) { return { response: null, source: 'none' }; }
-        }
-
-        async function getAnswer(q, isExplainMore = false) {
-            const fullQ = isExplainMore
-                ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from TEV version of the Bible."
-                : q;
-
-            try {
-                const gemini = await tryGemini(fullQ);
-                if (gemini.response && gemini.response.ok) {
-                    const data = await gemini.response.json();
-                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (text) return { text, source: 'Gemini' };
+            // === FETCH WITH TIMEOUT ===
+            async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                try {
+                    const res = await fetch(url, { ...options, signal: controller.signal });
+                    clearTimeout(id);
+                    return res;
+                } catch (e) {
+                    clearTimeout(id);
+                    console.error("Fetch failed:", e.message);
+                    throw e;
                 }
-            } catch (e) {}
+            }
 
-            try {
-                const or = await tryOpenRouter(fullQ);
-                if (or.response && or.response.ok) {
-                    const data = await or.response.json();
-                    const text = data.choices?.[0]?.message?.content;
-                    if (text) return { text, source: 'OpenRouter' };
-                }
-            } catch (e) {}
+            // === ANSWER GENERATOR ===
+            async function getAnswer(q, isExplainMore = false) {
+                const fullQ = isExplainMore
+                    ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from NIrv version of the Bible."
+                    : q;
 
-            return { text: "Sore, mi no karem ansa. Trae bakegen lelebet.", source: 'none' };
-        }
+                // TIER 1: GEMINI 2.5 FLASH
+                try {
+                    const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + fullQ }] }],
+                            generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
+                            safetySettings: [
+                                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+                            ]
+                        })
+                    }, 15000);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text && text.length > 150) {
+                            debugDiv.textContent = "Gemini 2.5 Flash";
+                            return { text, source: 'Gemini' };
+                        }
+                    }
+                } catch (e) {}
 
-        // === SUBMIT ===
-        const handleSubmit = async (q) => {
-            if (!q) return;
-            currentQuestion = q;
-            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-            answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
-            answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
+                // TIER 2: MISTRAL MIXTRAL
+                try {
+                    const res = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${OR_KEY}`
+                        },
+                        body: JSON.stringify({
+                            model: "mistralai/mixtral-8x22b-instruct:free",
+                            messages: [
+                                { role: "system", content: systemPrompt },
+                                { role: "user", content: fullQ }
+                            ],
+                            max_tokens: 2000,
+                            temperature: 0.7
+                        })
+                    }, 15000);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = data.choices?.[0]?.message?.content;
+                        if (text && text.length > 150) {
+                            debugDiv.textContent = "OpenRouter (Mixtral 8x22B)";
+                            return { text, source: 'OpenRouter' };
+                        }
+                    }
+                } catch (e) {}
 
-            const result = await getAnswer(q);
-            if (result.source !== 'none') {
+                // TIER 3: FALLBACK
+                debugDiv.textContent = "Fallback (no connection)";
+                return {
+                    text: `## Jesus is Stronger
+
+### Step 1: Know This
+- Spirits are real, but Jesus is Lord over all.
+- The Bible says do not talk to the dead.
+- Trust God, not kastom power.
+
+### Step 2: Remember This
+**Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
+**Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn’t you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
+**Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
+
+Jesus wins. You are safe in Him.`,
+                    source: 'fallback'
+                };
+            }
+
+            // === SUBMIT ===
+            const handleSubmit = async (q) => {
+                if (!q) return;
+                currentQuestion = q;
+                askBtn.disabled = true; askBtn.textContent = 'Please wait...';
+                answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
+                answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
+                debugDiv.textContent = 'Loading...';
+
+                const result = await getAnswer(q);
                 answerContent.innerHTML = marked.parse(result.text);
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
@@ -325,27 +313,22 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 
                 saveAnswer(q, answerContent.innerHTML, verse);
-            } else {
-                answerContent.innerHTML = `<div class="error">${result.text}</div>`;
-                answerDiv.style.display = 'block';
-                showWelcome();
-            }
 
-            askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-            isAutoSubmit = false;
-        };
+                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+                isAutoSubmit = false;
+            };
 
-        form.addEventListener('submit', e => {
-            e.preventDefault();
-            if (isAutoSubmit) return;
-            const q = questionInput.value.trim();
-            if (!q) return;
-            handleSubmit(q);
-        });
+            form.addEventListener('submit', e => {
+                e.preventDefault();
+                if (isAutoSubmit) return;
+                const q = questionInput.value.trim();
+                if (!q) return;
+                handleSubmit(q);
+            });
 
-        // === AI QUESTIONS: 1 ANIMISM + 4 FRESH AI ===
-        const ANIMISM_SEED = [
-            "Why does the Bible say not to talk to dead people?",
+            // === RANDOM QUESTIONS ===
+            const ANIMISM_SEED = [
+			"Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
             "Is it wrong to use kastom medicine with Bible prayers?",
             "What does the Bible say about people who see spirits?",
@@ -364,258 +347,124 @@ Keep under 350 words. Cite 3+ verses from the TEV Bible. Be warm, clear, and kin
             "Can Christians dance in kastom ceremonies?",
             "What does the Bible say about ancestors watching us?",
             "Is it okay to keep kastom carvings in the house?",
+			"Should I burn my old kastom things?",
             "Can a Christian marry someone who follows kastom?"
-        ];
+            ];
 
-        const AI_QUESTION_CACHE = { general: [], animism: [], used: [] };
+            const AI_QUESTIONS = [
+                "What does it mean to be born again?",
+                "How can I know God forgives me?",
+                "Why did Jesus have to die on the cross?",
+                "What is the Holy Spirit and what does He do?"
+            ];
 
-        const preloadAIQuestions = async () => {
+            const showQuestionButtons = (qs) => {
+                randomDiv.innerHTML = '';
+                qs.forEach(q => {
+                    const b = document.createElement('button');
+                    b.className = 'random-q-btn';
+                    b.textContent = q;
+                    b.onclick = () => {
+                        questionInput.value = q;
+                        questionInput.dispatchEvent(new Event('input'));
+                        randomDiv.style.display = 'none';
+                        isAutoSubmit = true;
+                        handleSubmit(q);
+                    };
+                    randomDiv.appendChild(b);
+                });
+                randomDiv.style.display = 'block';
+            };
+
+            randomBtn.onclick = () => {
+                const animism = ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
+                const shuffledAI = AI_QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 4);
+                showQuestionButtons([animism, ...shuffledAI]);
+            };
+
+            // === HISTORY & WELCOME ===
+            let history = [];
             try {
-                const raw = localStorage.getItem('aiQuestionCache');
-                if (raw) {
-                    const data = JSON.parse(raw);
-                    AI_QUESTION_CACHE.general = Array.isArray(data.general) ? data.general : [];
-                    AI_QUESTION_CACHE.animism = Array.isArray(data.animism) ? data.animism : [];
-                    AI_QUESTION_CACHE.used = Array.isArray(data.used) ? data.used : [];
-                }
+                const raw = localStorage.getItem('bibleHistory');
+                if (raw) history = JSON.parse(raw).filter(i => i && i.q && i.a);
             } catch (e) {}
 
-            if (AI_QUESTION_CACHE.animism.length === 0) {
-                AI_QUESTION_CACHE.animism = [...ANIMISM_SEED];
-            }
+            const saveAnswer = (q, a, verse) => {
+                const newItem = { q, a, date: new Date().toLocaleString('en-GB') };
+                if (verse) newItem.verse = verse;
+                history = [newItem, ...history].slice(0, 50);
+                try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
+                updateHistoryBtn();
+                showWelcome();
+            };
 
-            while (AI_QUESTION_CACHE.general.length < 10) {
-                const q = await generateSingleAIQuestion();
-                if (q && !AI_QUESTION_CACHE.used.includes(q)) {
-                    AI_QUESTION_CACHE.general.push(q);
-                } else break;
-            }
+            const updateHistoryBtn = () => {
+                const cnt = history.length;
+                showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
+                document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
+            };
 
-            try { localStorage.setItem('aiQuestionCache', JSON.stringify(AI_QUESTION_CACHE)); } catch(e) {}
-        };
-
-        const generateSingleAIQuestion = async () => {
-            const prompt = "Give ONE short Bible question about Christian faith. ONLY the question. No quotes. No extra text.";
-            return await getQuestion(prompt);
-        };
-
-        const showQuestionButtons = (qs) => {
-            randomDiv.innerHTML = '';
-            qs.forEach(q => {
-                const b = document.createElement('button');
-                b.className = 'random-q-btn';
-                b.textContent = q;
-                b.onclick = () => {
-                    questionInput.value = q;
-                    questionInput.dispatchEvent(new Event('input'));
-                    randomDiv.style.display = 'none';
-                    isAutoSubmit = true;
-                    handleSubmit(q);
-                };
-                randomDiv.appendChild(b);
-            });
-            randomDiv.style.display = 'block';
-        };
-
-        randomBtn.onclick = async () => {
-            randomBtn.disabled = true;
-            randomBtn.textContent = 'Wet...';
-
-            const five = [];
-            const used = [...AI_QUESTION_CACHE.used];
-
-            // 1 ANIMISM
-            if (AI_QUESTION_CACHE.animism.length > 0) {
-                const i = Math.floor(Math.random() * AI_QUESTION_CACHE.animism.length);
-                const q = AI_QUESTION_CACHE.animism.splice(i, 1)[0];
-                five.push(q);
-                used.push(q);
-            }
-
-            // 4 FRESH AI
-            while (five.length < 5 && AI_QUESTION_CACHE.general.length > 0) {
-                const i = Math.floor(Math.random() * AI_QUESTION_CACHE.general.length);
-                const q = AI_QUESTION_CACHE.general.splice(i, 1)[0];
-                if (!used.includes(q)) {
-                    five.push(q);
-                    used.push(q);
+            const showWelcome = () => {
+                welcomeVerse.style.display = 'none';
+                if (history.length > 0 && history[0].verse) {
+                    const v = history[0].verse;
+                    welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
+                } else {
+                    const v = { ref: "John 3:16", text: "For God loved the world so much that he gave his one and only Son, so that everyone who believes in him may not die but have eternal life." };
+                    welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
                 }
-            }
+                welcomeVerse.style.display = 'block';
+            };
 
-            // REFILL CACHE
-            setTimeout(async () => {
-                while (AI_QUESTION_CACHE.general.length < 10) {
-                    const q = await generateSingleAIQuestion();
-                    if (q && !used.includes(q)) {
-                        AI_QUESTION_CACHE.general.push(q);
-                    } else break;
-                }
-                try { localStorage.setItem('aiQuestionCache', JSON.stringify(AI_QUESTION_CACHE)); } catch(e) {}
-            }, 100);
+            showHistoryBtn.onclick = () => {
+                historyList.innerHTML = '';
+                history.forEach(item => {
+                    const div = document.createElement('div');
+                    div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
+                    div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
+                                     <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
+                                     <div style="font-size:15px;line-height:1.7">${item.a}</div>`;
+                    div.onclick = () => {
+                        questionInput.value = item.q;
+                        questionInput.dispatchEvent(new Event('input'));
+                        answerContent.innerHTML = item.a;
+                        answerHeader.style.display = 'flex';
+                        answerDiv.style.display = 'block';
+                        welcomeVerse.style.display = 'none';
+                        historyModal.style.display = 'none';
+                    };
+                    historyList.appendChild(div);
+                });
+                historyModal.style.display = 'flex';
+            };
 
-            // SHOW
-            if (five.length === 0) {
-                randomDiv.innerHTML = '<div class="loading">No internet. Using seed...</div>';
-                setTimeout(() => showQuestionButtons(ANIMISM_SEED.slice(0,5)), 500);
-            } else {
-                showQuestionButtons(five);
-            }
+            closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
+            historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-            AI_QUESTION_CACHE.used = used.slice(0, 10);
-            randomBtn.disabled = false;
-            randomBtn.textContent = 'Givim Kwestin';
-        };
-
-        // === SHARE, HISTORY, UI, PWA ===
-        shareFab.onclick = async () => {
-            if (!answerDiv.style.display || answerDiv.style.display === 'none') return;
-            const text = answerContent.innerText;
-            if (navigator.share) {
-                try { await navigator.share({ title: 'Baebol Kwestin', text }); }
-                catch { navigator.clipboard.writeText(text).then(() => alert('Copied!')); }
-            } else {
-                navigator.clipboard.writeText(text).then(() => alert('Copied!'));
-            }
-        };
-
-        let history = [];
-        try {
-            const raw = localStorage.getItem('bibleHistory');
-            if (raw) history = JSON.parse(raw).filter(i => i && i.q && i.a);
-        } catch (e) {}
-
-        const saveAnswer = (q, a, verse) => {
-            const newItem = { q, a, date: new Date().toLocaleString('en-GB') };
-            if (verse) newItem.verse = verse;
-            history = [newItem, ...history].slice(0, 50);
-            try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
-            updateHistoryBtn();
-            showWelcome();
-        };
-
-        const updateHistoryBtn = () => {
-            const cnt = history.length;
-            showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
-            document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
-        };
-
-        const showWelcome = () => {
-            welcomeVerse.style.display = 'none';
-            if (history.length > 0 && history[0].verse) {
-                const v = history[0].verse;
-                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
-            } else {
-                const verses = [
-                    { ref: "John 3:16", text: "For God loved the world so much..." },
-                    { ref: "Romans 8:28", text: "We know that in all things God works..." }
-                ];
-                const v = verses[new Date().getDate() % verses.length];
-                welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
-            }
-            welcomeVerse.style.display = 'block';
-        };
-
-        showHistoryBtn.onclick = () => {
-            historyList.innerHTML = '';
-            history.forEach(item => {
-                const div = document.createElement('div');
-                div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
-                div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
-                                 <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
-                                 <div style="font-size:15px;line-height:1.7">${item.a}</div>`;
-                div.onclick = () => {
-                    questionInput.value = item.q;
-                    questionInput.dispatchEvent(new Event('input'));
-                    answerContent.innerHTML = item.a;
-                    answerHeader.style.display = 'flex';
-                    answerDiv.style.display = 'block';
-                    welcomeVerse.style.display = 'none';
-                    historyModal.style.display = 'none';
-                };
-                historyList.appendChild(div);
-            });
-            historyModal.style.display = 'flex';
-        };
-
-        closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
-        historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-
-        let touchStartX = 0;
-        historyModal.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
-        historyModal.addEventListener('touchend', e => {
-            if (Math.abs(e.changedTouches[0].clientX - touchStartX) > 100) {
-                historyModal.style.display = 'none';
-            }
-        });
-
-        explainMoreBtn.onclick = async () => {
-            askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-            const result = await getAnswer(currentQuestion, true);
-            if (result.source !== 'none') {
+            explainMoreBtn.onclick = async () => {
+                askBtn.disabled = true; askBtn.textContent = 'Please wait...';
+                const result = await getAnswer(currentQuestion, true);
                 answerContent.innerHTML = marked.parse(result.text);
                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
                 saveAnswer(currentQuestion, answerContent.innerHTML, verse);
-            }
-            askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-        };
+                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+            };
 
-        darkFab.onclick = () => {
-            document.body.classList.toggle('dark-mode');
-            const isDark = document.body.classList.contains('dark-mode');
-            moon.style.display = isDark ? 'none' : 'block';
-            sun.style.display = isDark ? 'block' : 'none';
-        };
+            questionInput.addEventListener('input', () => {
+                clearBtn.style.display = questionInput.value ? 'flex' : 'none';
+            });
+            clearBtn.onclick = () => {
+                questionInput.value = '';
+                clearBtn.style.display = 'none';
+                questionInput.focus();
+            };
 
-        questionInput.addEventListener('input', () => {
-            clearBtn.style.display = questionInput.value ? 'flex' : 'none';
-        });
-        clearBtn.onclick = () => {
-            questionInput.value = '';
-            clearBtn.style.display = 'none';
-            questionInput.focus();
-        };
+            // === INIT ===
+            updateHistoryBtn();
+            showWelcome();
 
-        // === PWA INSTALL ===
-        let deferredPrompt;
-        const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-        window.addEventListener('beforeinstallprompt', e => {
-            if (!isIOS) {
-                e.preventDefault();
-                deferredPrompt = e;
-                const btn = document.createElement('button');
-                btn.id = 'installBtn';
-                btn.textContent = 'Instolem Baebol Kwestin app ia';
-                btn.onclick = () => {
-                    btn.style.display = 'none';
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(choice => {
-                        if (choice.outcome === 'accepted') console.log('Installed');
-                        deferredPrompt = null;
-                    });
-                };
-                document.body.appendChild(btn);
-            }
-        });
-
-        if (isIOS && !window.navigator.standalone) {
-            const iosBtn = document.createElement('div');
-            iosBtn.id = 'iosInstall';
-            iosBtn.innerHTML = 'Tap <strong>Share</strong> → <strong>Add to Home Screen</strong> blong instolem app';
-            document.body.appendChild(iosBtn);
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-
-        // === INIT ===
-        updateHistoryBtn();
-        showWelcome();
-        preloadAIQuestions();
-
-        console.log("RED X FLOATS. 1+4 FRESH. BULLETS INDENTED. GEMINI 2.5. DONE.");
+        }); // END DOMContentLoaded
     </script>
 </body>
 </html>
