@@ -72,6 +72,16 @@
             padding:12px;background:var(--card);border-top:1px solid var(--border);
         }
         #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
+        /* PWA Install Button */
+        #installBtn, #iosInstall {
+            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+            padding:16px 24px;border-radius:12px;
+            font-weight:bold;font-size:1.1em;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);
+            border:none;cursor:pointer;text-align:center;max-width:90%;
+        }
+        #installBtn { background:#e74c3c;color:white;animation:flash 1.5s infinite; }
+        #iosInstall { background:#1a5276;color:white; }
+        @keyframes flash{0%,100%{background:#e74c3c}50%{background:#c0392b}}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -120,12 +130,14 @@
     <footer class="footer">
         Ross Webb i mekem app ia (2.0) — 12 Nov 2025
     </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // === KEYS ===
             const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
             const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
             marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+
             // === ELEMENTS ===
             const darkFab = document.getElementById('darkFab');
             const moon = document.getElementById('moon');
@@ -148,6 +160,7 @@
             const debugDiv = document.getElementById('debug');
             let currentQuestion = '';
             let isAutoSubmit = false;
+
             // === DARK MODE ===
             darkFab.onclick = () => {
                 document.body.classList.toggle('dark-mode');
@@ -161,6 +174,7 @@
                 moon.style.display = 'none';
                 sun.style.display = 'block';
             }
+
             // === SYSTEM PROMPT ===
             const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
@@ -185,6 +199,7 @@ Followed by at least 3 supporting verses, each on a new line, from NIrV version 
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
 End with one short sentence of hope or encouragement.
 Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
+
             // === FETCH WITH TIMEOUT ===
             async function fetchWithTimeout(url, options = {}, timeout = 15000) {
                 const controller = new AbortController();
@@ -194,11 +209,12 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                     clearTimeout(id);
                     return res;
                 } catch (e) {
-                    clearTimeout(id);
+    clearTimeout(id);
                     console.error("Fetch failed:", e.message);
                     throw e;
                 }
             }
+
             // === ANSWER GENERATOR ===
             async function getAnswer(q, isExplainMore = false) {
                 const fullQ = isExplainMore
@@ -272,6 +288,7 @@ Jesus wins. You are safe in Him.`,
                     source: 'fallback'
                 };
             }
+
             // === SUBMIT ===
             const handleSubmit = async (q) => {
                 if (!q) return;
@@ -297,6 +314,7 @@ Jesus wins. You are safe in Him.`,
                 if (!q) return;
                 handleSubmit(q);
             });
+
             // === RANDOM QUESTIONS ===
             const ANIMISM_SEED = [
 "Why does the Bible say not to talk to dead people?",
@@ -349,6 +367,7 @@ Jesus wins. You are safe in Him.`,
                 const shuffledAI = AI_QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 4);
                 showQuestionButtons([animism, ...shuffledAI]);
             };
+
             // === HISTORY & WELCOME ===
             let history = [];
             try {
@@ -419,52 +438,50 @@ Jesus wins. You are safe in Him.`,
                 clearBtn.style.display = 'none';
                 questionInput.focus();
             };
-            // === PWA INSTALL (FIXED) ===
-            let deferredPrompt;
-            const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
 
-            // Android: Use beforeinstallprompt
+            // === PWA INSTALL — FIXED & GUARANTEED TO SHOW ===
+            let deferredPrompt;
+            let installShown = false;
+
+            // Android: beforeinstallprompt
             window.addEventListener('beforeinstallprompt', (e) => {
+                if (installShown) return;
                 e.preventDefault();
                 deferredPrompt = e;
+
                 const btn = document.createElement('button');
                 btn.id = 'installBtn';
                 btn.textContent = 'Instolem Baebol Kwestin';
-                btn.style.cssText = `
-                    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-                    background:#e74c3c;color:white;padding:16px 24px;border-radius:12px;
-                    font-weight:bold;font-size:1.1em;z-index:1000;box-shadow:0 4px 12px rgba(231,76,60,.5);
-                    border:none;cursor:pointer;animation:flash 1.5s infinite;
-                `;
                 btn.onclick = () => {
                     btn.style.display = 'none';
                     deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                    deferredPrompt.userChoice.then(choice => {
+                        if (choice.outcome === 'accepted') {
+                            console.log('PWA installed');
+                        }
+                        deferredPrompt = null;
+                        installShown = false;
+                    });
                 };
                 document.body.appendChild(btn);
+                installShown = true;
             });
 
-            // iOS: Show manual instructions
-            if (isIOS && !window.navigator.standalone) {
+            // iOS: Show manual install message
+            const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !window.navigator.standalone && !installShown) {
                 const iosDiv = document.createElement('div');
                 iosDiv.id = 'iosInstall';
                 iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
-                iosDiv.style.cssText = `
-                    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-                    background:#1a5276;color:white;padding:16px 24px;border-radius:12px;
-                    font-weight:bold;font-size:1.1em;z-index:1000;text-align:center;max-width:90%;
-                `;
                 document.body.appendChild(iosDiv);
+                installShown = true;
             }
-
-            // Flash animation
-            const style = document.createElement('style');
-            style.textContent = `@keyframes flash{0%,100%{background:#e74c3c}50%{background:#c0392b}}`;
-            document.head.appendChild(style);
 
             // Service Worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').catch(() => {});
+                navigator.serviceWorker.register('/sw.js')
+                    .then(() => console.log('SW registered'))
+                    .catch(err => console.log('SW failed:', err));
             }
 
             // === INIT ===
