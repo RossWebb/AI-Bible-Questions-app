@@ -76,7 +76,6 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-
     <div class="header">
         <button id="shareFab" class="fab" title="Share">
             <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
@@ -88,7 +87,6 @@
         <h1>Baebol Kwestin</h1>
     </div>
     <p class="subtitle">Askem eni kwestin long Baebol</p>
-
     <div class="card">
         <form id="queryForm">
             <label>Raetem kwestin blong yu:</label>
@@ -105,16 +103,13 @@
             <div id="debug"></div>
         </form>
     </div>
-
     <div id="answer">
         <div id="answerHeader">
             <button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
         </div>
         <div id="answerContent"></div>
     </div>
-
     <div id="welcomeVerse"></div>
-
     <div id="historyModal">
         <div>
             <button id="closeHistoryBtn">x</button>
@@ -122,20 +117,15 @@
             <div id="historyList"></div>
         </div>
     </div>
-
     <footer class="footer">
         Ross Webb i mekem app ia (2.0) — 12 Nov 2025
     </footer>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
             // === KEYS ===
             const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
             const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
-
             marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
-
             // === ELEMENTS ===
             const darkFab = document.getElementById('darkFab');
             const moon = document.getElementById('moon');
@@ -156,10 +146,8 @@
             const historyList = document.getElementById('historyList');
             const closeHistoryBtn = document.getElementById('closeHistoryBtn');
             const debugDiv = document.getElementById('debug');
-
             let currentQuestion = '';
             let isAutoSubmit = false;
-
             // === DARK MODE ===
             darkFab.onclick = () => {
                 document.body.classList.toggle('dark-mode');
@@ -173,11 +161,10 @@
                 moon.style.display = 'none';
                 sun.style.display = 'block';
             }
-
             // === SYSTEM PROMPT ===
             const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
-Answers follow solid REFORMED theology. 
+Answers follow solid REFORMED theology.
 Do NOT contradict these truths:
 - God created everything and is sovereign.
 - Every person sins and needs forgiveness.
@@ -196,10 +183,8 @@ Do *NOT* start with an introductory greeting
 ### Step 2: Remember This
 Followed by at least 3 supporting verses, each on a new line, from NIrV version of the Bible styled like this:
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
-
 End with one short sentence of hope or encouragement.
 Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
-
             // === FETCH WITH TIMEOUT ===
             async function fetchWithTimeout(url, options = {}, timeout = 15000) {
                 const controller = new AbortController();
@@ -214,13 +199,11 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                     throw e;
                 }
             }
-
             // === ANSWER GENERATOR ===
             async function getAnswer(q, isExplainMore = false) {
                 const fullQ = isExplainMore
                     ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from NIrv version of the Bible."
                     : q;
-
                 // TIER 1: GEMINI 2.5 FLASH
                 try {
                     const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
@@ -246,7 +229,6 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                         }
                     }
                 } catch (e) {}
-
                 // TIER 2: MISTRAL MIXTRAL
                 try {
                     const res = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
@@ -274,27 +256,22 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                         }
                     }
                 } catch (e) {}
-
                 // TIER 3: FALLBACK
                 debugDiv.textContent = "Fallback (no connection)";
                 return {
                     text: `## Jesus is Stronger
-
 ### Step 1: Know This
 - Spirits are real, but Jesus is Lord over all.
 - The Bible says do not talk to the dead.
 - Trust God, not kastom power.
-
 ### Step 2: Remember This
 **Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
 **Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn’t you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
 **Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
-
 Jesus wins. You are safe in Him.`,
                     source: 'fallback'
                 };
             }
-
             // === SUBMIT ===
             const handleSubmit = async (q) => {
                 if (!q) return;
@@ -303,21 +280,16 @@ Jesus wins. You are safe in Him.`,
                 answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
                 answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
                 debugDiv.textContent = 'Loading...';
-
                 const result = await getAnswer(q);
                 answerContent.innerHTML = marked.parse(result.text);
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
-
                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-
                 saveAnswer(q, answerContent.innerHTML, verse);
-
                 askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
                 isAutoSubmit = false;
             };
-
             form.addEventListener('submit', e => {
                 e.preventDefault();
                 if (isAutoSubmit) return;
@@ -325,10 +297,9 @@ Jesus wins. You are safe in Him.`,
                 if (!q) return;
                 handleSubmit(q);
             });
-
             // === RANDOM QUESTIONS ===
             const ANIMISM_SEED = [
-			"Why does the Bible say not to talk to dead people?",
+"Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
             "Is it wrong to use kastom medicine with Bible prayers?",
             "What does the Bible say about people who see spirits?",
@@ -347,17 +318,15 @@ Jesus wins. You are safe in Him.`,
             "Can Christians dance in kastom ceremonies?",
             "What does the Bible say about ancestors watching us?",
             "Is it okay to keep kastom carvings in the house?",
-			"Should I burn my old kastom things?",
+"Should I burn my old kastom things?",
             "Can a Christian marry someone who follows kastom?"
             ];
-
             const AI_QUESTIONS = [
                 "What does it mean to be born again?",
                 "How can I know God forgives me?",
                 "Why did Jesus have to die on the cross?",
                 "What is the Holy Spirit and what does He do?"
             ];
-
             const showQuestionButtons = (qs) => {
                 randomDiv.innerHTML = '';
                 qs.forEach(q => {
@@ -375,20 +344,17 @@ Jesus wins. You are safe in Him.`,
                 });
                 randomDiv.style.display = 'block';
             };
-
             randomBtn.onclick = () => {
                 const animism = ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
                 const shuffledAI = AI_QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 4);
                 showQuestionButtons([animism, ...shuffledAI]);
             };
-
             // === HISTORY & WELCOME ===
             let history = [];
             try {
                 const raw = localStorage.getItem('bibleHistory');
                 if (raw) history = JSON.parse(raw).filter(i => i && i.q && i.a);
             } catch (e) {}
-
             const saveAnswer = (q, a, verse) => {
                 const newItem = { q, a, date: new Date().toLocaleString('en-GB') };
                 if (verse) newItem.verse = verse;
@@ -397,13 +363,11 @@ Jesus wins. You are safe in Him.`,
                 updateHistoryBtn();
                 showWelcome();
             };
-
             const updateHistoryBtn = () => {
                 const cnt = history.length;
                 showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
                 document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
             };
-
             const showWelcome = () => {
                 welcomeVerse.style.display = 'none';
                 if (history.length > 0 && history[0].verse) {
@@ -415,7 +379,6 @@ Jesus wins. You are safe in Him.`,
                 }
                 welcomeVerse.style.display = 'block';
             };
-
             showHistoryBtn.onclick = () => {
                 historyList.innerHTML = '';
                 history.forEach(item => {
@@ -437,10 +400,8 @@ Jesus wins. You are safe in Him.`,
                 });
                 historyModal.style.display = 'flex';
             };
-
             closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
             historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-
             explainMoreBtn.onclick = async () => {
                 askBtn.disabled = true; askBtn.textContent = 'Please wait...';
                 const result = await getAnswer(currentQuestion, true);
@@ -450,7 +411,6 @@ Jesus wins. You are safe in Him.`,
                 saveAnswer(currentQuestion, answerContent.innerHTML, verse);
                 askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
             };
-
             questionInput.addEventListener('input', () => {
                 clearBtn.style.display = questionInput.value ? 'flex' : 'none';
             });
@@ -459,11 +419,57 @@ Jesus wins. You are safe in Him.`,
                 clearBtn.style.display = 'none';
                 questionInput.focus();
             };
+            // === PWA INSTALL (FIXED) ===
+            let deferredPrompt;
+            const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+            // Android: Use beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const btn = document.createElement('button');
+                btn.id = 'installBtn';
+                btn.textContent = 'Instolem Baebol Kwestin';
+                btn.style.cssText = `
+                    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+                    background:#e74c3c;color:white;padding:16px 24px;border-radius:12px;
+                    font-weight:bold;font-size:1.1em;z-index:1000;box-shadow:0 4px 12px rgba(231,76,60,.5);
+                    border:none;cursor:pointer;animation:flash 1.5s infinite;
+                `;
+                btn.onclick = () => {
+                    btn.style.display = 'none';
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
+                };
+                document.body.appendChild(btn);
+            });
+
+            // iOS: Show manual instructions
+            if (isIOS && !window.navigator.standalone) {
+                const iosDiv = document.createElement('div');
+                iosDiv.id = 'iosInstall';
+                iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
+                iosDiv.style.cssText = `
+                    position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+                    background:#1a5276;color:white;padding:16px 24px;border-radius:12px;
+                    font-weight:bold;font-size:1.1em;z-index:1000;text-align:center;max-width:90%;
+                `;
+                document.body.appendChild(iosDiv);
+            }
+
+            // Flash animation
+            const style = document.createElement('style');
+            style.textContent = `@keyframes flash{0%,100%{background:#e74c3c}50%{background:#c0392b}}`;
+            document.head.appendChild(style);
+
+            // Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }
 
             // === INIT ===
             updateHistoryBtn();
             showWelcome();
-
         }); // END DOMContentLoaded
     </script>
 </body>
