@@ -74,14 +74,34 @@
         #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
         /* PWA Install Button */
         #installBtn, #iosInstall {
-            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-            padding:16px 24px;border-radius:12px;
-            font-weight:bold;font-size:1.1em;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.3);
-            border:none;cursor:pointer;text-align:center;max-width:90%;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1em;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,.3);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            max-width: 90%;
         }
-        #installBtn { background:#e74c3c;color:white;animation:flash 1.5s infinite; }
-        #iosInstall { background:#1a5276;color:white; }
-        @keyframes flash{0%,100%{background:#e74c3c}50%{background:#c0392b}}
+        #installBtn {
+            background: #e74c3c;
+            color: white;
+            animation: flash 1.5s infinite;
+        }
+        #iosInstall {
+            background: #1a5276;
+            color: white;
+        }
+        @keyframes flash {
+            0%, 100% { background: #e74c3c; }
+            50% { background: #c0392b; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -209,7 +229,7 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                     clearTimeout(id);
                     return res;
                 } catch (e) {
-    clearTimeout(id);
+                    clearTimeout(id);
                     console.error("Fetch failed:", e.message);
                     throw e;
                 }
@@ -407,7 +427,7 @@ Jesus wins. You are safe in Him.`,
                                      <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
                                      <div style="font-size:15px;line-height:1.7">${item.a}</div>`;
                     div.onclick = () => {
-                        questionInput.value = item.q;
+                        QUESTIONInput.value = item.q;
                         questionInput.dispatchEvent(new Event('input'));
                         answerContent.innerHTML = item.a;
                         answerHeader.style.display = 'flex';
@@ -439,49 +459,74 @@ Jesus wins. You are safe in Him.`,
                 questionInput.focus();
             };
 
-            // === PWA INSTALL — FIXED & GUARANTEED TO SHOW ===
-            let deferredPrompt;
-            let installShown = false;
+            // === PWA INSTALL — BULLETPROOF ===
+            let deferredPrompt = null;
+            let hasEngaged = false;
+            let installBtn = null;
 
-            // Android: beforeinstallprompt
+            // 1. Track user engagement
+            const engage = () => { hasEngaged = true; };
+            document.addEventListener('click', engage, { once: true });
+            document.addEventListener('scroll', engage, { once: true });
+
+            // 2. Listen for install prompt
             window.addEventListener('beforeinstallprompt', (e) => {
-                if (installShown) return;
+                console.log('PWA: beforeinstallprompt fired');
                 e.preventDefault();
                 deferredPrompt = e;
 
-                const btn = document.createElement('button');
-                btn.id = 'installBtn';
-                btn.textContent = 'Instolem Baebol Kwestin';
-                btn.onclick = () => {
-                    btn.style.display = 'none';
+                // Only show if user has engaged
+                if (hasEngaged && !installBtn) {
+                    showInstallButton();
+                }
+            });
+
+            // 3. Show button only when ready
+            function showInstallButton() {
+                if (installBtn) return;
+
+                installBtn = document.createElement('button');
+                installBtn.id = 'installBtn';
+                installBtn.textContent = 'Instolem Baebol Kwestin';
+                installBtn.onclick = () => {
+                    installBtn.style.display = 'none';
                     deferredPrompt.prompt();
                     deferredPrompt.userChoice.then(choice => {
                         if (choice.outcome === 'accepted') {
-                            console.log('PWA installed');
+                            console.log('PWA: Installed');
+                        } else {
+                            console.log('PWA: Install declined');
                         }
                         deferredPrompt = null;
-                        installShown = false;
+                        installBtn = null;
                     });
                 };
-                document.body.appendChild(btn);
-                installShown = true;
-            });
+                document.body.appendChild(installBtn);
+                console.log('PWA: Install button shown');
+            }
 
-            // iOS: Show manual install message
+            // 4. Optional: Show button after engagement if prompt already fired
+            setTimeout(() => {
+                if (hasEngaged && deferredPrompt && !installBtn) {
+                    showInstallButton();
+                }
+            }, 3000);
+
+            // 5. iOS: Show manual install message
             const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS && !window.navigator.standalone && !installShown) {
+            if (isIOS && !window.navigator.standalone) {
                 const iosDiv = document.createElement('div');
                 iosDiv.id = 'iosInstall';
                 iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
                 document.body.appendChild(iosDiv);
-                installShown = true;
+                console.log('PWA: iOS install prompt shown');
             }
 
-            // Service Worker
+            // 6. Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(() => console.log('SW registered'))
-                    .catch(err => console.log('SW failed:', err));
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.error('SW failed:', err));
             }
 
             // === INIT ===
