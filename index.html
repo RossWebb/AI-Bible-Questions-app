@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baebol Kwestin</title>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="/icon-192.png" type="image/png">
     <meta name="theme-color" content="#1a5276">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -459,75 +459,66 @@ Jesus wins. You are safe in Him.`,
                 questionInput.focus();
             };
 
-            // === PWA INSTALL — BULLETPROOF ===
-            let deferredPrompt = null;
-            let hasEngaged = false;
-            let installBtn = null;
+// === PWA INSTALL — FIXED ===
+let deferredPrompt = null;
+let installBtn = null;
+let hasEngaged = false;
 
-            // 1. Track user engagement
-            const engage = () => { hasEngaged = true; };
-            document.addEventListener('click', engage, { once: true });
-            document.addEventListener('scroll', engage, { once: true });
+// Strong engagement
+const engage = () => {
+    hasEngaged = true;
+    document.removeEventListener('click', engage);
+    document.removeEventListener('touchstart', engage);
+    document.removeEventListener('keydown', engage);
+    if (deferredPrompt) showInstallButton();
+};
+document.addEventListener('click', engage);
+document.addEventListener('touchstart', engage);
+document.addEventListener('keydown', engage);
 
-            // 2. Listen for install prompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                console.log('PWA: beforeinstallprompt fired');
-                e.preventDefault();
-                deferredPrompt = e;
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('PWA: Prompt fired');
+    e.preventDefault();
+    deferredPrompt = e;
+    if (hasEngaged) showInstallButton();
+});
 
-                // Only show if user has engaged
-                if (hasEngaged && !installBtn) {
-                    showInstallButton();
-                }
-            });
+function showInstallButton() {
+    if (installBtn) return;
+    installBtn = document.createElement('button');
+    installBtn.id = 'installBtn';
+    installBtn.textContent = 'Instolem Baebol Kwestin';
+    installBtn.onclick = () => {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+            deferredPrompt = null;
+            installBtn = null;
+        });
+    };
+    document.body.appendChild(installBtn);
+}
 
-            // 3. Show button only when ready
-            function showInstallButton() {
-                if (installBtn) return;
+// Force after 10s
+setTimeout(() => {
+    if (deferredPrompt && !installBtn) showInstallButton();
+}, 10000);
 
-                installBtn = document.createElement('button');
-                installBtn.id = 'installBtn';
-                installBtn.textContent = 'Instolem Baebol Kwestin';
-                installBtn.onclick = () => {
-                    installBtn.style.display = 'none';
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(choice => {
-                        if (choice.outcome === 'accepted') {
-                            console.log('PWA: Installed');
-                        } else {
-                            console.log('PWA: Install declined');
-                        }
-                        deferredPrompt = null;
-                        installBtn = null;
-                    });
-                };
-                document.body.appendChild(installBtn);
-                console.log('PWA: Install button shown');
-            }
+// iOS
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+if (isIOS && !window.navigator.standalone) {
+    const iosDiv = document.createElement('div');
+    iosDiv.id = 'iosInstall';
+    iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
+    document.body.appendChild(iosDiv);
+}
 
-            // 4. Optional: Show button after engagement if prompt already fired
-            setTimeout(() => {
-                if (hasEngaged && deferredPrompt && !installBtn) {
-                    showInstallButton();
-                }
-            }, 3000);
-
-            // 5. iOS: Show manual install message
-            const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (isIOS && !window.navigator.standalone) {
-                const iosDiv = document.createElement('div');
-                iosDiv.id = 'iosInstall';
-                iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
-                document.body.appendChild(iosDiv);
-                console.log('PWA: iOS install prompt shown');
-            }
-
-            // 6. Service Worker
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('SW registered:', reg.scope))
-                    .catch(err => console.error('SW failed:', err));
-            }
+// SW with correct path
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then(r => console.log('SW registered:', r.scope))
+        .catch(e => console.error('SW failed:', e));
+}
 
             // === INIT ===
             updateHistoryBtn();
