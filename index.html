@@ -75,7 +75,7 @@
         /* PWA Install Button */
         #installBtn, #iosInstall {
             position: fixed;
-            bottom: 20px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
             padding: 16px 24px;
@@ -477,10 +477,12 @@ document.addEventListener('touchstart', engage);
 document.addEventListener('keydown', engage);
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('PWA: Prompt fired');
+    console.log('PWA: beforeinstallprompt fired');
     e.preventDefault();
     deferredPrompt = e;
-    if (hasEngaged) showInstallButton();
+
+    // Auto-show install button after 1.5 s (no user tap required)
+    setTimeout(showInstallButton, 1500);
 });
 
 function showInstallButton() {
@@ -527,3 +529,4 @@ if ('serviceWorker' in navigator) {
     </script>
 </body>
 </html>
+
