@@ -50,10 +50,35 @@
         #answerContent{line-height:1.8;font-size:15px}
         #answerContent ul, #answerContent ol { padding-left: 1.5em; margin: 0.5em 0; }
         #answerContent li { margin-bottom: 0.3em; }
+		
+		#answerContent h2 {
+			color: var(--primary);
+			font-size: 1.3em;
+			margin-top: 1.2em;
+			margin-bottom: 0.6em;
+			padding-bottom: 0.3em;
+			border-bottom: 2px solid var(--accent);
+		}
+		#answerContent h3 {
+			color: var(--accent);
+			font-size: 1.1em;
+			margin-top: 1em;
+			margin-bottom: 0.5em;
+		}
+		#answerContent strong {
+			color: var(--primary);
+		}
+		#answerContent em {
+			color: var(--text);
+			font-style: italic;
+		}
+		#answerContent p {
+			margin-bottom: 0.8em;
+		}		
         #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
         #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
-        #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:1.2rem;position:relative}
-        #welcomeVerse em::before{content:'"';color:var(--accent);left:0;position:absolute}
+        #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
+        #welcomeVerse em::before{content:'"';color:var(--accent)}
         #welcomeVerse em::after{content:'"';color:var(--accent)}
         #historyBtn{margin-top:12px;text-align:center;display:none}
         #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
@@ -62,11 +87,24 @@
             background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;
             overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
         }
-        #closeHistoryBtn{
-            position:sticky;top:8px;right:8px;background:var(--danger);color:white;border:none;
-            width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
-            display:flex;align-items:center;justify-content:center;float:right;margin-bottom:8px;z-index:999;
-        }
+		#closeHistoryBtn{
+			position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
+			width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
+			display:flex;align-items:center;justify-content:center;z-index:999;
+		}
+		
+		#errorMessage {
+			display: none;
+			background: #e74c3c;
+			color: white;
+			padding: 12px;
+			border-radius: 8px;
+			text-align: center;
+			font-weight: bold;
+			margin-bottom: 12px;
+			animation: flash 1.5s infinite;
+		}
+		
         .footer{
             margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
             padding:12px;background:var(--card);border-top:1px solid var(--border);
@@ -133,13 +171,14 @@
             <div id="debug"></div>
         </form>
     </div>
-    <div id="answer">
-        <div id="answerHeader">
-            <button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
-        </div>
-        <div id="answerContent"></div>
-    </div>
-    <div id="welcomeVerse"></div>
+	<div id="answer">
+		<div id="answerHeader">
+			<button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
+		</div>
+		<div id="answerContent"></div>
+	</div>
+	<div id="errorMessage"></div>
+	<div id="welcomeVerse"></div>
     <div id="historyModal">
         <div>
             <button id="closeHistoryBtn">x</button>
@@ -148,7 +187,7 @@
         </div>
     </div>
     <footer class="footer">
-        Ross Webb i mekem app ia (2.0) — 12 Nov 2025
+        Ross Webb i mekem app ia (2.0) 2025
     </footer>
 
     <script>
@@ -177,9 +216,11 @@
             const historyModal = document.getElementById('historyModal');
             const historyList = document.getElementById('historyList');
             const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-            const debugDiv = document.getElementById('debug');
-            let currentQuestion = '';
-            let isAutoSubmit = false;
+			const debugDiv = document.getElementById('debug');
+			const errorMessage = document.getElementById('errorMessage');
+			let currentQuestion = '';
+			let currentAnswer = '';
+			let isAutoSubmit = false;
 
             // === DARK MODE ===
             darkFab.onclick = () => {
@@ -215,15 +256,18 @@ Do *NOT* start with an introductory greeting
 - bullet points
 - keep short
 ### Step 2: Remember This
-Followed by at least 3 supporting verses, each on a new line, from NIrV version of the Bible styled like this:
+Followed by at least 3 supporting verses from NIrV version of the Bible. Put each verse on its own line with a blank line between them, styled like this:
+
 **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
+
+**Romans 3:23** *"Everyone has sinned. No one measures up to God's glory."*
 End with one short sentence of hope or encouragement.
 Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
 
             // === FETCH WITH TIMEOUT ===
-            async function fetchWithTimeout(url, options = {}, timeout = 15000) {
-                const controller = new AbortController();
-                const id = setTimeout(() => controller.abort(), timeout);
+				async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+					const controller = new AbortController();
+					const id = setTimeout(() => controller.abort(), timeout);
                 try {
                     const res = await fetch(url, { ...options, signal: controller.signal });
                     clearTimeout(id);
@@ -235,19 +279,27 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                 }
             }
 
-            // === ANSWER GENERATOR ===
-            async function getAnswer(q, isExplainMore = false) {
-                const fullQ = isExplainMore
-                    ? q + "\n\nGive a FULL, DETAILED answer suitable for Bible study. Up to 1200 words. Cite 5+ verses from NIrv version of the Bible."
-                    : q;
+			// === ANSWER GENERATOR ===
+			async function getAnswer(q, isExplainMore = false) {
+				// CHANGED: Override system prompt for detailed study mode
+				const activeSystemPrompt = isExplainMore 
+					? systemPrompt
+						.replace('Keep under 350 words', 'Write 600-800 words')
+						.replace('Cite 3+ verses', 'Include 6-8 verses from NIrV, each on its own line with blank lines between them')
+						.replace('**FORMAT EXACTLY LIKE THIS:**', '**BIBLE STUDY FORMAT:**')
+					: systemPrompt;
+				
+					const fullQ = isExplainMore
+						? q + "\n\n**BIBLE STUDY FORMAT** - Follow this structure exactly:\n\n**1. THE QUESTION & QUICK ANSWER**\n\n(Blank line after heading)\n\nBriefly state the problem/question and give a one-sentence summary answer.\n\n**2. WHAT THE BIBLE SAYS**\n\n(Blank line after heading)\n\nLet's see what the Bible says about this:\n\n(Blank line, then each verse on this pattern:)\n\n**Verse Reference** *\"Full verse text from NIrV\"*\n\nOne sentence explaining what this verse teaches us.\n\n(BLANK LINE between each verse block)\n\n**3. UNDERSTANDING THIS DEEPER**\n\n(Blank line after heading)\n\nNow expand on the answer in 3-4 paragraphs:\n- What does this mean for us?\n- How does this change how we think?\n- Why is this important?\n\n(Blank line between paragraphs)\n\n**4. LIVING THIS OUT**\n\n(Blank line after heading)\n\nGive 3-4 practical steps:\n- First step\n- Second step\n- Third step\n\n**5. REMEMBER THIS**\n\n(Blank line after heading)\n\nEnd with one encouraging sentence.\n\nCRITICAL: Put blank lines after EVERY heading and between EVERY verse block. Total: 500-700 words. Keep language SIMPLE (13-year-old level)."
+						: q;				
                 // TIER 1: GEMINI 2.5 FLASH
                 try {
                     const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: systemPrompt + "\n\nQuestion: " + fullQ }] }],
-                            generationConfig: { maxOutputTokens: 2048, temperature: 0.7 },
+						body: JSON.stringify({
+							contents: [{ parts: [{ text: activeSystemPrompt + "\n\nQuestion: " + fullQ }] }],
+							generationConfig: { maxOutputTokens: isExplainMore ? 3500 : 2048, temperature: 0.7 },
                             safetySettings: [
                                 { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
                                 { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
@@ -255,7 +307,7 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                                 { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
                             ]
                         })
-                    }, 15000);
+                    }, isExplainMore ? 30000 : 15000);
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -275,14 +327,14 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                         },
                         body: JSON.stringify({
                             model: "mistralai/mixtral-8x22b-instruct:free",
-                            messages: [
-                                { role: "system", content: systemPrompt },
-                                { role: "user", content: fullQ }
-                            ],
-                            max_tokens: 2000,
+						messages: [
+							{ role: "system", content: activeSystemPrompt },
+							{ role: "user", content: fullQ }
+						],
+						max_tokens: isExplainMore ? 3500 : 2000,
                             temperature: 0.7
                         })
-                    }, 15000);
+                    }, isExplainMore ? 30000 : 15000);
                     if (res.ok) {
                         const data = await res.json();
                         const text = data.choices?.[0]?.message?.content;
@@ -292,10 +344,12 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
                         }
                     }
                 } catch (e) {}
-                // TIER 3: FALLBACK
-                debugDiv.textContent = "Fallback (no connection)";
-                return {
-                    text: `## Jesus is Stronger
+				// TIER 3: FALLBACK
+				debugDiv.textContent = "Fallback (no connection)";
+				errorMessage.textContent = "⚠️ Sore! Nogat intanet - traem bakegen";
+				errorMessage.style.display = 'block';
+				return {
+					text: `## Jesus is Stronger
 ### Step 1: Know This
 - Spirits are real, but Jesus is Lord over all.
 - The Bible says do not talk to the dead.
@@ -307,23 +361,28 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
 Jesus wins. You are safe in Him.`,
                     source: 'fallback'
                 };
-            }
+           }
 
             // === SUBMIT ===
-            const handleSubmit = async (q) => {
-                if (!q) return;
-                currentQuestion = q;
-                askBtn.disabled = true; askBtn.textContent = 'Please wait...';
-                answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
-                answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
-                debugDiv.textContent = 'Loading...';
-                const result = await getAnswer(q);
-                answerContent.innerHTML = marked.parse(result.text);
+			const handleSubmit = async (q) => {
+				if (!q) return;
+				currentQuestion = q;
+				askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
+				answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
+				answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
+				errorMessage.style.display = 'none'; // Hide any previous errors
+				debugDiv.textContent = 'Loading...';
+				const result = await getAnswer(q);
+				answerContent.innerHTML = marked.parse(result.text);
+				// Only store real answers, not fallback
+				if (result.source !== 'fallback') {
+					currentAnswer = result.text;
+				}
                 answerHeader.style.display = 'flex';
                 answerDiv.style.display = 'block';
                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-                saveAnswer(q, answerContent.innerHTML, verse);
+                saveAnswer(q, result.text, verse);
                 askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
                 isAutoSubmit = false;
             };
@@ -337,7 +396,7 @@ Jesus wins. You are safe in Him.`,
 
             // === RANDOM QUESTIONS ===
             const ANIMISM_SEED = [
-"Why does the Bible say not to talk to dead people?",
+			"Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
             "Is it wrong to use kastom medicine with Bible prayers?",
             "What does the Bible say about people who see spirits?",
@@ -346,17 +405,17 @@ Jesus wins. You are safe in Him.`,
             "Is it okay to burn a house where someone died?",
             "Can a Christian use love magic?",
             "What does the Bible say about dreams from spirits?",
-            "Is it wrong to pay bride price with kastom money?",
+            "Is it wrong to pay bride price - some people say it is wrong to buy a wife.",
             "Can spirits follow you if you move villages?",
             "What does the Bible say about tabu places?",
             "Is it okay to eat food offered to spirits?",
-            "Can a Christian wear kastom clothes to church?",
+            "Does it matter if a person wearing kastom clothes comes to church?",
             "What does the Bible say about people who do poison?",
             "Is it wrong to go to a kastom healer?",
             "Can Christians dance in kastom ceremonies?",
             "What does the Bible say about ancestors watching us?",
             "Is it okay to keep kastom carvings in the house?",
-"Should I burn my old kastom things?",
+			"Should I burn my old kastom things?",
             "Can a Christian marry someone who follows kastom?"
             ];
             const AI_QUESTIONS = [
@@ -388,20 +447,20 @@ Jesus wins. You are safe in Him.`,
                 showQuestionButtons([animism, ...shuffledAI]);
             };
 
-            // === HISTORY & WELCOME ===
-            let history = [];
-            try {
-                const raw = localStorage.getItem('bibleHistory');
-                if (raw) history = JSON.parse(raw).filter(i => i && i.q && i.a);
-            } catch (e) {}
-            const saveAnswer = (q, a, verse) => {
-                const newItem = { q, a, date: new Date().toLocaleString('en-GB') };
-                if (verse) newItem.verse = verse;
-                history = [newItem, ...history].slice(0, 50);
-                try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
-                updateHistoryBtn();
-                showWelcome();
-            };
+			// === HISTORY & WELCOME ===
+			let history = [];
+			try {
+				const raw = localStorage.getItem('bibleHistory');
+				if (raw) history = JSON.parse(raw).filter(i => i && i.q && (i.rawAnswer || i.a));
+			} catch (e) {}
+			const saveAnswer = (q, rawMarkdown, verse) => {
+				const newItem = { q, rawAnswer: rawMarkdown, date: new Date().toLocaleString('en-GB') };
+				if (verse) newItem.verse = verse;
+				history = [newItem, ...history].slice(0, 50);
+				try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
+				updateHistoryBtn();
+				showWelcome();
+			};
             const updateHistoryBtn = () => {
                 const cnt = history.length;
                 showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
@@ -423,33 +482,50 @@ Jesus wins. You are safe in Him.`,
                 history.forEach(item => {
                     const div = document.createElement('div');
                     div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
-                    div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
-                                     <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
-                                     <div style="font-size:15px;line-height:1.7">${item.a}</div>`;
-                    div.onclick = () => {
-                        QUESTIONInput.value = item.q;
-                        questionInput.dispatchEvent(new Event('input'));
-                        answerContent.innerHTML = item.a;
-                        answerHeader.style.display = 'flex';
-                        answerDiv.style.display = 'block';
-                        welcomeVerse.style.display = 'none';
-                        historyModal.style.display = 'none';
-                    };
+			const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
+			div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
+							 <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
+							 <div style="font-size:15px;line-height:1.7">${renderedAnswer}</div>`;
+				div.onclick = () => {
+					questionInput.value = item.q;
+					questionInput.dispatchEvent(new Event('input'));
+					answerContent.innerHTML = marked.parse(item.rawAnswer || item.a || '');
+					currentQuestion = item.q;  // UPDATE: Set the current question
+					currentAnswer = item.rawAnswer || item.a || '';  // UPDATE: Set the current answer
+					answerHeader.style.display = 'flex';
+					answerDiv.style.display = 'block';
+					welcomeVerse.style.display = 'none';
+					historyModal.style.display = 'none';
+				};
                     historyList.appendChild(div);
                 });
                 historyModal.style.display = 'flex';
             };
             closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
             historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-            explainMoreBtn.onclick = async () => {
-                askBtn.disabled = true; askBtn.textContent = 'Please wait...';
-                const result = await getAnswer(currentQuestion, true);
-                answerContent.innerHTML = marked.parse(result.text);
-                const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-                const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-                saveAnswer(currentQuestion, answerContent.innerHTML, verse);
-                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-            };
+			explainMoreBtn.onclick = async () => {
+				askBtn.disabled = true; askBtn.textContent = 'Please wait...';
+				explainMoreBtn.disabled = true;
+				errorMessage.style.display = 'none'; // Hide any previous errors
+				
+				const result = await getAnswer(currentQuestion, true);
+				
+				// If fallback response (connection failed), keep original answer
+				if (result.source === 'fallback') {
+					errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
+					errorMessage.style.display = 'block';
+					answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
+				} else {
+					answerContent.innerHTML = marked.parse(result.text);
+					currentAnswer = result.text; // Update stored answer
+					const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+					const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+					saveAnswer(currentQuestion, result.text, verse);
+				}
+				
+				askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+				explainMoreBtn.disabled = false;
+				};
             questionInput.addEventListener('input', () => {
                 clearBtn.style.display = questionInput.value ? 'flex' : 'none';
             });
@@ -529,4 +605,3 @@ if ('serviceWorker' in navigator) {
     </script>
 </body>
 </html>
-
