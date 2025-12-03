@@ -35,7 +35,11 @@
             display:none;align-items:center;justify-content:center;line-height:1;
         }
         .btn-row{display:flex;gap:10px;margin-top:8px}
-        button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+		button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+		.button-loading {
+			animation: flashButton 1s infinite;
+			pointer-events: none;
+		}
         #askBtn{background:#2980b9;color:white}#randomBtn{background:#9b59b6;color:white}
         #randomQuestions{margin-top:12px;display:none}
         .random-q-btn{
@@ -80,17 +84,85 @@
         #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
         #welcomeVerse em::before{content:'"';color:var(--accent)}
         #welcomeVerse em::after{content:'"';color:var(--accent)}
+
         #historyBtn{margin-top:12px;text-align:center;display:none}
         #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
-        #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
-        #historyModal > div{
-            background:var(--card);padding:20px;border-radius:16px;max-width:90%;max-height:80%;
-            overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
-        }
+     
+		#historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
+			#historyModal > div{
+				background:var(--card);padding:20px;border-radius:16px;
+				width:90%;max-width:700px;max-height:80%;
+				overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
+			}
+		
 		#closeHistoryBtn{
 			position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
 			width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
 			display:flex;align-items:center;justify-content:center;z-index:999;
+		}
+
+		.history-item {
+			border-bottom: 1px solid var(--border);
+			padding: 12px 0;
+		}
+		.history-question {
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 8px;
+			transition: background 0.2s;
+		}
+		.history-question:hover {
+			background: var(--border);
+		}
+		.history-answer {
+			display: none;
+			margin-top: 8px;
+			padding: 12px;
+			background: var(--bg);
+			border-radius: 8px;
+			font-size: 14px;
+			line-height: 1.6;
+		}
+		.history-answer h2 {
+			color: var(--primary);
+			font-size: 1.2em;
+			margin-top: 1em;
+			margin-bottom: 0.5em;
+			padding-bottom: 0.3em;
+			border-bottom: 2px solid var(--accent);
+		}
+		.history-answer h3 {
+			color: var(--accent);
+			font-size: 1em;
+			margin-top: 0.8em;
+			margin-bottom: 0.4em;
+		}
+		.history-answer strong {
+			color: var(--primary);
+		}
+		.history-answer em {
+			color: var(--text);
+			font-style: italic;
+		}
+		.history-answer p {
+			margin-bottom: 0.6em;
+		}
+		.history-answer.expanded {
+			display: block;
+		}
+		.history-open-btn {
+			background: #e67e22;
+			color: white;
+			border: none;
+			padding: 6px 12px;
+			border-radius: 6px;
+			font-size: 13px;
+			font-weight: bold;
+			cursor: pointer;
+			margin-top: 8px;
+		}
+		.history-open-btn:hover {
+			background: #d35400;
 		}
 		
 		#errorMessage {
@@ -140,6 +212,10 @@
             0%, 100% { background: #e74c3c; }
             50% { background: #c0392b; }
         }
+		@keyframes flashButton {
+			0%, 100% { background: #e74c3c; }
+			50% { background: #c0392b; }
+		}		
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
@@ -163,8 +239,8 @@
                 <button type="button" id="clearBtn" class="clear-circle">x</button>
             </div>
             <div class="btn-row">
-                <button type="submit" id="askBtn">Askem Baebol</button>
-                <button type="button" id="randomBtn">Givim Kwestin</button>
+                <button type="submit" id="askBtn">ASKEM Baebol</button>
+                <button type="button" id="randomBtn">GIVIM Kwestin</button>
             </div>
             <div id="historyBtn"><button type="button" id="showHistoryBtn">Ol kwestin (0)</button></div>
             <div id="randomQuestions"></div>
@@ -179,13 +255,18 @@
 	</div>
 	<div id="errorMessage"></div>
 	<div id="welcomeVerse"></div>
-    <div id="historyModal">
-        <div>
-            <button id="closeHistoryBtn">x</button>
-            <h3 style="margin:0 0 12px;color:var(--primary);text-align:center">Ol Kwestin We Yu Askem Finis</h3>
-            <div id="historyList"></div>
-        </div>
-    </div>
+	<div id="historyModal">
+		<div>
+			<button id="closeHistoryBtn">x</button>
+			<h3 style="margin:0 0 4px;color:#e67e22;text-align:center">HISTRI: Ol Kwestin We Yu Askem Finis</h3>
+			<p style="margin:0 0 12px;text-align:center;font-size:0.85em;color:#7f8c8d;font-style:italic">(Tajem kwestin we yu wantem luk ansa blong hem.)</p>
+			<div id="historyList"></div>
+			<div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+				<button id="downloadHistoryBtn" style="flex:1;background:#3498db;color:white;padding:10px;border-radius:8px;font-weight:bold">DAONLOTEM ol olfala ansa</button>
+				<button id="clearHistoryBtn" style="flex:1;background:var(--danger);color:white;padding:10px;border-radius:8px;font-weight:bold">WAEPEMAOT ol olfala ansa</button>
+			</div>
+		</div>
+	</div>
     <footer class="footer">
         Ross Webb i mekem app ia (2.0) 2025
     </footer>
@@ -367,7 +448,9 @@ Jesus wins. You are safe in Him.`,
 			const handleSubmit = async (q) => {
 				if (!q) return;
 				currentQuestion = q;
-				askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
+				askBtn.disabled = true; 
+				askBtn.textContent = 'Wet smol...';
+				askBtn.classList.add('button-loading');
 				answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
 				answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
 				errorMessage.style.display = 'none'; // Hide any previous errors
@@ -383,7 +466,9 @@ Jesus wins. You are safe in Him.`,
                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
                 saveAnswer(q, result.text, verse);
-                askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+				askBtn.disabled = false; 
+				askBtn.textContent = 'Askem Baebol';
+				askBtn.classList.remove('button-loading');
                 isAutoSubmit = false;
             };
             form.addEventListener('submit', e => {
@@ -456,14 +541,14 @@ Jesus wins. You are safe in Him.`,
 			const saveAnswer = (q, rawMarkdown, verse) => {
 				const newItem = { q, rawAnswer: rawMarkdown, date: new Date().toLocaleString('en-GB') };
 				if (verse) newItem.verse = verse;
-				history = [newItem, ...history].slice(0, 50);
+				history = [newItem, ...history].slice(0, 200);
 				try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
 				updateHistoryBtn();
 				showWelcome();
 			};
             const updateHistoryBtn = () => {
                 const cnt = history.length;
-                showHistoryBtn.textContent = `Ol kwestin we yu askem finis (${cnt})`;
+                showHistoryBtn.textContent = `HISTRI: Ol kwestin we yu askem finis (${cnt})`;
                 document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
             };
             const showWelcome = () => {
@@ -477,35 +562,149 @@ Jesus wins. You are safe in Him.`,
                 }
                 welcomeVerse.style.display = 'block';
             };
-            showHistoryBtn.onclick = () => {
-                historyList.innerHTML = '';
-                history.forEach(item => {
-                    const div = document.createElement('div');
-                    div.style = 'border-bottom:1px solid var(--border);padding:12px 0;cursor:pointer;';
-			const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
-			div.innerHTML = `<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
-							 <p style="margin:4px 0 8px;font-size:.9em;color:#7f8c8d">${item.date}</p>
-							 <div style="font-size:15px;line-height:1.7">${renderedAnswer}</div>`;
-				div.onclick = () => {
-					questionInput.value = item.q;
-					questionInput.dispatchEvent(new Event('input'));
-					answerContent.innerHTML = marked.parse(item.rawAnswer || item.a || '');
-					currentQuestion = item.q;  // UPDATE: Set the current question
-					currentAnswer = item.rawAnswer || item.a || '';  // UPDATE: Set the current answer
-					answerHeader.style.display = 'flex';
-					answerDiv.style.display = 'block';
-					welcomeVerse.style.display = 'none';
+
+			showHistoryBtn.onclick = () => {
+				historyList.innerHTML = '';
+				
+				// Create extend button that will appear when answer is expanded
+				const extendBtnContainer = document.createElement('div');
+				extendBtnContainer.id = 'modalExtendBtn';
+				extendBtnContainer.style = 'display:none;text-align:center;margin-bottom:12px;padding:12px;background:var(--border);border-radius:8px';
+				const extendBtn = document.createElement('button');
+				extendBtn.textContent = 'Mekem ansa i longfala...';
+				extendBtn.style = 'background:#e67e22;color:white;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1em';
+				extendBtn.onmouseover = () => extendBtn.style.background = '#d35400';
+				extendBtn.onmouseout = () => extendBtn.style.background = '#e67e22';
+				extendBtnContainer.appendChild(extendBtn);
+				
+				// Insert extend button after the subtitle
+				const subtitle = document.querySelector('#historyModal p');
+				subtitle.after(extendBtnContainer);
+				
+				let currentExpandedItem = null;
+				
+				history.forEach((item, index) => {
+					const itemDiv = document.createElement('div');
+					itemDiv.className = 'history-item';
+					
+					const questionDiv = document.createElement('div');
+					questionDiv.className = 'history-question';
+					questionDiv.innerHTML = `
+						<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
+						<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
+					`;
+					
+					const answerDiv = document.createElement('div');
+					answerDiv.className = 'history-answer';
+					const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
+					answerDiv.innerHTML = renderedAnswer;
+					
+					// Toggle expand/collapse on click
+					questionDiv.onclick = () => {
+						const wasExpanded = answerDiv.classList.contains('expanded');
+						
+						// Collapse all other answers
+						document.querySelectorAll('.history-answer').forEach(a => a.classList.remove('expanded'));
+						
+						if (!wasExpanded) {
+							answerDiv.classList.add('expanded');
+							extendBtnContainer.style.display = 'block';
+							currentExpandedItem = item;
+							
+							// Update extend button click handler
+							extendBtn.onclick = async () => {
+								extendBtn.disabled = true;
+								extendBtn.textContent = 'Wet smol...';
+								extendBtn.classList.add('button-loading');
+								
+								const result = await getAnswer(currentExpandedItem.q, true);
+								
+								if (result.source === 'fallback') {
+									errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
+									errorMessage.style.display = 'block';
+									setTimeout(() => errorMessage.style.display = 'none', 3000);
+								} else {
+									// Update the answer in the modal
+									answerDiv.innerHTML = marked.parse(result.text);
+									// Update in history
+									const histIndex = history.findIndex(h => h.q === currentExpandedItem.q && h.date === currentExpandedItem.date);
+									if (histIndex !== -1) {
+										history[histIndex].rawAnswer = result.text;
+										localStorage.setItem('bibleHistory', JSON.stringify(history));
+									}
+								}
+								
+								extendBtn.disabled = false;
+								extendBtn.textContent = 'Mekem ansa i longfala...';
+								extendBtn.classList.remove('button-loading');
+							};
+						} else {
+							extendBtnContainer.style.display = 'none';
+							currentExpandedItem = null;
+						}
+					};
+					
+					itemDiv.appendChild(questionDiv);
+					itemDiv.appendChild(answerDiv);
+					historyList.appendChild(itemDiv);
+				});
+				historyModal.style.display = 'flex';
+			};
+
+			closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
+
+			// Download history backup
+			document.getElementById('downloadHistoryBtn').onclick = () => {
+				if (history.length === 0) {
+					alert('Nogat eni ansa blong daonlotem!');
+					return;
+				}
+				
+				let textContent = 'BAEBOL KWESTIN - Ol Kwestin mo Ansa Blong Mi\n';
+				textContent += '='.repeat(50) + '\n\n';
+				
+				history.forEach((item, index) => {
+					textContent += `Kwestin ${index + 1}: ${item.q}\n`;
+					textContent += `Taem: ${item.date}\n`;
+					textContent += '-'.repeat(50) + '\n';
+					textContent += item.rawAnswer || item.a || '';
+					textContent += '\n\n' + '='.repeat(50) + '\n\n';
+				});
+				
+				const blob = new Blob([textContent], { type: 'text/plain' });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `Baebol-Kwestin-${new Date().toISOString().split('T')[0]}.txt`;
+				a.click();
+				URL.revokeObjectURL(url);
+				
+				alert('Ol ansa i daonlot long wan fael finis');
+			};
+
+			// Clear all history
+			document.getElementById('clearHistoryBtn').onclick = () => {
+				if (history.length === 0) {
+					alert('Nogat ansa blong waepemaot!');
+					return;
+				}
+				
+				if (confirm(`Waepemaot ${history.length} ansa blo bifo? Yu no save karembak!`)) {
+					localStorage.removeItem('bibleHistory');
+					history = [];
+					updateHistoryBtn();
+					showWelcome();
 					historyModal.style.display = 'none';
-				};
-                    historyList.appendChild(div);
-                });
-                historyModal.style.display = 'flex';
-            };
-            closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
+					alert('Ol olfala ansa i  aot finis!');
+				}
+			};
+
             historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 			explainMoreBtn.onclick = async () => {
 				askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-				explainMoreBtn.disabled = true;
+			explainMoreBtn.disabled = true;
+			explainMoreBtn.textContent = 'Wet smol...';
+			explainMoreBtn.classList.add('button-loading');
 				errorMessage.style.display = 'none'; // Hide any previous errors
 				
 				const result = await getAnswer(currentQuestion, true);
@@ -524,7 +723,9 @@ Jesus wins. You are safe in Him.`,
 				}
 				
 				askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-				explainMoreBtn.disabled = false;
+			explainMoreBtn.disabled = false;
+			explainMoreBtn.textContent = 'Mekem ansa i longfala...';
+			explainMoreBtn.classList.remove('button-loading');
 				};
             questionInput.addEventListener('input', () => {
                 clearBtn.style.display = questionInput.value ? 'flex' : 'none';
@@ -605,4 +806,3 @@ if ('serviceWorker' in navigator) {
     </script>
 </body>
 </html>
-
