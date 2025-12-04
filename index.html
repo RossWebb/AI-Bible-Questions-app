@@ -626,11 +626,16 @@ Jesus wins. You are safe in Him.`,
 								} else {
 									// Update the answer in the modal
 									answerDiv.innerHTML = marked.parse(result.text);
+									// Extract verse for the extended answer
+									const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+									const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 									// Update in history
 									const histIndex = history.findIndex(h => h.q === currentExpandedItem.q && h.date === currentExpandedItem.date);
 									if (histIndex !== -1) {
 										history[histIndex].rawAnswer = result.text;
+										if (verse) history[histIndex].verse = verse;
 										localStorage.setItem('bibleHistory', JSON.stringify(history));
+										showWelcome(); // Update welcome verse if this was the most recent
 									}
 								}
 								
