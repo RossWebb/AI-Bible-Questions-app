@@ -563,98 +563,111 @@ Jesus wins. You are safe in Him.`,
                 welcomeVerse.style.display = 'block';
             };
 
-			showHistoryBtn.onclick = () => {
-				historyList.innerHTML = '';
-				
-				// Create extend button that will appear when answer is expanded
-				const extendBtnContainer = document.createElement('div');
-				extendBtnContainer.id = 'modalExtendBtn';
-				extendBtnContainer.style = 'display:none;text-align:center;margin-bottom:12px;padding:12px;background:var(--border);border-radius:8px';
-				const extendBtn = document.createElement('button');
-				extendBtn.textContent = 'Mekem ansa i longfala...';
-				extendBtn.style = 'background:#e67e22;color:white;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1em';
-				extendBtn.onmouseover = () => extendBtn.style.background = '#d35400';
-				extendBtn.onmouseout = () => extendBtn.style.background = '#e67e22';
-				extendBtnContainer.appendChild(extendBtn);
-				
-				// Insert extend button after the subtitle
-				const subtitle = document.querySelector('#historyModal p');
-				subtitle.after(extendBtnContainer);
-				
-				let currentExpandedItem = null;
-				
-				history.forEach((item, index) => {
-					const itemDiv = document.createElement('div');
-					itemDiv.className = 'history-item';
-					
-					const questionDiv = document.createElement('div');
-					questionDiv.className = 'history-question';
-					questionDiv.innerHTML = `
-						<p style="margin:0;font-weight:bold;color:var(--primary)">${item.q}</p>
-						<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
-					`;
-					
-					const answerDiv = document.createElement('div');
-					answerDiv.className = 'history-answer';
-					const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
-					answerDiv.innerHTML = renderedAnswer;
-					
-					// Toggle expand/collapse on click
-					questionDiv.onclick = () => {
-						const wasExpanded = answerDiv.classList.contains('expanded');
+showHistoryBtn.onclick = () => {
+    historyList.innerHTML = '';
+    
+    history.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'history-item';
+        
+		const questionDiv = document.createElement('div');
+		questionDiv.className = 'history-question';
+		const displayTitle = item.isExtended ? `${item.q} -longfala` : item.q;
+		questionDiv.innerHTML = `
+			<p style="margin:0;font-weight:bold;color:var(--primary)">${displayTitle}</p>
+			<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
+		`;
+        
+        const answerDiv = document.createElement('div');
+        answerDiv.className = 'history-answer';
+        const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
+        answerDiv.innerHTML = renderedAnswer;
+        
+        // Create extend button for THIS item (hidden by default)
+        const extendBtnContainer = document.createElement('div');
+        extendBtnContainer.className = 'item-extend-btn';
+        extendBtnContainer.style = 'display:none;text-align:center;margin:12px 0;padding:12px;background:var(--border);border-radius:8px';
+        const extendBtn = document.createElement('button');
+        extendBtn.textContent = 'Mekem ansa i longfala...';
+        extendBtn.style = 'background:#e67e22;color:white;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1em';
+        extendBtn.onmouseover = () => extendBtn.style.background = '#d35400';
+        extendBtn.onmouseout = () => extendBtn.style.background = '#e67e22';
+        extendBtnContainer.appendChild(extendBtn);
+        
+        // Toggle expand/collapse on click
+        questionDiv.onclick = () => {
+            const wasExpanded = answerDiv.classList.contains('expanded');
+            
+            // Collapse all other answers and hide their buttons
+            document.querySelectorAll('.history-answer').forEach(a => a.classList.remove('expanded'));
+            document.querySelectorAll('.item-extend-btn').forEach(b => b.style.display = 'none');
+            
+			if (!wasExpanded) {
+				answerDiv.classList.add('expanded');
+				// Only show extend button if not already extended
+				if (!item.isExtended) {
+					extendBtnContainer.style.display = 'block';
+				}
+                
+                // Scroll the button into view
+                setTimeout(() => extendBtnContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                
+                // Set up extend button click handler
+                extendBtn.onclick = async () => {
+                    extendBtn.disabled = true;
+                    extendBtn.textContent = 'Wet smol...';
+                    extendBtn.classList.add('button-loading');
+                    
+                    const result = await getAnswer(item.q, true);
+                    
+                    if (result.source === 'fallback') {
+                        errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
+                        errorMessage.style.display = 'block';
+                        setTimeout(() => errorMessage.style.display = 'none', 3000);
+                        extendBtn.disabled = false;
+                        extendBtn.textContent = 'Mekem ansa i longfala...';
+                        extendBtn.classList.remove('button-loading');
+					} else {
+						// Update the answer in the modal with extended version
+						answerDiv.innerHTML = marked.parse(result.text);
 						
-						// Collapse all other answers
-						document.querySelectorAll('.history-answer').forEach(a => a.classList.remove('expanded'));
+						// Extract verse for the extended answer
+						const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+						const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 						
-						if (!wasExpanded) {
-							answerDiv.classList.add('expanded');
-							extendBtnContainer.style.display = 'block';
-							currentExpandedItem = item;
+						// Update in history array and localStorage
+						const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
+						if (histIndex !== -1) {
+							// Store BOTH versions: keep original as backup, add extended
+							if (!history[histIndex].originalAnswer) {
+								history[histIndex].originalAnswer = history[histIndex].rawAnswer; // Backup original
+							}
+							history[histIndex].rawAnswer = result.text; // Save extended version
+							history[histIndex].isExtended = true; // Flag as extended
+							if (verse) history[histIndex].verse = verse;
 							
-							// Update extend button click handler
-							extendBtn.onclick = async () => {
-								extendBtn.disabled = true;
-								extendBtn.textContent = 'Wet smol...';
-								extendBtn.classList.add('button-loading');
-								
-								const result = await getAnswer(currentExpandedItem.q, true);
-								
-								if (result.source === 'fallback') {
-									errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
-									errorMessage.style.display = 'block';
-									setTimeout(() => errorMessage.style.display = 'none', 3000);
-								} else {
-									// Update the answer in the modal
-									answerDiv.innerHTML = marked.parse(result.text);
-									// Extract verse for the extended answer
-									const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-									const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-									// Update in history
-									const histIndex = history.findIndex(h => h.q === currentExpandedItem.q && h.date === currentExpandedItem.date);
-									if (histIndex !== -1) {
-										history[histIndex].rawAnswer = result.text;
-										if (verse) history[histIndex].verse = verse;
-										localStorage.setItem('bibleHistory', JSON.stringify(history));
-										showWelcome(); // Update welcome verse if this was the most recent
-									}
-								}
-								
-								extendBtn.disabled = false;
-								extendBtn.textContent = 'Mekem ansa i longfala...';
-								extendBtn.classList.remove('button-loading');
-							};
-						} else {
-							extendBtnContainer.style.display = 'none';
-							currentExpandedItem = null;
+							try {
+								localStorage.setItem('bibleHistory', JSON.stringify(history));
+								showWelcome(); // Update welcome verse if this was the most recent
+							} catch(e) {
+								console.error('Failed to save to localStorage:', e);
+							}
 						}
-					};
-					
-					itemDiv.appendChild(questionDiv);
-					itemDiv.appendChild(answerDiv);
-					historyList.appendChild(itemDiv);
-				});
-				historyModal.style.display = 'flex';
-			};
+						
+						// Hide the extend button after success
+						extendBtnContainer.style.display = 'none';
+					}
+                };
+            }
+        };
+        
+        itemDiv.appendChild(questionDiv);
+        itemDiv.appendChild(extendBtnContainer); // Button goes between question and answer
+        itemDiv.appendChild(answerDiv);
+        historyList.appendChild(itemDiv);
+    });
+    historyModal.style.display = 'flex';
+};
 
 			closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
 
