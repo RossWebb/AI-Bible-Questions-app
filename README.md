@@ -1,12 +1,14 @@
 # Baebol Kwestin (Bible Questions App)
 
-A Progressive Web App (PWA) for asking Bible questions in Bislama (Vanuatu). Powered by AI to provide clear, Reformed theology-based answers in simple English suitable for new Christians.
+A Progressive Web App (PWA) for asking Bible questions in Bislama (Vanuatu). Powered by AI to provide clear, conservative theology-based answers in simple English suitable for new Christians.
+
+Produced by *Grok, Claude, and Ross Webb*
 
 ## 🌟 Features
 
 - **AI-Powered Answers**: Get biblical answers to your questions using Google Gemini AI
 - **Simple Language**: Answers written for 13-year-old reading level
-- **Reformed Theology**: All answers align with solid Reformed biblical principles
+- **Conservative Theology**: All answers align with solid Reformed biblical principles
 - **Offline Support**: Works as a PWA - install on your phone or computer
 - **Dark Mode**: Easy reading in any lighting condition
 - **Question History**: Save and review all your past questions and answers
@@ -105,7 +107,7 @@ Simply visit the app URL in your web browser.
 
 ## 🎨 Theology Guidelines
 
-All answers follow Reformed theology principles:
+All answers follow conservative theology principles:
 - God's sovereignty and creation
 - Universal sin and need for forgiveness
 - Jesus' substitutionary atonement
@@ -116,7 +118,6 @@ All answers follow Reformed theology principles:
 
 ### Special Focus: Animism & Kastom
 The app includes questions specifically addressing:
-- Ancestor worship
 - Spirit communication
 - Traditional healing practices
 - Ceremonial participation
@@ -175,7 +176,7 @@ Key Bislama Terms:
 - `Wet smol` = Wait a moment
 - `Nogat intanet` = No internet
 - `Serem` = Share
-- `Deletem` = Delete
+- `Waepemaot` = Delete
 - `longfala` = extended/detailed
 
 ## 📱 Offline Functionality
@@ -197,7 +198,18 @@ Contributions welcome! Areas for improvement:
 
 ## 📄 License
 
-[Your chosen license - e.g., MIT]
+This work is licensed under [Creative Commons Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)](https://creativecommons.org/licenses/by-nd/4.0/).
+
+### What this means:
+- ✅ You can use and share this app freely
+- ✅ You must give appropriate credit
+- ❌ You cannot modify the theological guidelines or create altered versions
+- ❌ You cannot change the Reformed theology system prompts
+
+### Theological Integrity
+The doctrinal framework of this application is grounded in Reformed theology and must remain unchanged to preserve biblical accuracy and consistency.
+
+For questions about licensing or special use cases, please contact [your contact info].
 
 ## 👤 Author
 
@@ -208,7 +220,7 @@ Contributions welcome! Areas for improvement:
 ## 🙏 Acknowledgments
 
 - Built for the Christians of Vanuatu
-- Reformed theology resources
+- Conservative theology resources
 - NIrV Bible translation
 - Google Gemini AI
 - Anthropic Claude (development assistance)
@@ -222,6 +234,7 @@ For questions, issues, or suggestions:
 ## 🔮 Future Enhancements
 
 Potential features:
+- Translation of answer to various languages
 - More Bislama interface elements
 - Audio answers (text-to-speech)
 - Verse lookup tool
