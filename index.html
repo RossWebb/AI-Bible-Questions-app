@@ -175,6 +175,13 @@
 			font-weight: bold;
 			margin-bottom: 12px;
 			animation: flash 1.5s infinite;
+			position: fixed;
+			top: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 10000;
+			max-width: 90%;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 		}
 		
         .footer{
@@ -275,7 +282,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             // === KEYS ===
             const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
-            const OR_KEY = atob("c2stb3ItdjEtMDRkYTAwZjc5YzIzZTQ2MTgzMDcxYzRhNDYwMmVmZWY0ZmMxOTdiZWEwZTdkMTIwZTVkNWE2OWQwNjNhNGQwYQ==");
             marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
 
             // === ELEMENTS ===
@@ -316,10 +322,64 @@
                 moon.style.display = 'none';
                 sun.style.display = 'block';
             }
+			
+			// === SHARE BUTTON ===
+			document.getElementById('shareFab').onclick = async () => {
+				// Check if there's a current answer to share
+				if (!currentQuestion || !currentAnswer) {
+					alert('Nogat ansa blong serem! Askem wan kwestin fastaem.');
+					return;
+				}
+				
+				// Format the answer for sharing
+				const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
+				
+				try {
+					// Always copy to clipboard first
+					await navigator.clipboard.writeText(shareText);
+					
+					// Try native share if available
+					if (navigator.share) {
+						await navigator.share({
+							title: 'Baebol Kwestin - ' + currentQuestion,
+							text: shareText
+						});
+					} else {
+						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+					}
+				} catch (err) {
+					if (err.name !== 'AbortError') {
+						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+					}
+				}
+			};
+			
+			// === SHARE FUNCTION ===
+			async function shareAnswer(question, answer) {
+				const shareText = `KWESTIN: ${question}\n\nANSA:\n${answer}\n\n--- Baebol Kwestin App ---`;
+				
+				try {
+					await navigator.clipboard.writeText(shareText);
+					
+					if (navigator.share) {
+						await navigator.share({
+							title: 'Baebol Kwestin - ' + question,
+							text: shareText
+						});
+					} else {
+						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+					}
+				} catch (err) {
+					if (err.name !== 'AbortError') {
+						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+					}
+				}
+			}			
 
             // === SYSTEM PROMPT ===
             const systemPrompt = `You are a kind Bible teacher in Vanuatu.
 Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
+When there is a negative concept like 'not innocent' also give the positive like 'guilty'
 Answers follow solid REFORMED theology.
 Do NOT contradict these truths:
 - God created everything and is sovereign.
@@ -362,7 +422,7 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
 
 			// === ANSWER GENERATOR ===
 			async function getAnswer(q, isExplainMore = false) {
-				// CHANGED: Override system prompt for detailed study mode
+				// Override system prompt for detailed study mode
 				const activeSystemPrompt = isExplainMore 
 					? systemPrompt
 						.replace('Keep under 350 words', 'Write 600-800 words')
@@ -370,79 +430,66 @@ Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm
 						.replace('**FORMAT EXACTLY LIKE THIS:**', '**BIBLE STUDY FORMAT:**')
 					: systemPrompt;
 				
-					const fullQ = isExplainMore
-						? q + "\n\n**BIBLE STUDY FORMAT** - Follow this structure exactly:\n\n**1. THE QUESTION & QUICK ANSWER**\n\n(Blank line after heading)\n\nBriefly state the problem/question and give a one-sentence summary answer.\n\n**2. WHAT THE BIBLE SAYS**\n\n(Blank line after heading)\n\nLet's see what the Bible says about this:\n\n(Blank line, then each verse on this pattern:)\n\n**Verse Reference** *\"Full verse text from NIrV\"*\n\nOne sentence explaining what this verse teaches us.\n\n(BLANK LINE between each verse block)\n\n**3. UNDERSTANDING THIS DEEPER**\n\n(Blank line after heading)\n\nNow expand on the answer in 3-4 paragraphs:\n- What does this mean for us?\n- How does this change how we think?\n- Why is this important?\n\n(Blank line between paragraphs)\n\n**4. LIVING THIS OUT**\n\n(Blank line after heading)\n\nGive 3-4 practical steps:\n- First step\n- Second step\n- Third step\n\n**5. REMEMBER THIS**\n\n(Blank line after heading)\n\nEnd with one encouraging sentence.\n\nCRITICAL: Put blank lines after EVERY heading and between EVERY verse block. Total: 500-700 words. Keep language SIMPLE (13-year-old level)."
-						: q;				
-                // TIER 1: GEMINI 2.5 FLASH
-                try {
-                    const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+				const fullQ = isExplainMore
+					? q + "\n\n**BIBLE STUDY FORMAT** - Follow this structure exactly:\n\n**1. A SUMMARY ANSWER FIRST**\n\n(Blank line after heading)\n\nBriefly state the problem/question and give a one-sentence summary answer.\n\n**2. WHAT THE BIBLE SAYS**\n\n(Blank line after heading)\n\nLet's see what the Bible says about this:\n\n(Blank line, then each verse on this pattern:)\n\n**Verse Reference** *\"Full verse text from NIrV\"*\n\nOne sentence explaining what this verse teaches us.\n\n(BLANK LINE between each verse block)\n\n**3. UNDERSTANDING THIS DEEPER**\n\n(Blank line after heading)\n\nNow expand on the answer in 3-4 paragraphs:\n- What does this mean for us?\n- How does this change how we think?\n- Why is this important?\n\n(Blank line between paragraphs)\n\n**4. LIVING THIS OUT**\n\n(Blank line after heading)\n\nGive 3-4 practical steps:\n- First step\n- Second step\n- Third step\n\n**5. REMEMBER THIS**\n\n(Blank line after heading)\n\nEnd with one encouraging sentence.\n\nCRITICAL: Put blank lines after EVERY heading and between EVERY verse block. Total: 500-700 words. Keep language SIMPLE (13-year-old level)."
+					: q;
+				
+				// Try Gemini API
+				try {
+					const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify({
 							contents: [{ parts: [{ text: activeSystemPrompt + "\n\nQuestion: " + fullQ }] }],
 							generationConfig: { maxOutputTokens: isExplainMore ? 3500 : 2048, temperature: 0.7 },
-                            safetySettings: [
-                                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-                                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-                            ]
-                        })
-                    }, isExplainMore ? 30000 : 15000);
-                    if (res.ok) {
-                        const data = await res.json();
-                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                        if (text && text.length > 150) {
-                            debugDiv.textContent = "Gemini 2.5 Flash";
-                            return { text, source: 'Gemini' };
-                        }
-                    }
-                } catch (e) {}
-                // TIER 2: MISTRAL MIXTRAL
-                try {
-                    const res = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${OR_KEY}`
-                        },
-                        body: JSON.stringify({
-                            model: "mistralai/mixtral-8x22b-instruct:free",
-						messages: [
-							{ role: "system", content: activeSystemPrompt },
-							{ role: "user", content: fullQ }
-						],
-						max_tokens: isExplainMore ? 3500 : 2000,
-                            temperature: 0.7
-                        })
-                    }, isExplainMore ? 30000 : 15000);
-                    if (res.ok) {
-                        const data = await res.json();
-                        const text = data.choices?.[0]?.message?.content;
-                        if (text && text.length > 150) {
-                            debugDiv.textContent = "OpenRouter (Mixtral 8x22B)";
-                            return { text, source: 'OpenRouter' };
-                        }
-                    }
-                } catch (e) {}
-				// TIER 3: FALLBACK
-				debugDiv.textContent = "Fallback (no connection)";
-				errorMessage.textContent = "⚠️ Sore! Nogat intanet - traem bakegen";
+							safetySettings: [
+								{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+								{ category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+								{ category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+								{ category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+							]
+						})
+					}, isExplainMore ? 30000 : 15000);
+					
+					if (res.ok) {
+						const data = await res.json();
+						const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+						if (text && text.length > 150) {
+							debugDiv.textContent = "Gemini 2.5 Flash";
+							return { text, source: 'Gemini' };
+						}
+					}
+				} catch (e) {
+					console.error("Gemini failed:", e.message);
+				}
+				
+				// Fallback if Gemini fails
+				debugDiv.textContent = "Offline (no connection)";
+				errorMessage.textContent = "⚠️ Sore, nogat intanet! Onem intanet, afta traem bakegen.";
 				errorMessage.style.display = 'block';
 				return {
-					text: `## Jesus is Stronger
-### Step 1: Know This
-- Spirits are real, but Jesus is Lord over all.
-- The Bible says do not talk to the dead.
-- Trust God, not kastom power.
-### Step 2: Remember This
-**Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
-**Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn’t you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
-**Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
-Jesus wins. You are safe in Him.`,
-                    source: 'fallback'
-                };
-           }
+					text: ``,
+					source: 'fallback'
+				};
+    
+    // ALTERNATIVE FALLBACK - Default Bible answer (kept for possible future use)
+    // return {
+    //     text: `## Jesus is Stronger
+    // ### Step 1: Know This
+    // - Spirits are real, but Jesus is Lord over all.
+    // - The Bible says do not talk to the dead.
+    // - Trust God, not kastom power.
+    // ### Step 2: Remember This
+    // **Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
+    // 
+    // **Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn't you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
+    // 
+    // **Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
+    // 
+    // Jesus wins. You are safe in Him.`,
+    //     source: 'fallback'
+    // };
+}
 
             // === SUBMIT ===
 			const handleSubmit = async (q) => {
@@ -483,11 +530,11 @@ Jesus wins. You are safe in Him.`,
             const ANIMISM_SEED = [
 			"Why does the Bible say not to talk to dead people?",
             "Can spirits in the bush really hurt me?",
-            "Is it wrong to use kastom medicine with Bible prayers?",
+            "Is it wrong to use kastom medicine and Christian prayers together?",
             "What does the Bible say about people who see spirits?",
             "Can a Christian go to a kastom dance?",
-            "What does the Bible say about nakaimas?",
-            "Is it okay to burn a house where someone died?",
+            "What does the Bible say about nakaimas? (sorcery)",
+            "Is it okay to destroy a house where someone died?",
             "Can a Christian use love magic?",
             "What does the Bible say about dreams from spirits?",
             "Is it wrong to pay bride price - some people say it is wrong to buy a wife.",
@@ -495,7 +542,7 @@ Jesus wins. You are safe in Him.`,
             "What does the Bible say about tabu places?",
             "Is it okay to eat food offered to spirits?",
             "Does it matter if a person wearing kastom clothes comes to church?",
-            "What does the Bible say about people who do poison?",
+            "What does the Bible say about people who do poison (harming by sorcery)?",
             "Is it wrong to go to a kastom healer?",
             "Can Christians dance in kastom ceremonies?",
             "What does the Bible say about ancestors watching us?",
@@ -503,34 +550,115 @@ Jesus wins. You are safe in Him.`,
 			"Should I burn my old kastom things?",
             "Can a Christian marry someone who follows kastom?"
             ];
-            const AI_QUESTIONS = [
-                "What does it mean to be born again?",
-                "How can I know God forgives me?",
-                "Why did Jesus have to die on the cross?",
-                "What is the Holy Spirit and what does He do?"
-            ];
-            const showQuestionButtons = (qs) => {
-                randomDiv.innerHTML = '';
-                qs.forEach(q => {
-                    const b = document.createElement('button');
-                    b.className = 'random-q-btn';
-                    b.textContent = q;
-                    b.onclick = () => {
-                        questionInput.value = q;
-                        questionInput.dispatchEvent(new Event('input'));
-                        randomDiv.style.display = 'none';
-                        isAutoSubmit = true;
-                        handleSubmit(q);
-                    };
-                    randomDiv.appendChild(b);
-                });
-                randomDiv.style.display = 'block';
-            };
-            randomBtn.onclick = () => {
-                const animism = ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
-                const shuffledAI = AI_QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 4);
-                showQuestionButtons([animism, ...shuffledAI]);
-            };
+			const GENERAL_SEED = [
+				"Why do I still sin sometimes even after trusting Jesus?",
+				"What is the real thinking behind my sins? Why do I sin?",
+				"How can talking to God every day make my life better?",
+				"What changed in me the moment I accepted Jesus as my Lord and Saviour?",
+				"Why does God give me what I don't deserve?",
+				"Do I have to keep living a good life so God will not turn away from me?",
+				"Why should I always get together with other strong Christians?",
+				"What do I do when a part of the Bible is hard to understand?",
+				"Why can't good actions alone make God accept a person?",
+				"How does God help me fight bad habits day by day?",
+				"Help me learn how to pray more regularly?",
+				"Why do I have to go to church every week?",
+				"I have heard that Jesus' cross is like the key that opens God's door for me? True?",
+				"What happens when God chooses a person to follow Him?",
+				"What is the best way to read the Bible?",
+				"How does God show his kindness to me after I believe?",
+				"How do other believers help you grow stronger in faith?",
+				"Why does trusting Jesus alone save me from going to hell?",
+				"What daily step gets me closer to living like Jesus?",
+				"How does the Bible light up good and bad choices?",
+				"How does God make everything good flow from His love?",
+				"Why share prayer needs with my church group?",
+				"If my life is hard, does that mean God is cross with me?",
+				"What fights inside you after you start following Jesus?",
+				"Are all churches the same? Which one should I go to?",
+				"How can you obey Jesus' words in everyday life?",
+				"What changes in me when God makes me his child?",
+				"Why does the Bible talk about eternal life as though it is a good thing?",
+				"How can I stop being afraid to die?"
+			];
+
+			// Initialize pools
+			let generalPool = [...GENERAL_SEED];
+			let usedAnimism = JSON.parse(localStorage.getItem('usedAnimism') || '[]');
+			let isGeneratingQuestion = false;
+
+			const showQuestionButtons = (qs) => {
+				randomDiv.innerHTML = '';
+				qs.forEach(q => {
+					const b = document.createElement('button');
+					b.className = 'random-q-btn';
+					b.textContent = q;
+					b.onclick = () => {
+						questionInput.value = q;
+						questionInput.dispatchEvent(new Event('input'));
+						randomDiv.style.display = 'none';
+						isAutoSubmit = true;
+						handleSubmit(q);
+					};
+					randomDiv.appendChild(b);
+				});
+				randomDiv.style.display = 'block';
+			};
+
+			randomBtn.onclick = () => {
+				// Get 1 animism question (track usage)
+				const availableAnimism = ANIMISM_SEED.filter(q => !usedAnimism.includes(q));
+				if (availableAnimism.length === 0) {
+					usedAnimism = []; // Reset when all used
+					localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+				}
+				const animismQ = availableAnimism.length > 0 
+					? availableAnimism[Math.floor(Math.random() * availableAnimism.length)]
+					: ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
+					usedAnimism.push(animismQ);
+					localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+				
+				// Get 4 general questions from pool
+				const shuffled = generalPool.sort(() => 0.5 - Math.random());
+				const selectedGeneral = shuffled.slice(0, 4);
+				
+				// Show all 5 questions
+				showQuestionButtons([animismQ, ...selectedGeneral]);
+				
+				// Replenish pool if needed (async in background)
+				if (generalPool.length < 10 && !isGeneratingQuestion) {
+					replenishPool();
+				}
+			};
+
+			// Background function to add AI questions to pool
+			async function replenishPool() {
+				isGeneratingQuestion = true;
+				try {
+					const prompt = "Generate 1 simple Bible question for a new Christian in Vanuatu. The question should cover Reformed theology topics like salvation, grace, sanctification, God's sovereignty, prayer, or Scripture. Make it practical, conversational, and under 20 words. Return ONLY the question, no numbering or extra text.";
+					
+					const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							contents: [{ parts: [{ text: prompt }] }],
+							generationConfig: { maxOutputTokens: 100, temperature: 0.9 }
+						})
+					}, 10000);
+					
+					if (res.ok) {
+						const data = await res.json();
+						const newQ = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+						if (newQ && newQ.length > 10 && newQ.length < 150) {
+							generalPool.push(newQ);
+							console.log('Added new question to pool:', newQ);
+						}
+					}
+				} catch (e) {
+					console.log('Failed to generate question, pool will use seed questions');
+				}
+				isGeneratingQuestion = false;
+			}
 
 			// === HISTORY & WELCOME ===
 			let history = [];
@@ -538,10 +666,23 @@ Jesus wins. You are safe in Him.`,
 				const raw = localStorage.getItem('bibleHistory');
 				if (raw) history = JSON.parse(raw).filter(i => i && i.q && (i.rawAnswer || i.a));
 			} catch (e) {}
-			const saveAnswer = (q, rawMarkdown, verse) => {
-				const newItem = { q, rawAnswer: rawMarkdown, date: new Date().toLocaleString('en-GB') };
+			const saveAnswer = (q, rawMarkdown, verse, keepDate = null, insertAfterDate = null) => {
+				const newItem = { q, rawAnswer: rawMarkdown, date: keepDate || new Date().toLocaleString('en-GB') };
 				if (verse) newItem.verse = verse;
-				history = [newItem, ...history].slice(0, 200);
+				
+				// If insertAfterDate is provided, insert right after that item
+				if (insertAfterDate) {
+					const insertIndex = history.findIndex(h => h.date === insertAfterDate);
+					if (insertIndex !== -1) {
+						history.splice(insertIndex + 1, 0, newItem);
+					} else {
+						history = [newItem, ...history];
+					}
+				} else {
+					history = [newItem, ...history];
+				}
+				
+				history = history.slice(0, 200);
 				try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
 				updateHistoryBtn();
 				showWelcome();
@@ -570,13 +711,61 @@ showHistoryBtn.onclick = () => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'history-item';
         
-		const questionDiv = document.createElement('div');
-		questionDiv.className = 'history-question';
-		const displayTitle = item.isExtended ? `${item.q} -longfala` : item.q;
-		questionDiv.innerHTML = `
-			<p style="margin:0;font-weight:bold;color:var(--primary)">${displayTitle}</p>
-			<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
-		`;
+		// Create wrapper for question and delete button
+				const questionWrapper = document.createElement('div');
+				questionWrapper.style.cssText = 'position:relative;padding-right:32px';
+				
+				const questionDiv = document.createElement('div');
+						questionDiv.className = 'history-question';
+						// Check if question ends with '-longfala' and format accordingly
+						const displayTitle = item.q.endsWith(' -longfala') 
+							? item.q.replace(' -longfala', ' <em style="font-style:italic;font-weight:normal">-longfala</em>')
+							: item.q;
+						questionDiv.innerHTML = `
+							<p style="margin:0;font-weight:bold;color:var(--primary)">${displayTitle}</p>
+							<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
+						`;
+
+			// Create share button
+			const shareBtn = document.createElement('button');
+			shareBtn.className = 'share-item-btn';
+			shareBtn.innerHTML = '📤';
+			shareBtn.title = 'Serem';
+			shareBtn.style.cssText = 'background:transparent;color:var(--accent);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:32px';
+
+			// Create delete button separately
+			const deleteBtn = document.createElement('button');
+			deleteBtn.className = 'delete-item-btn';
+			deleteBtn.innerHTML = '🗑️';
+			deleteBtn.title = 'Deletem';
+			deleteBtn.style.cssText = 'background:transparent;color:var(--danger);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:0px';
+			
+			// Add share button handler
+			shareBtn.onclick = (e) => {
+				e.stopPropagation(); // Prevent opening the answer
+				// Remove '-longfala' suffix for cleaner sharing
+				const cleanQuestion = item.q.replace(' -longfala', '');
+				shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
+			};
+
+			// Add delete button handler
+			deleteBtn.onclick = (e) => {
+				e.stopPropagation(); // Prevent opening the answer
+				if (confirm(`Deletem "${item.q}"?`)) {
+					// Remove from history array
+					const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
+					if (histIndex !== -1) {
+						history.splice(histIndex, 1);
+						try { 
+							localStorage.setItem('bibleHistory', JSON.stringify(history)); 
+							updateHistoryBtn();
+							showWelcome();
+						} catch(e) {}
+						// Remove from display
+						itemDiv.remove();
+					}
+				}
+			};
         
         const answerDiv = document.createElement('div');
         answerDiv.className = 'history-answer';
@@ -603,11 +792,11 @@ showHistoryBtn.onclick = () => {
             document.querySelectorAll('.item-extend-btn').forEach(b => b.style.display = 'none');
             
 			if (!wasExpanded) {
-				answerDiv.classList.add('expanded');
-				// Only show extend button if not already extended
-				if (!item.isExtended) {
-					extendBtnContainer.style.display = 'block';
-				}
+					answerDiv.classList.add('expanded');
+					// Only show extend button if question doesn't already end with '-longfala'
+					if (!item.q.endsWith(' -longfala')) {
+						extendBtnContainer.style.display = 'block';
+					}
                 
                 // Scroll the button into view
                 setTimeout(() => extendBtnContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
@@ -628,40 +817,38 @@ showHistoryBtn.onclick = () => {
                         extendBtn.textContent = 'Mekem ansa i longfala...';
                         extendBtn.classList.remove('button-loading');
 					} else {
-						// Update the answer in the modal with extended version
-						answerDiv.innerHTML = marked.parse(result.text);
-						
 						// Extract verse for the extended answer
 						const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
 						const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 						
-						// Update in history array and localStorage
-						const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
-						if (histIndex !== -1) {
-							// Store BOTH versions: keep original as backup, add extended
-							if (!history[histIndex].originalAnswer) {
-								history[histIndex].originalAnswer = history[histIndex].rawAnswer; // Backup original
-							}
-							history[histIndex].rawAnswer = result.text; // Save extended version
-							history[histIndex].isExtended = true; // Flag as extended
-							if (verse) history[histIndex].verse = verse;
-							
-							try {
-								localStorage.setItem('bibleHistory', JSON.stringify(history));
-								showWelcome(); // Update welcome verse if this was the most recent
-							} catch(e) {
-								console.error('Failed to save to localStorage:', e);
-							}
-						}
+						// Save as NEW history entry with modified question, keeping original date and position
+						const longQuestion = item.q + ' -longfala';
+						saveAnswer(longQuestion, result.text, verse, item.date, item.date);
 						
-						// Hide the extend button after success
-						extendBtnContainer.style.display = 'none';
+						// Close and reopen modal, then auto-open the new long answer
+						historyModal.style.display = 'none';
+						setTimeout(() => {
+							showHistoryBtn.click();
+							// Wait for modal to render, then click the first matching longfala question
+							setTimeout(() => {
+								const longAnswers = document.querySelectorAll('.history-question');
+								for (let qa of longAnswers) {
+									if (qa.textContent.includes(item.q) && qa.textContent.includes('longfala')) {
+										qa.click();
+										break;
+									}
+								}
+							}, 150);
+						}, 100);
 					}
                 };
             }
         };
         
-        itemDiv.appendChild(questionDiv);
+		questionWrapper.appendChild(questionDiv);
+		questionWrapper.appendChild(shareBtn);
+		questionWrapper.appendChild(deleteBtn);
+        itemDiv.appendChild(questionWrapper);
         itemDiv.appendChild(extendBtnContainer); // Button goes between question and answer
         itemDiv.appendChild(answerDiv);
         historyList.appendChild(itemDiv);
@@ -719,27 +906,28 @@ showHistoryBtn.onclick = () => {
 
             historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 			explainMoreBtn.onclick = async () => {
-				askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-			explainMoreBtn.disabled = true;
-			explainMoreBtn.textContent = 'Wet smol...';
-			explainMoreBtn.classList.add('button-loading');
-				errorMessage.style.display = 'none'; // Hide any previous errors
-				
-				const result = await getAnswer(currentQuestion, true);
-				
-				// If fallback response (connection failed), keep original answer
-				if (result.source === 'fallback') {
-					errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
-					errorMessage.style.display = 'block';
-					answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
-				} else {
-					answerContent.innerHTML = marked.parse(result.text);
-					currentAnswer = result.text; // Update stored answer
-					const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-					const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-					saveAnswer(currentQuestion, result.text, verse);
-				}
-				
+							askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
+						explainMoreBtn.disabled = true;
+						explainMoreBtn.textContent = 'Wet smol...';
+						explainMoreBtn.classList.add('button-loading');
+							errorMessage.style.display = 'none'; // Hide any previous errors
+							
+							const result = await getAnswer(currentQuestion, true);
+							
+							// If fallback response (connection failed), keep original answer
+							if (result.source === 'fallback') {
+								errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
+								errorMessage.style.display = 'block';
+								answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
+							} else {
+								answerContent.innerHTML = marked.parse(result.text);
+								currentAnswer = result.text; // Update stored answer
+								const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+								const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+								// Save as NEW entry with modified question
+								const longQuestion = currentQuestion + ' -longfala';
+								saveAnswer(longQuestion, result.text, verse);
+							}			
 				askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
 			explainMoreBtn.disabled = false;
 			explainMoreBtn.textContent = 'Mekem ansa i longfala...';
