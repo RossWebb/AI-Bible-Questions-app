@@ -176,7 +176,7 @@ Key Bislama Terms:
 - `Wet smol` = Wait a moment
 - `Nogat intanet` = No internet
 - `Serem` = Share
-- `Waepemaot` = Delete
+- `Karemaot` = Delete
 - `longfala` = extended/detailed
 
 ## 📱 Offline Functionality
