@@ -1,1018 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baebol Kwestin</title>
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="/icon-192.png" type="image/png">
-    <meta name="theme-color" content="#1a5276">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Baebol">
-    <style>
-        :root{--bg:#f8fbff;--card:#fff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);--danger:#e74c3c}
-        .dark-mode{--bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;--border:#444;--shadow:rgba(0,0,0,0.3)}
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:Georgia,serif;background:var(--bg);color:var(--text);padding:12px;max-width:800px;margin:auto;display:flex;flex-direction:column;min-height:100vh}
-        .header{position:relative;text-align:center;padding:16px 56px 4px}
-        h1{color:var(--primary);font-size:1.8em;margin:0;line-height:1.2}
-        .fab{
-            position:absolute;top:16px;width:48px;height:48px;border-radius:50%;
-            background:var(--card);border:1px solid var(--border);box-shadow:0 3px 8px var(--shadow);
-            display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;
-        }
-        .fab svg{width:28px;height:28px;fill:var(--primary)}
-        #shareFab{left:8px}#darkFab{right:8px}
-        .subtitle{text-align:center;font-style:italic;color:#5d6d7e;margin:2px 0 16px;font-size:1em}
-        .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 6px 20px var(--shadow);border:1px solid var(--border);margin-bottom:16px}
-        label{display:block;font-weight:bold;color:var(--primary);margin-bottom:8px}
-        .input-wrapper{position:relative}
-        textarea{width:100%;padding:12px 36px 12px 12px;border:1px solid #aed6f1;border-radius:10px;font-size:16px;min-height:90px;resize:vertical}
-        .clear-circle{
-            position:absolute;top:6px;right:6px;background:var(--danger);color:white;border:none;
-            width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:bold;cursor:pointer;
-            display:none;align-items:center;justify-content:center;line-height:1;
-        }
-        .btn-row{display:flex;gap:10px;margin-top:8px}
-		button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
-		.button-loading {
-			animation: flashButton 1s infinite;
-			pointer-events: none;
-		}
-        #askBtn{background:#2980b9;color:white}#randomBtn{background:#9b59b6;color:white}
-        #randomQuestions{margin-top:12px;display:none}
-        .random-q-btn{
-            display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
-            padding:14px;border-radius:12px;cursor:pointer;font-weight:500;text-align:center;
-            font-size:15px;line-height:1.4;
-        }
-        .random-q-btn:hover{background:#2980b9}
-        #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);display:none;max-height:60vh;overflow-y:auto}
-        #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
-        #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px}
-        #answerContent{line-height:1.8;font-size:15px}
-        #answerContent ul, #answerContent ol { padding-left: 1.5em; margin: 0.5em 0; }
-        #answerContent li { margin-bottom: 0.3em; }
-		
-		#answerContent h2 {
-			color: var(--primary);
-			font-size: 1.3em;
-			margin-top: 1.2em;
-			margin-bottom: 0.6em;
-			padding-bottom: 0.3em;
-			border-bottom: 2px solid var(--accent);
-		}
-		#answerContent h3 {
-			color: var(--accent);
-			font-size: 1.1em;
-			margin-top: 1em;
-			margin-bottom: 0.5em;
-		}
-		#answerContent strong {
-			color: var(--primary);
-		}
-		#answerContent em {
-			color: var(--text);
-			font-style: italic;
-		}
-		#answerContent p {
-			margin-bottom: 0.8em;
-		}		
-        #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
-        #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
-        #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
-        #welcomeVerse em::before{content:'"';color:var(--accent)}
-        #welcomeVerse em::after{content:'"';color:var(--accent)}
-
-        #historyBtn{margin-top:12px;text-align:center;display:none}
-        #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
-     
-		#historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
-			#historyModal > div{
-				background:var(--card);padding:20px;border-radius:16px;
-				width:90%;max-width:700px;max-height:80%;
-				overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
-			}
-		
-		#closeHistoryBtn{
-			position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
-			width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
-			display:flex;align-items:center;justify-content:center;z-index:999;
-		}
-
-		.history-item {
-			border-bottom: 1px solid var(--border);
-			padding: 12px 0;
-		}
-		.history-question {
-			cursor: pointer;
-			padding: 8px;
-			border-radius: 8px;
-			transition: background 0.2s;
-		}
-		.history-question:hover {
-			background: var(--border);
-		}
-		.history-answer {
-			display: none;
-			margin-top: 8px;
-			padding: 12px;
-			background: var(--bg);
-			border-radius: 8px;
-			font-size: 14px;
-			line-height: 1.6;
-		}
-		.history-answer h2 {
-			color: var(--primary);
-			font-size: 1.2em;
-			margin-top: 1em;
-			margin-bottom: 0.5em;
-			padding-bottom: 0.3em;
-			border-bottom: 2px solid var(--accent);
-		}
-		.history-answer h3 {
-			color: var(--accent);
-			font-size: 1em;
-			margin-top: 0.8em;
-			margin-bottom: 0.4em;
-		}
-		.history-answer strong {
-			color: var(--primary);
-		}
-		.history-answer em {
-			color: var(--text);
-			font-style: italic;
-		}
-		.history-answer p {
-			margin-bottom: 0.6em;
-		}
-		.history-answer.expanded {
-			display: block;
-		}
-		.history-open-btn {
-			background: #e67e22;
-			color: white;
-			border: none;
-			padding: 6px 12px;
-			border-radius: 6px;
-			font-size: 13px;
-			font-weight: bold;
-			cursor: pointer;
-			margin-top: 8px;
-		}
-		.history-open-btn:hover {
-			background: #d35400;
-		}
-		
-		#errorMessage {
-			display: none;
-			background: #e74c3c;
-			color: white;
-			padding: 12px;
-			border-radius: 8px;
-			text-align: center;
-			font-weight: bold;
-			margin-bottom: 12px;
-			animation: flash 1.5s infinite;
-			position: fixed;
-			top: 20px;
-			left: 50%;
-			transform: translateX(-50%);
-			z-index: 10000;
-			max-width: 90%;
-			box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-		}
-		
-        .footer{
-            margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
-            padding:12px;background:var(--card);border-top:1px solid var(--border);
-        }
-        #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
-        /* PWA Install Button */
-        #installBtn, #iosInstall {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1em;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,.3);
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            max-width: 90%;
-        }
-        #installBtn {
-            background: #e74c3c;
-            color: white;
-            animation: flash 1.5s infinite;
-        }
-        #iosInstall {
-            background: #1a5276;
-            color: white;
-        }
-        @keyframes flash {
-            0%, 100% { background: #e74c3c; }
-            50% { background: #c0392b; }
-        }
-		@keyframes flashButton {
-			0%, 100% { background: #e74c3c; }
-			50% { background: #c0392b; }
-		}		
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-</head>
-<body>
-    <div class="header">
-        <button id="shareFab" class="fab" title="Share">
-            <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
-        </button>
-        <button id="darkFab" class="fab" title="Dark Mode">
-            <svg id="moon" viewBox="0 0 24 24"><path d="M12 1c-6.07 0-11 5.43-11 11s4.93 11 11 11 11-4.93 11-11-4.93-11-11-11zm-0 18c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z"/></svg>
-            <svg id="sun" viewBox="0 0 24 24" style="display:none"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/></svg>
-        </button>
-        <h1>Baebol Kwestin</h1>
-    </div>
-    <p class="subtitle">Askem eni kwestin long Baebol</p>
-    <div class="card">
-        <form id="queryForm">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Baebol Kwestin</title>
+      <link rel="manifest" href="./manifest.json">
+      <link rel="icon" href="/icon-192.png" type="image/png">
+      <meta name="theme-color" content="#1a5276">
+      <meta name="apple-mobile-web-app-capable" content="yes">
+      <meta name="apple-mobile-web-app-status-bar-style" content="default">
+      <meta name="apple-mobile-web-app-title" content="Baebol">
+      <style>
+         :root{--bg:#f8fbff;--card:#fff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);--danger:#e74c3c}
+         .dark-mode{--bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;--border:#444;--shadow:rgba(0,0,0,0.3)}
+         *{box-sizing:border-box;margin:0;padding:0}
+         body{font-family:Georgia,serif;background:var(--bg);color:var(--text);padding:12px;max-width:800px;margin:auto;display:flex;flex-direction:column;min-height:100vh}
+         .header{position:relative;text-align:center;padding:16px 56px 4px}
+         h1{color:var(--primary);font-size:1.8em;margin:0;line-height:1.2}
+         .fab{
+         position:absolute;top:16px;width:48px;height:48px;border-radius:50%;
+         background:var(--card);border:1px solid var(--border);box-shadow:0 3px 8px var(--shadow);
+         display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;
+         }
+         .fab svg{width:28px;height:28px;fill:var(--primary)}
+         #shareFab{left:8px}#darkFab{right:8px}
+         .subtitle{text-align:center;font-style:italic;color:#5d6d7e;margin:2px 0 16px;font-size:1em}
+         .card{background:var(--card);padding:20px;border-radius:16px;box-shadow:0 6px 20px var(--shadow);border:1px solid var(--border);margin-bottom:16px}
+         label{display:block;font-weight:bold;color:var(--primary);margin-bottom:8px}
+         .input-wrapper{position:relative}
+         textarea{width:100%;padding:12px 36px 12px 12px;border:1px solid #aed6f1;border-radius:10px;font-size:16px;min-height:90px;resize:vertical}
+         .clear-circle{
+         position:absolute;top:6px;right:6px;background:var(--danger);color:white;border:none;
+         width:20px;height:20px;border-radius:50%;font-size:13px;font-weight:bold;cursor:pointer;
+         display:none;align-items:center;justify-content:center;line-height:1;
+         }
+         .btn-row{display:flex;gap:10px;margin-top:8px}
+         button{flex:1;padding:12px;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+         .button-loading {
+         animation: flashButton 1s infinite;
+         pointer-events: none;
+         }
+         #askBtn{background:#2980b9;color:white}#randomBtn{background:#9b59b6;color:white}
+         #randomQuestions{margin-top:12px;display:none}
+         .random-q-btn{
+         display:block;width:100%;margin:8px 0;background:var(--accent);color:white;
+         padding:14px;border-radius:12px;cursor:pointer;font-weight:500;text-align:center;
+         font-size:15px;line-height:1.4;
+         }
+         .random-q-btn:hover{background:#2980b9}
+         #answer{background:var(--card);padding:18px;border-radius:12px;border-left:5px solid var(--accent);display:none;max-height:60vh;overflow-y:auto}
+         #answerHeader{display:none;justify-content:flex-end;margin-bottom:8px}
+         #explainMoreBtn{background:var(--accent);color:white;padding:6px 12px;border-radius:6px;font-size:13px}
+         #answerContent{line-height:1.8;font-size:15px}
+         #answerContent ul, #answerContent ol { padding-left: 1.5em; margin: 0.5em 0; }
+         #answerContent li { margin-bottom: 0.3em; }
+         #answerContent h2 {
+         color: var(--primary);
+         font-size: 1.3em;
+         margin-top: 1.2em;
+         margin-bottom: 0.6em;
+         padding-bottom: 0.3em;
+         border-bottom: 2px solid var(--accent);
+         }
+         #answerContent h3 {
+         color: var(--accent);
+         font-size: 1.1em;
+         margin-top: 1em;
+         margin-bottom: 0.5em;
+         }
+         #answerContent strong {
+         color: var(--primary);
+         }
+         #answerContent em {
+         color: var(--text);
+         font-style: italic;
+         }
+         #answerContent p {
+         margin-bottom: 0.8em;
+         }		
+         #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
+         #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
+         #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
+         #welcomeVerse em::before{content:'"';color:var(--accent)}
+         #welcomeVerse em::after{content:'"';color:var(--accent)}
+         #historyBtn{margin-top:12px;text-align:center;display:none}
+         #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
+         #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
+         #historyModal > div{
+         background:var(--card);padding:20px;border-radius:16px;
+         width:90%;max-width:700px;max-height:80%;
+         overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
+         }
+         #closeHistoryBtn{
+         position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
+         width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
+         display:flex;align-items:center;justify-content:center;z-index:999;
+         }
+         .history-item {
+         border-bottom: 1px solid var(--border);
+         padding: 12px 0;
+         }
+         .history-question {
+         cursor: pointer;
+         padding: 8px;
+         border-radius: 8px;
+         transition: background 0.2s;
+         }
+         .history-question:hover {
+         background: var(--border);
+         }
+         .history-answer {
+         display: none;
+         margin-top: 8px;
+         padding: 12px;
+         background: var(--bg);
+         border-radius: 8px;
+         font-size: 14px;
+         line-height: 1.6;
+         }
+         .history-answer h2 {
+         color: var(--primary);
+         font-size: 1.2em;
+         margin-top: 1em;
+         margin-bottom: 0.5em;
+         padding-bottom: 0.3em;
+         border-bottom: 2px solid var(--accent);
+         }
+         .history-answer h3 {
+         color: var(--accent);
+         font-size: 1em;
+         margin-top: 0.8em;
+         margin-bottom: 0.4em;
+         }
+         .history-answer strong {
+         color: var(--primary);
+         }
+         .history-answer em {
+         color: var(--text);
+         font-style: italic;
+         }
+         .history-answer p {
+         margin-bottom: 0.6em;
+         }
+         .history-answer.expanded {
+         display: block;
+         }
+         .history-open-btn {
+         background: #e67e22;
+         color: white;
+         border: none;
+         padding: 6px 12px;
+         border-radius: 6px;
+         font-size: 13px;
+         font-weight: bold;
+         cursor: pointer;
+         margin-top: 8px;
+         }
+         .history-open-btn:hover {
+         background: #d35400;
+         }
+         #errorMessage {
+         display: none;
+         background: #e74c3c;
+         color: white;
+         padding: 12px;
+         border-radius: 8px;
+         text-align: center;
+         font-weight: bold;
+         margin-bottom: 12px;
+         animation: flash 1.5s infinite;
+         position: fixed;
+         top: 20px;
+         left: 50%;
+         transform: translateX(-50%);
+         z-index: 10000;
+         max-width: 90%;
+         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+         }
+         .footer{
+         margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
+         padding:12px;background:var(--card);border-top:1px solid var(--border);
+         }
+         #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
+         /* PWA Install Button */
+         #installBtn, #iosInstall {
+         position: fixed;
+         bottom: 40px;
+         left: 50%;
+         transform: translateX(-50%);
+         padding: 16px 24px;
+         border-radius: 12px;
+         font-weight: bold;
+         font-size: 1.1em;
+         z-index: 1000;
+         box-shadow: 0 4px 12px rgba(0,0,0,.3);
+         border: none;
+         cursor: pointer;
+         text-align: center;
+         max-width: 90%;
+         }
+         #installBtn {
+         background: #e74c3c;
+         color: white;
+         animation: flash 1.5s infinite;
+         }
+         #iosInstall {
+         background: #1a5276;
+         color: white;
+         }
+         @keyframes flash {
+         0%, 100% { background: #e74c3c; }
+         50% { background: #c0392b; }
+         }
+         @keyframes flashButton {
+         0%, 100% { background: #e74c3c; }
+         50% { background: #c0392b; }
+         }		
+      </style>
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+   </head>
+   <body>
+      <div class="header">
+		 <button id="shareFab" class="fab" title="Serem" style="font-size:24px">
+				📤
+		 </button>
+         <button id="darkFab" class="fab" title="Dark Mode">
+            <svg id="moon" viewBox="0 0 24 24">
+               <path d="M12 1c-6.07 0-11 5.43-11 11s4.93 11 11 11 11-4.93 11-11-4.93-11-11-11zm-0 18c-4.14 0-7.5-3.36-7.5-7.5 0-2.6 1.32-4.88 3.33-6.23.61-.41 1.39.25.94.94-.68 1.05-1.07 2.29-1.07 3.62 0 3.59 2.91 6.5 6.5 6.5 1.33 0 2.57-.39 3.62-1.07.69-.45 1.35.33.94.94-1.35 2.01-3.63 3.33-6.76 3.33z"/>
+            </svg>
+            <svg id="sun" viewBox="0 0 24 24" style="display:none">
+               <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm18 0h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm-9-9h2c.55 0 1-.45 1-1V2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1zm0 18h2c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1z"/>
+            </svg>
+         </button>
+         <h1>Baebol Kwestin</h1>
+      </div>
+      <p class="subtitle">Askem eni kwestin long Baebol</p>
+      <div class="card">
+         <form id="queryForm">
             <label>Raetem kwestin blong yu:</label>
             <div class="input-wrapper">
-                <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?"></textarea>
-                <button type="button" id="clearBtn" class="clear-circle">x</button>
+               <textarea id="question" placeholder="e.g., From wanem Jisas i mas ded long kros?"></textarea>
+               <button type="button" id="clearBtn" class="clear-circle">x</button>
             </div>
             <div class="btn-row">
-                <button type="submit" id="askBtn">ASKEM Baebol</button>
-                <button type="button" id="randomBtn">GIVIM Kwestin</button>
+               <button type="submit" id="askBtn">ASKEM Baebol</button>
+               <button type="button" id="randomBtn">GIVIM Kwestin</button>
             </div>
             <div id="historyBtn"><button type="button" id="showHistoryBtn">Ol kwestin (0)</button></div>
             <div id="randomQuestions"></div>
             <div id="debug"></div>
-        </form>
-    </div>
-	<div id="answer">
-		<div id="answerHeader">
-			<button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
-		</div>
-		<div id="answerContent"></div>
-	</div>
-	<div id="errorMessage"></div>
-	<div id="welcomeVerse"></div>
-	<div id="historyModal">
-		<div>
-			<button id="closeHistoryBtn">x</button>
-			<h3 style="margin:0 0 4px;color:#e67e22;text-align:center">HISTRI: Ol Kwestin We Yu Askem Finis</h3>
-			<p style="margin:0 0 12px;text-align:center;font-size:0.85em;color:#7f8c8d;font-style:italic">(Tajem kwestin we yu wantem luk ansa blong hem.)</p>
-			<div id="historyList"></div>
-			<div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-				<button id="downloadHistoryBtn" style="flex:1;background:#3498db;color:white;padding:10px;border-radius:8px;font-weight:bold">DAONLOTEM ol olfala ansa</button>
-				<button id="clearHistoryBtn" style="flex:1;background:var(--danger);color:white;padding:10px;border-radius:8px;font-weight:bold">WAEPEMAOT ol olfala ansa</button>
-			</div>
-		</div>
-	</div>
-    <footer class="footer">
-        Ross Webb i mekem app ia (2.0) 2025
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // === KEYS ===
-            const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
-            marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
-
-            // === ELEMENTS ===
-            const darkFab = document.getElementById('darkFab');
-            const moon = document.getElementById('moon');
-            const sun = document.getElementById('sun');
-            const form = document.getElementById('queryForm');
-            const questionInput = document.getElementById('question');
-            const askBtn = document.getElementById('askBtn');
-            const randomBtn = document.getElementById('randomBtn');
-            const randomDiv = document.getElementById('randomQuestions');
-            const answerDiv = document.getElementById('answer');
-            const answerHeader = document.getElementById('answerHeader');
-            const answerContent = document.getElementById('answerContent');
-            const explainMoreBtn = document.getElementById('explainMoreBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const showHistoryBtn = document.getElementById('showHistoryBtn');
-            const welcomeVerse = document.getElementById('welcomeVerse');
-            const historyModal = document.getElementById('historyModal');
-            const historyList = document.getElementById('historyList');
-            const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-			const debugDiv = document.getElementById('debug');
-			const errorMessage = document.getElementById('errorMessage');
-			let currentQuestion = '';
-			let currentAnswer = '';
-			let isAutoSubmit = false;
-
-            // === DARK MODE ===
-            darkFab.onclick = () => {
-                document.body.classList.toggle('dark-mode');
-                const isDark = document.body.classList.contains('dark-mode');
-                moon.style.display = isDark ? 'none' : 'block';
-                sun.style.display = isDark ? 'block' : 'none';
-                localStorage.setItem('darkMode', isDark);
-            };
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                moon.style.display = 'none';
-                sun.style.display = 'block';
-            }
-			
-			// === SHARE BUTTON ===
-			document.getElementById('shareFab').onclick = async () => {
-				// Check if there's a current answer to share
-				if (!currentQuestion || !currentAnswer) {
-					alert('Nogat ansa blong serem! Askem wan kwestin fastaem.');
-					return;
-				}
-				
-				// Format the answer for sharing
-				const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
-				
-				try {
-					// Always copy to clipboard first
-					await navigator.clipboard.writeText(shareText);
-					
-					// Try native share if available
-					if (navigator.share) {
-						await navigator.share({
-							title: 'Baebol Kwestin - ' + currentQuestion,
-							text: shareText
-						});
-					} else {
-						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-					}
-				} catch (err) {
-					if (err.name !== 'AbortError') {
-						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-					}
-				}
+         </form>
+      </div>
+      <div id="answer">
+         <div id="answerHeader">
+            <button type="button" id="explainMoreBtn">Mekem ansa i longfala...</button>
+         </div>
+         <div id="answerContent"></div>
+      </div>
+      <div id="errorMessage"></div>
+      <div id="welcomeVerse"></div>
+      <div id="historyModal">
+         <div>
+            <button id="closeHistoryBtn">x</button>
+            <h3 style="margin:0 0 4px;color:#e67e22;text-align:center">HISTRI: Ol Kwestin We Yu Askem Finis</h3>
+            <p style="margin:0 0 12px;text-align:center;font-size:0.85em;color:#7f8c8d;font-style:italic">(Tajem kwestin we yu wantem luk ansa blong hem.)</p>
+            <div id="historyList"></div>
+            <div style="display:flex;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+               <button id="downloadHistoryBtn" style="flex:1;background:#3498db;color:white;padding:10px;border-radius:8px;font-weight:bold">DAONLOTEM ol olfala ansa</button>
+               <button id="clearHistoryBtn" style="flex:1;background:var(--danger);color:white;padding:10px;border-radius:8px;font-weight:bold">WAEPEMAOT ol olfala ansa</button>
+            </div>
+         </div>
+      </div>
+	  <footer class="footer" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+		  <span>App by Ross Webb (2.0) 2025</span>
+		  <div style="display:flex;align-items:center;gap:4px">
+			  <span>Serem app ia</span>
+			  <button id="footerShareBtn" style="background:transparent;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;margin-top:2px" title="Serem app">
+				  <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--primary)">
+					  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+				  </svg>
+			  </button>
+		  </div>
+	  </footer>
+      <script>
+         document.addEventListener('DOMContentLoaded', () => {
+             // === KEYS ===
+             const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
+             marked.setOptions({ gfm: true, breaks: false, sanitize: false, headerIds: false });
+         
+             // === ELEMENTS ===
+             const darkFab = document.getElementById('darkFab');
+             const moon = document.getElementById('moon');
+             const sun = document.getElementById('sun');
+             const form = document.getElementById('queryForm');
+             const questionInput = document.getElementById('question');
+             const askBtn = document.getElementById('askBtn');
+             const randomBtn = document.getElementById('randomBtn');
+             const randomDiv = document.getElementById('randomQuestions');
+             const answerDiv = document.getElementById('answer');
+             const answerHeader = document.getElementById('answerHeader');
+             const answerContent = document.getElementById('answerContent');
+             const explainMoreBtn = document.getElementById('explainMoreBtn');
+             const clearBtn = document.getElementById('clearBtn');
+             const showHistoryBtn = document.getElementById('showHistoryBtn');
+             const welcomeVerse = document.getElementById('welcomeVerse');
+             const historyModal = document.getElementById('historyModal');
+             const historyList = document.getElementById('historyList');
+             const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+         const debugDiv = document.getElementById('debug');
+         const errorMessage = document.getElementById('errorMessage');
+         let currentQuestion = '';
+         let currentAnswer = '';
+         let isAutoSubmit = false;
+         
+             // === DARK MODE ===
+             darkFab.onclick = () => {
+                 document.body.classList.toggle('dark-mode');
+                 const isDark = document.body.classList.contains('dark-mode');
+                 moon.style.display = isDark ? 'none' : 'block';
+                 sun.style.display = isDark ? 'block' : 'none';
+                 localStorage.setItem('darkMode', isDark);
+             };
+             if (localStorage.getItem('darkMode') === 'true') {
+                 document.body.classList.add('dark-mode');
+                 moon.style.display = 'none';
+                 sun.style.display = 'block';
+             }
+         
+         // === SHARE BUTTON ===
+         document.getElementById('shareFab').onclick = async () => {
+         // Check if there's a current answer to share
+         if (!currentQuestion || !currentAnswer) {
+         alert('Nogat ansa blong serem! Askem wan kwestin fastaem.');
+         return;
+         }
+         
+         // Format the answer for sharing
+         const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
+         
+         try {
+         // Always copy to clipboard first
+         await navigator.clipboard.writeText(shareText);
+         
+         // Try native share if available
+         if (navigator.share) {
+         await navigator.share({
+         title: 'Baebol Kwestin - ' + currentQuestion,
+         text: shareText
+         });
+         } else {
+         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         }
+         } catch (err) {
+         if (err.name !== 'AbortError') {
+         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         }
+         }
+         };
+         
+         // === SHARE FUNCTION ===
+         async function shareAnswer(question, answer) {
+         const shareText = `KWESTIN: ${question}\n\nANSA:\n${answer}\n\n--- Baebol Kwestin App ---`;
+         
+         try {
+         await navigator.clipboard.writeText(shareText);
+         
+         if (navigator.share) {
+         await navigator.share({
+         title: 'Baebol Kwestin - ' + question,
+         text: shareText
+         });
+         } else {
+         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         }
+         } catch (err) {
+         if (err.name !== 'AbortError') {
+         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         }
+         }
+         }			
+         
+		// === FOOTER SHARE BUTTON (Share App) ===
+		document.getElementById('footerShareBtn').onclick = async () => {
+			const shareData = {
+				title: 'Baebol Kwestin',
+				text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
+				url: "https://tinyurl.com/AskemBaebol"
 			};
 			
-			// === SHARE FUNCTION ===
-			async function shareAnswer(question, answer) {
-				const shareText = `KWESTIN: ${question}\n\nANSA:\n${answer}\n\n--- Baebol Kwestin App ---`;
-				
-				try {
-					await navigator.clipboard.writeText(shareText);
-					
-					if (navigator.share) {
-						await navigator.share({
-							title: 'Baebol Kwestin - ' + question,
-							text: shareText
-						});
-					} else {
-						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-					}
-				} catch (err) {
-					if (err.name !== 'AbortError') {
-						alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-					}
-				}
-			}			
-
-            // === SYSTEM PROMPT ===
-            const systemPrompt = `You are a kind Bible teacher in Vanuatu.
-Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
-When there is a negative concept like 'not innocent' also give the positive like 'guilty'
-Answers follow solid REFORMED theology.
-Do NOT contradict these truths:
-- God created everything and is sovereign.
-- Every person sins and needs forgiveness.
-- Jesus, God’s Son, died on the cross to pay for sin.
-- He rose again to give new life.
-- Salvation is by faith in Jesus alone, not works.
-- The Holy Spirit helps us obey and love others.
-- The Bible is God’s true Word.
-- Jesus will return to judge; believers go to heaven, unbelievers to hell (as the Bible teaches).
-**FORMAT EXACTLY LIKE THIS:**
-Do *NOT* start with an introductory greeting
-## Main Idea
-### Step 1: Do This
-- bullet points
-- keep short
-### Step 2: Remember This
-Followed by at least 3 supporting verses from NIrV version of the Bible. Put each verse on its own line with a blank line between them, styled like this:
-
-**John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
-
-**Romans 3:23** *"Everyone has sinned. No one measures up to God's glory."*
-End with one short sentence of hope or encouragement.
-Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
-
-            // === FETCH WITH TIMEOUT ===
-				async function fetchWithTimeout(url, options = {}, timeout = 15000) {
-					const controller = new AbortController();
-					const id = setTimeout(() => controller.abort(), timeout);
-                try {
-                    const res = await fetch(url, { ...options, signal: controller.signal });
-                    clearTimeout(id);
-                    return res;
-                } catch (e) {
-                    clearTimeout(id);
-                    console.error("Fetch failed:", e.message);
-                    throw e;
-                }
-            }
-
-			// === ANSWER GENERATOR ===
-			async function getAnswer(q, isExplainMore = false) {
-				// Override system prompt for detailed study mode
-				const activeSystemPrompt = isExplainMore 
-					? systemPrompt
-						.replace('Keep under 350 words', 'Write 600-800 words')
-						.replace('Cite 3+ verses', 'Include 6-8 verses from NIrV, each on its own line with blank lines between them')
-						.replace('**FORMAT EXACTLY LIKE THIS:**', '**BIBLE STUDY FORMAT:**')
-					: systemPrompt;
-				
-				const fullQ = isExplainMore
-					? q + "\n\n**BIBLE STUDY FORMAT** - Follow this structure exactly:\n\n**1. A SUMMARY ANSWER FIRST**\n\n(Blank line after heading)\n\nBriefly state the problem/question and give a one-sentence summary answer.\n\n**2. WHAT THE BIBLE SAYS**\n\n(Blank line after heading)\n\nLet's see what the Bible says about this:\n\n(Blank line, then each verse on this pattern:)\n\n**Verse Reference** *\"Full verse text from NIrV\"*\n\nOne sentence explaining what this verse teaches us.\n\n(BLANK LINE between each verse block)\n\n**3. UNDERSTANDING THIS DEEPER**\n\n(Blank line after heading)\n\nNow expand on the answer in 3-4 paragraphs:\n- What does this mean for us?\n- How does this change how we think?\n- Why is this important?\n\n(Blank line between paragraphs)\n\n**4. LIVING THIS OUT**\n\n(Blank line after heading)\n\nGive 3-4 practical steps:\n- First step\n- Second step\n- Third step\n\n**5. REMEMBER THIS**\n\n(Blank line after heading)\n\nEnd with one encouraging sentence.\n\nCRITICAL: Put blank lines after EVERY heading and between EVERY verse block. Total: 500-700 words. Keep language SIMPLE (13-year-old level)."
-					: q;
-				
-				// Try Gemini API
-				try {
-					const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							contents: [{ parts: [{ text: activeSystemPrompt + "\n\nQuestion: " + fullQ }] }],
-							generationConfig: { maxOutputTokens: isExplainMore ? 3500 : 2048, temperature: 0.7 },
-							safetySettings: [
-								{ category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-								{ category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-								{ category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-								{ category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
-							]
-						})
-					}, isExplainMore ? 30000 : 15000);
-					
-					if (res.ok) {
-						const data = await res.json();
-						const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-						if (text && text.length > 150) {
-							debugDiv.textContent = "Gemini 2.5 Flash";
-							return { text, source: 'Gemini' };
-						}
-					}
-				} catch (e) {
-					console.error("Gemini failed:", e.message);
-				}
-				
-				// Fallback if Gemini fails
-				debugDiv.textContent = "Offline (no connection)";
-				errorMessage.textContent = "⚠️ Sore, nogat intanet! Onem intanet, afta traem bakegen.";
-				errorMessage.style.display = 'block';
-				return {
-					text: ``,
-					source: 'fallback'
-				};
-    
-    // ALTERNATIVE FALLBACK - Default Bible answer (kept for possible future use)
-    // return {
-    //     text: `## Jesus is Stronger
-    // ### Step 1: Know This
-    // - Spirits are real, but Jesus is Lord over all.
-    // - The Bible says do not talk to the dead.
-    // - Trust God, not kastom power.
-    // ### Step 2: Remember This
-    // **Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
-    // 
-    // **Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn't you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
-    // 
-    // **Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
-    // 
-    // Jesus wins. You are safe in Him.`,
-    //     source: 'fallback'
-    // };
-}
-
-            // === SUBMIT ===
-			const handleSubmit = async (q) => {
-				if (!q) return;
-				currentQuestion = q;
-				askBtn.disabled = true; 
-				askBtn.textContent = 'Wet smol...';
-				askBtn.classList.add('button-loading');
-				answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
-				answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
-				errorMessage.style.display = 'none'; // Hide any previous errors
-				debugDiv.textContent = 'Loading...';
-				const result = await getAnswer(q);
-				answerContent.innerHTML = marked.parse(result.text);
-				// Only store real answers, not fallback
-				if (result.source !== 'fallback') {
-					currentAnswer = result.text;
-				}
-                answerHeader.style.display = 'flex';
-                answerDiv.style.display = 'block';
-                const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-                const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-                saveAnswer(q, result.text, verse);
-				askBtn.disabled = false; 
-				askBtn.textContent = 'Askem Baebol';
-				askBtn.classList.remove('button-loading');
-                isAutoSubmit = false;
-            };
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                if (isAutoSubmit) return;
-                const q = questionInput.value.trim();
-                if (!q) return;
-                handleSubmit(q);
-            });
-
-            // === RANDOM QUESTIONS ===
-            const ANIMISM_SEED = [
-			"Why does the Bible say not to talk to dead people?",
-            "Can spirits in the bush really hurt me?",
-            "Is it wrong to use kastom medicine and Christian prayers together?",
-            "What does the Bible say about people who see spirits?",
-            "Can a Christian go to a kastom dance?",
-            "What does the Bible say about finding out things (divination)?",
-            "Is it okay to destroy a house where someone died?",
-			"What do I think if someone says they have seen into heaven or hell?",
-			"What if someone tells me they have a 'gift' to find out things?",
-            "Can a Christian use magic to get a woman or man?",
-            "What does the Bible say about dreams from spirits?",
-            "Is it wrong to pay bride price - some people say it is wrong to buy a wife.",
-            "Can spirits follow you if you move villages?",
-            "What does the Bible say about tabu places?",
-            "Is it okay to eat food offered to spirits?",
-            "Does it matter if a person wearing kastom clothes comes to church?",
-            "What does the Bible say about people who do nakaemas (harming by sorcery)?",
-            "Is it wrong to go to a kastom healer?",
-            "Can Christians dance in kastom ceremonies?",
-            "What does the Bible say about ancestors watching us?",
-            "Is it okay to keep kastom carvings in the house?",
-			"Should I burn my old kastom things?",
-            "Can a Christian marry someone who follows kastom?"
-            ];
-			const GENERAL_SEED = [
-			"Why do I still sin sometimes even after trusting Jesus?",
-			"What is the real thinking behind my sins? Why do I sin?",
-			"How can talking to God every day make my life better?",
-			"What changed in me the moment I accepted Jesus as my Lord and Saviour?",
-			"Why does God give me what I don't deserve?",
-			"Do I have to keep living a good life so God will not turn away from me?",
-			"Why should I always get together with other strong Christians?",
-			"What do I do when a part of the Bible is hard to understand?",
-			"Why can't good actions alone make God accept a person?",
-			"How does God help me fight bad habits day by day?",
-			"Help me learn how to pray more regularly?",
-			"Why do I have to go to church every week?",
-			"I have heard that Jesus' cross is like the key that opens God's door for me? True?",
-			"What happens when God chooses a person to follow Him?",
-			"What is the best way to read the Bible?",
-			"How does God show his kindness to me after I believe?",
-			"How do other believers help you grow stronger in faith?",
-			"Why does trusting Jesus alone save me from going to hell?",
-			"What daily step gets me closer to living like Jesus?",
-			"How does the Bible light up good and bad choices?",
-			"How does God make everything good flow from His love?",
-			"Why share prayer needs with my church group?",
-			"If my life is hard, does that mean God is cross with me?",
-			"What fights inside you after you start following Jesus?",
-			"Are all churches the same? Which one should I go to?",
-			"How can you obey Jesus' words in everyday life?",
-			"What changes in me when God makes me his child?",
-			"Why does the Bible talk about eternal life as though it is a good thing?",
-			"How can I stop being afraid to die?"
-			];
-
-			// Initialize pools
-			let generalPool = [...GENERAL_SEED];
-			let usedAnimism = JSON.parse(localStorage.getItem('usedAnimism') || '[]');
-			let isGeneratingQuestion = false;
-
-			const showQuestionButtons = (qs) => {
-				randomDiv.innerHTML = '';
-				qs.forEach(q => {
-					const b = document.createElement('button');
-					b.className = 'random-q-btn';
-					b.textContent = q;
-					b.onclick = () => {
-						questionInput.value = q;
-						questionInput.dispatchEvent(new Event('input'));
-						randomDiv.style.display = 'none';
-						isAutoSubmit = true;
-						handleSubmit(q);
-					};
-					randomDiv.appendChild(b);
-				});
-				randomDiv.style.display = 'block';
-			};
-
-			randomBtn.onclick = () => {
-				// Get 1 animism question (track usage)
-				const availableAnimism = ANIMISM_SEED.filter(q => !usedAnimism.includes(q));
-				if (availableAnimism.length === 0) {
-					usedAnimism = []; // Reset when all used
-					localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
-				}
-				const animismQ = availableAnimism.length > 0 
-					? availableAnimism[Math.floor(Math.random() * availableAnimism.length)]
-					: ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
-					usedAnimism.push(animismQ);
-					localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
-				
-				// Get 4 general questions from pool
-				const shuffled = generalPool.sort(() => 0.5 - Math.random());
-				const selectedGeneral = shuffled.slice(0, 4);
-				
-				// Show all 5 questions
-				showQuestionButtons([animismQ, ...selectedGeneral]);
-				
-				// Replenish pool if needed (async in background)
-				if (generalPool.length < 10 && !isGeneratingQuestion) {
-					replenishPool();
-				}
-			};
-
-			// Background function to add AI questions to pool
-			async function replenishPool() {
-				isGeneratingQuestion = true;
-				try {
-					const prompt = "Generate 1 simple Bible question for a new Christian in Vanuatu. The question should cover conservative theology topics like salvation, grace, sanctification, God's sovereignty, election, prayer, or Scripture. Make it practical, conversational, and under 20 words. Return ONLY the question, no numbering or extra text.";
-					
-					const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({
-							contents: [{ parts: [{ text: prompt }] }],
-							generationConfig: { maxOutputTokens: 100, temperature: 0.9 }
-						})
-					}, 10000);
-					
-					if (res.ok) {
-						const data = await res.json();
-						const newQ = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-						if (newQ && newQ.length > 10 && newQ.length < 150) {
-							generalPool.push(newQ);
-							console.log('Added new question to pool:', newQ);
-						}
-					}
-				} catch (e) {
-					console.log('Failed to generate question, pool will use seed questions');
-				}
-				isGeneratingQuestion = false;
-			}
-
-			// === HISTORY & WELCOME ===
-			let history = [];
 			try {
-				const raw = localStorage.getItem('bibleHistory');
-				if (raw) history = JSON.parse(raw).filter(i => i && i.q && (i.rawAnswer || i.a));
-			} catch (e) {}
-			const saveAnswer = (q, rawMarkdown, verse, keepDate = null, insertAfterDate = null) => {
-				const newItem = { q, rawAnswer: rawMarkdown, date: keepDate || new Date().toLocaleString('en-GB') };
-				if (verse) newItem.verse = verse;
+				await navigator.clipboard.writeText(window.location.href);
 				
-				// If insertAfterDate is provided, insert right after that item
-				if (insertAfterDate) {
-					const insertIndex = history.findIndex(h => h.date === insertAfterDate);
-					if (insertIndex !== -1) {
-						history.splice(insertIndex + 1, 0, newItem);
-					} else {
-						history = [newItem, ...history];
-					}
+				if (navigator.share) {
+					await navigator.share(shareData);
 				} else {
-					history = [newItem, ...history];
+					alert('Link i kopi finis! Yu save sendem long ol narafala man.');
 				}
-				
-				history = history.slice(0, 200);
-				try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
-				updateHistoryBtn();
-				showWelcome();
-			};
-            const updateHistoryBtn = () => {
-                const cnt = history.length;
-                showHistoryBtn.textContent = `HISTRI: Ol kwestin we yu askem finis (${cnt})`;
-                document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
-            };
-            const showWelcome = () => {
-                welcomeVerse.style.display = 'none';
-                if (history.length > 0 && history[0].verse) {
-                    const v = history[0].verse;
-                    welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
-                } else {
-                    const v = { ref: "John 3:16", text: "For God loved the world so much that he gave his one and only Son, so that everyone who believes in him may not die but have eternal life." };
-                    welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
-                }
-                welcomeVerse.style.display = 'block';
-            };
-
-showHistoryBtn.onclick = () => {
-    historyList.innerHTML = '';
-    
-    history.forEach((item, index) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'history-item';
-        
-		// Create wrapper for question and delete button
-				const questionWrapper = document.createElement('div');
-				questionWrapper.style.cssText = 'position:relative;padding-right:32px';
-				
-				const questionDiv = document.createElement('div');
-						questionDiv.className = 'history-question';
-						// Check if question ends with '-longfala' and format accordingly
-						const displayTitle = item.q.endsWith(' -longfala') 
-							? item.q.replace(' -longfala', ' <em style="font-style:italic;font-weight:normal">-longfala</em>')
-							: item.q;
-						questionDiv.innerHTML = `
-							<p style="margin:0;font-weight:bold;color:var(--primary)">${displayTitle}</p>
-							<p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
-						`;
-
-			// Create share button
-			const shareBtn = document.createElement('button');
-			shareBtn.className = 'share-item-btn';
-			shareBtn.innerHTML = '📤';
-			shareBtn.title = 'Serem';
-			shareBtn.style.cssText = 'background:transparent;color:var(--accent);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:32px';
-
-			// Create delete button separately
-			const deleteBtn = document.createElement('button');
-			deleteBtn.className = 'delete-item-btn';
-			deleteBtn.innerHTML = '🗑️';
-			deleteBtn.title = 'Karemaot';
-			deleteBtn.style.cssText = 'background:transparent;color:var(--danger);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:0px';
-			
-			// Add share button handler
-			shareBtn.onclick = (e) => {
-				e.stopPropagation(); // Prevent opening the answer
-				// Remove '-longfala' suffix for cleaner sharing
-				const cleanQuestion = item.q.replace(' -longfala', '');
-				shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
-			};
-
-			// Add delete button handler
-			deleteBtn.onclick = (e) => {
-				e.stopPropagation(); // Prevent opening the answer
-				if (confirm(`Karemaot "${item.q}"?`)) {
-					// Remove from history array
-					const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
-					if (histIndex !== -1) {
-						history.splice(histIndex, 1);
-						try { 
-							localStorage.setItem('bibleHistory', JSON.stringify(history)); 
-							updateHistoryBtn();
-							showWelcome();
-						} catch(e) {}
-						// Remove from display
-						itemDiv.remove();
-					}
+			} catch (err) {
+				if (err.name !== 'AbortError') {
+					alert('Link i kopi finis! Yu save sendem long ol narafala man.');
 				}
-			};
-        
-        const answerDiv = document.createElement('div');
-        answerDiv.className = 'history-answer';
-        const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
-        answerDiv.innerHTML = renderedAnswer;
-        
-        // Create extend button for THIS item (hidden by default)
-        const extendBtnContainer = document.createElement('div');
-        extendBtnContainer.className = 'item-extend-btn';
-        extendBtnContainer.style = 'display:none;text-align:center;margin:12px 0;padding:12px;background:var(--border);border-radius:8px';
-        const extendBtn = document.createElement('button');
-        extendBtn.textContent = 'Mekem ansa i longfala...';
-        extendBtn.style = 'background:#e67e22;color:white;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1em';
-        extendBtn.onmouseover = () => extendBtn.style.background = '#d35400';
-        extendBtn.onmouseout = () => extendBtn.style.background = '#e67e22';
-        extendBtnContainer.appendChild(extendBtn);
-        
-        // Toggle expand/collapse on click
-        questionDiv.onclick = () => {
-            const wasExpanded = answerDiv.classList.contains('expanded');
-            
-            // Collapse all other answers and hide their buttons
-            document.querySelectorAll('.history-answer').forEach(a => a.classList.remove('expanded'));
-            document.querySelectorAll('.item-extend-btn').forEach(b => b.style.display = 'none');
-            
-			if (!wasExpanded) {
-					answerDiv.classList.add('expanded');
-					// Only show extend button if question doesn't already end with '-longfala'
-					if (!item.q.endsWith(' -longfala')) {
-						extendBtnContainer.style.display = 'block';
-					}
-                
-                // Scroll the button into view
-                setTimeout(() => extendBtnContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-                
-                // Set up extend button click handler
-                extendBtn.onclick = async () => {
-                    extendBtn.disabled = true;
-                    extendBtn.textContent = 'Wet smol...';
-                    extendBtn.classList.add('button-loading');
-                    
-                    const result = await getAnswer(item.q, true);
-                    
-                    if (result.source === 'fallback') {
-                        errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
-                        errorMessage.style.display = 'block';
-                        setTimeout(() => errorMessage.style.display = 'none', 3000);
-                        extendBtn.disabled = false;
-                        extendBtn.textContent = 'Mekem ansa i longfala...';
-                        extendBtn.classList.remove('button-loading');
-					} else {
-						// Extract verse for the extended answer
-						const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-						const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-						
-						// Save as NEW history entry with modified question, keeping original date and position
-						const longQuestion = item.q + ' -longfala';
-						saveAnswer(longQuestion, result.text, verse, item.date, item.date);
-						
-						// Close and reopen modal, then auto-open the new long answer
-						historyModal.style.display = 'none';
-						setTimeout(() => {
-							showHistoryBtn.click();
-							// Wait for modal to render, then click the first matching longfala question
-							setTimeout(() => {
-								const longAnswers = document.querySelectorAll('.history-question');
-								for (let qa of longAnswers) {
-									if (qa.textContent.includes(item.q) && qa.textContent.includes('longfala')) {
-										qa.click();
-										break;
-									}
-								}
-							}, 150);
-						}, 100);
-					}
-                };
-            }
-        };
-        
-		questionWrapper.appendChild(questionDiv);
-		questionWrapper.appendChild(shareBtn);
-		questionWrapper.appendChild(deleteBtn);
-        itemDiv.appendChild(questionWrapper);
-        itemDiv.appendChild(extendBtnContainer); // Button goes between question and answer
-        itemDiv.appendChild(answerDiv);
-        historyList.appendChild(itemDiv);
-    });
-    historyModal.style.display = 'flex';
-};
-
-			closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
-
-			// Download history backup
-			document.getElementById('downloadHistoryBtn').onclick = () => {
-				if (history.length === 0) {
-					alert('Nogat eni ansa blong daonlotem!');
-					return;
-				}
-				
-				let textContent = 'BAEBOL KWESTIN - Ol Kwestin mo Ansa Blong Mi\n';
-				textContent += '='.repeat(50) + '\n\n';
-				
-				history.forEach((item, index) => {
-					textContent += `Kwestin ${index + 1}: ${item.q}\n`;
-					textContent += `Taem: ${item.date}\n`;
-					textContent += '-'.repeat(50) + '\n';
-					textContent += item.rawAnswer || item.a || '';
-					textContent += '\n\n' + '='.repeat(50) + '\n\n';
-				});
-				
-				const blob = new Blob([textContent], { type: 'text/plain' });
-				const url = URL.createObjectURL(blob);
-				const a = document.createElement('a');
-				a.href = url;
-				a.download = `Baebol-Kwestin-${new Date().toISOString().split('T')[0]}.txt`;
-				a.click();
-				URL.revokeObjectURL(url);
-				
-				alert('Ol ansa i daonlot long wan fael finis');
-			};
-
-			// Clear all history
-			document.getElementById('clearHistoryBtn').onclick = () => {
-				if (history.length === 0) {
-					alert('Nogat ansa blong waepemaot!');
-					return;
-				}
-				
-				if (confirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
-					localStorage.removeItem('bibleHistory');
-					history = [];
-					updateHistoryBtn();
-					showWelcome();
-					historyModal.style.display = 'none';
-					alert('Ol olfala ansa i  aot finis!');
-				}
-			};
-
-            historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
-			explainMoreBtn.onclick = async () => {
-							askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-						explainMoreBtn.disabled = true;
-						explainMoreBtn.textContent = 'Wet smol...';
-						explainMoreBtn.classList.add('button-loading');
-							errorMessage.style.display = 'none'; // Hide any previous errors
-							
-							const result = await getAnswer(currentQuestion, true);
-							
-							// If fallback response (connection failed), keep original answer
-							if (result.source === 'fallback') {
-								errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
-								errorMessage.style.display = 'block';
-								answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
-							} else {
-								answerContent.innerHTML = marked.parse(result.text);
-								currentAnswer = result.text; // Update stored answer
-								const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-								const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-								// Save as NEW entry with modified question
-								const longQuestion = currentQuestion + ' -longfala';
-								saveAnswer(longQuestion, result.text, verse);
-							}			
-			askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-			explainMoreBtn.disabled = false;
-			explainMoreBtn.textContent = 'Mekem ansa i longfala...';
-			explainMoreBtn.classList.remove('button-loading');
-				};
-            questionInput.addEventListener('input', () => {
-                clearBtn.style.display = questionInput.value ? 'flex' : 'none';
-            });
-            clearBtn.onclick = () => {
-                questionInput.value = '';
-                clearBtn.style.display = 'none';
-                questionInput.focus();
-            };
-
-// === PWA INSTALL
-let deferredPrompt = null;
-let installBtn = null;
-let hasEngaged = false;
-
-// Strong engagement
-const engage = () => {
-    hasEngaged = true;
-    document.removeEventListener('click', engage);
-    document.removeEventListener('touchstart', engage);
-    document.removeEventListener('keydown', engage);
-    if (deferredPrompt) showInstallButton();
-};
-document.addEventListener('click', engage);
-document.addEventListener('touchstart', engage);
-document.addEventListener('keydown', engage);
-
-window.addEventListener('beforeinstallprompt', (e) => {
-    console.log('PWA: beforeinstallprompt fired');
-    e.preventDefault();
-    deferredPrompt = e;
-
-    // Auto-show install button after 1.5 s (no user tap required)
-    setTimeout(showInstallButton, 1500);
-});
-
-function showInstallButton() {
-    if (installBtn) return;
-    installBtn = document.createElement('button');
-    installBtn.id = 'installBtn';
-    installBtn.textContent = 'Instolem Baebol Kwestin';
-    installBtn.onclick = () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-            deferredPrompt = null;
-            installBtn = null;
-        });
-    };
-    document.body.appendChild(installBtn);
-}
-
-// Force after 10s
-setTimeout(() => {
-    if (deferredPrompt && !installBtn) showInstallButton();
-}, 10000);
-
-// iOS
-const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-if (isIOS && !window.navigator.standalone) {
-    const iosDiv = document.createElement('div');
-    iosDiv.id = 'iosInstall';
-    iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
-    document.body.appendChild(iosDiv);
-}
-
-// SW with correct path
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-        .then(r => console.log('SW registered:', r.scope))
-        .catch(e => console.error('SW failed:', e));
-}
-
-            // === INIT ===
-            updateHistoryBtn();
-            showWelcome();
-        }); // END DOMContentLoaded
-    </script>
-</body>
+			}
+		};
+		 
+             // === SYSTEM PROMPT ===
+             const systemPrompt = `You are a kind Bible teacher in Vanuatu.
+         Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.
+         When there is a negative concept like 'not innocent' also give the positive like 'guilty'
+         Answers follow solid REFORMED theology.
+         Do NOT contradict these truths:
+         - God created everything and is sovereign.
+         - Every person sins and needs forgiveness.
+         - Jesus, God’s Son, died on the cross to pay for sin.
+         - He rose again to give new life.
+         - Salvation is by faith in Jesus alone, not works.
+         - The Holy Spirit helps us obey and love others.
+         - The Bible is God’s true Word.
+         - Jesus will return to judge; believers go to heaven, unbelievers to hell (as the Bible teaches).
+         **FORMAT EXACTLY LIKE THIS:**
+         Do *NOT* start with an introductory greeting
+         ## Main Idea
+         ### Step 1: Do This
+         - bullet points
+         - keep short
+         ### Step 2: Remember This
+         Followed by at least 3 supporting verses from NIrV version of the Bible. Put each verse on its own line with a blank line between them, styled like this:
+         
+         **John 3:16** *"For God loved the world so much that he gave his only Son, so that everyone who believes in him may not die but have eternal life."*
+         
+         **Romans 3:23** *"Everyone has sinned. No one measures up to God's glory."*
+         End with one short sentence of hope or encouragement.
+         Keep under 350 words. Cite 3+ verses from the NIrV version of the Bible. Be warm, clear, and kind.`;
+         
+             // === FETCH WITH TIMEOUT ===
+         async function fetchWithTimeout(url, options = {}, timeout = 15000) {
+         const controller = new AbortController();
+         const id = setTimeout(() => controller.abort(), timeout);
+                 try {
+                     const res = await fetch(url, { ...options, signal: controller.signal });
+                     clearTimeout(id);
+                     return res;
+                 } catch (e) {
+                     clearTimeout(id);
+                     console.error("Fetch failed:", e.message);
+                     throw e;
+                 }
+             }
+         
+         // === ANSWER GENERATOR ===
+         async function getAnswer(q, isExplainMore = false) {
+         // Override system prompt for detailed study mode
+         const activeSystemPrompt = isExplainMore 
+         ? systemPrompt
+         .replace('Keep under 350 words', 'Write 600-800 words')
+         .replace('Cite 3+ verses', 'Include 6-8 verses from NIrV, each on its own line with blank lines between them')
+         .replace('**FORMAT EXACTLY LIKE THIS:**', '**BIBLE STUDY FORMAT:**')
+         : systemPrompt;
+         
+         const fullQ = isExplainMore
+         ? q + "\n\n**BIBLE STUDY FORMAT** - Follow this structure exactly:\n\n**1. A SUMMARY ANSWER FIRST**\n\n(Blank line after heading)\n\nBriefly state the problem/question and give a one-sentence summary answer.\n\n**2. WHAT THE BIBLE SAYS**\n\n(Blank line after heading)\n\nLet's see what the Bible says about this:\n\n(Blank line, then each verse on this pattern:)\n\n**Verse Reference** *\"Full verse text from NIrV\"*\n\nOne sentence explaining what this verse teaches us.\n\n(BLANK LINE between each verse block)\n\n**3. UNDERSTANDING THIS DEEPER**\n\n(Blank line after heading)\n\nNow expand on the answer in 3-4 paragraphs:\n- What does this mean for us?\n- How does this change how we think?\n- Why is this important?\n\n(Blank line between paragraphs)\n\n**4. LIVING THIS OUT**\n\n(Blank line after heading)\n\nGive 3-4 practical steps:\n- First step\n- Second step\n- Third step\n\n**5. REMEMBER THIS**\n\n(Blank line after heading)\n\nEnd with one encouraging sentence.\n\nCRITICAL: Put blank lines after EVERY heading and between EVERY verse block. Total: 500-700 words. Keep language SIMPLE (13-year-old level)."
+         : q;
+         
+         // Try Gemini API
+         try {
+         const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+         contents: [{ parts: [{ text: activeSystemPrompt + "\n\nQuestion: " + fullQ }] }],
+         generationConfig: { maxOutputTokens: isExplainMore ? 3500 : 2048, temperature: 0.7 },
+         safetySettings: [
+         { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+         { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+         { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+         { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" }
+         ]
+         })
+         }, isExplainMore ? 30000 : 15000);
+         
+         if (res.ok) {
+         const data = await res.json();
+         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+         if (text && text.length > 150) {
+         debugDiv.textContent = "Gemini 2.5 Flash";
+         return { text, source: 'Gemini' };
+         }
+         }
+         } catch (e) {
+         console.error("Gemini failed:", e.message);
+         }
+         
+         // Fallback if Gemini fails
+         debugDiv.textContent = "Offline (no connection)";
+         errorMessage.textContent = "⚠️ Sore, nogat intanet! Onem intanet, afta traem bakegen.";
+         errorMessage.style.display = 'block';
+         return {
+         text: ``,
+         source: 'fallback'
+         };
+         
+         // ALTERNATIVE FALLBACK - Default Bible answer (kept for possible future use)
+         // return {
+         //     text: `## Jesus is Stronger
+         // ### Step 1: Know This
+         // - Spirits are real, but Jesus is Lord over all.
+         // - The Bible says do not talk to the dead.
+         // - Trust God, not kastom power.
+         // ### Step 2: Remember This
+         // **Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
+         // 
+         // **Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn't you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
+         // 
+         // **Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
+         // 
+         // Jesus wins. You are safe in Him.`,
+         //     source: 'fallback'
+         // };
+         }
+         
+             // === SUBMIT ===
+         const handleSubmit = async (q) => {
+         if (!q) return;
+         currentQuestion = q;
+         askBtn.disabled = true; 
+         askBtn.textContent = 'Wet smol...';
+         askBtn.classList.add('button-loading');
+         answerDiv.style.display = 'none'; answerHeader.style.display = 'none';
+         answerContent.innerHTML = ''; welcomeVerse.style.display = 'none';
+         errorMessage.style.display = 'none'; // Hide any previous errors
+         debugDiv.textContent = 'Loading...';
+		 const result = await getAnswer(q);
+	 	 answerContent.innerHTML = marked.parse(result.text);
+		 // Only store real answers, not fallback
+		 if (result.source !== 'fallback') {
+			currentAnswer = result.text;
+			answerHeader.style.display = 'flex';
+			answerDiv.style.display = 'block';
+			const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+			const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+			saveAnswer(q, result.text, verse);
+		 } else {
+			 // Don't show answer header/div for fallback
+			 answerHeader.style.display = 'none';
+			 answerDiv.style.display = 'none';
+		 }
+         askBtn.disabled = false; 
+         askBtn.textContent = 'Askem Baebol';
+         askBtn.classList.remove('button-loading');
+                 isAutoSubmit = false;
+             };
+             form.addEventListener('submit', e => {
+                 e.preventDefault();
+                 if (isAutoSubmit) return;
+                 const q = questionInput.value.trim();
+                 if (!q) return;
+                 handleSubmit(q);
+             });
+         
+             // === RANDOM QUESTIONS ===
+             const ANIMISM_SEED = [
+         "Why does the Bible say not to talk to dead people?",
+             "Can spirits in the bush really hurt me?",
+             "Is it wrong to use kastom medicine and Christian prayers together?",
+             "What does the Bible say about people who see spirits?",
+             "Can a Christian go to a kastom dance?",
+             "What does the Bible say about nakaimas? (sorcery)",
+             "Is it okay to destroy a house where someone died?",
+             "Can a Christian use love magic?",
+             "What does the Bible say about dreams from spirits?",
+             "Is it wrong to pay bride price - some people say it is wrong to buy a wife.",
+             "Can spirits follow you if you move villages?",
+             "What does the Bible say about tabu places?",
+             "Is it okay to eat food offered to spirits?",
+             "Does it matter if a person wearing kastom clothes comes to church?",
+             "What does the Bible say about people who do poison (harming by sorcery)?",
+             "Is it wrong to go to a kastom healer?",
+             "Can Christians dance in kastom ceremonies?",
+             "What does the Bible say about ancestors watching us?",
+             "Is it okay to keep kastom carvings in the house?",
+         "Should I burn my old kastom things?",
+             "Can a Christian marry someone who follows kastom?"
+             ];
+         const GENERAL_SEED = [
+         "Why do I still sin sometimes even after trusting Jesus?",
+         "What is the real thinking behind my sins? Why do I sin?",
+         "How can talking to God every day make my life better?",
+         "What changed in me the moment I accepted Jesus as my Lord and Saviour?",
+         "Why does God give me what I don't deserve?",
+         "Do I have to keep living a good life so God will not turn away from me?",
+         "Why should I always get together with other strong Christians?",
+         "What do I do when a part of the Bible is hard to understand?",
+         "Why can't good actions alone make God accept a person?",
+         "How does God help me fight bad habits day by day?",
+         "Help me learn how to pray more regularly?",
+         "Why do I have to go to church every week?",
+         "I have heard that Jesus' cross is like the key that opens God's door for me? True?",
+         "What happens when God chooses a person to follow Him?",
+         "What is the best way to read the Bible?",
+         "How does God show his kindness to me after I believe?",
+         "How do other believers help you grow stronger in faith?",
+         "Why does trusting Jesus alone save me from going to hell?",
+         "What daily step gets me closer to living like Jesus?",
+         "How does the Bible light up good and bad choices?",
+         "How does God make everything good flow from His love?",
+         "Why share prayer needs with my church group?",
+         "If my life is hard, does that mean God is cross with me?",
+         "What fights inside you after you start following Jesus?",
+         "Are all churches the same? Which one should I go to?",
+         "How can you obey Jesus' words in everyday life?",
+         "What changes in me when God makes me his child?",
+         "Why does the Bible talk about eternal life as though it is a good thing?",
+         "How can I stop being afraid to die?"
+         ];
+         
+         // Initialize pools
+         let generalPool = [...GENERAL_SEED];
+         let usedAnimism = JSON.parse(localStorage.getItem('usedAnimism') || '[]');
+         let isGeneratingQuestion = false;
+         
+         const showQuestionButtons = (qs) => {
+         randomDiv.innerHTML = '';
+         qs.forEach(q => {
+         const b = document.createElement('button');
+         b.className = 'random-q-btn';
+         b.textContent = q;
+         b.onclick = () => {
+         questionInput.value = q;
+         questionInput.dispatchEvent(new Event('input'));
+         randomDiv.style.display = 'none';
+         isAutoSubmit = true;
+         handleSubmit(q);
+         };
+         randomDiv.appendChild(b);
+         });
+         randomDiv.style.display = 'block';
+         };
+         
+         randomBtn.onclick = () => {
+         // Get 1 animism question (track usage)
+         const availableAnimism = ANIMISM_SEED.filter(q => !usedAnimism.includes(q));
+         if (availableAnimism.length === 0) {
+         usedAnimism = []; // Reset when all used
+         localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+         }
+         const animismQ = availableAnimism.length > 0 
+         ? availableAnimism[Math.floor(Math.random() * availableAnimism.length)]
+         : ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
+         usedAnimism.push(animismQ);
+         localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+         
+         // Get 4 general questions from pool
+         const shuffled = generalPool.sort(() => 0.5 - Math.random());
+         const selectedGeneral = shuffled.slice(0, 4);
+         
+         // Show all 5 questions
+         showQuestionButtons([animismQ, ...selectedGeneral]);
+         
+         // Replenish pool if needed (async in background)
+         if (generalPool.length < 10 && !isGeneratingQuestion) {
+         replenishPool();
+         }
+         };
+         
+         // Background function to add AI questions to pool
+         async function replenishPool() {
+         isGeneratingQuestion = true;
+         try {
+         const prompt = "Generate 1 simple Bible question for a new Christian in Vanuatu. The question should cover conservative theology topics like salvation, grace, sanctification, God's sovereignty, election, prayer, or Scripture. Make it practical, conversational, and under 20 words. Return ONLY the question, no numbering or extra text.";
+         
+         const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`, {
+         method: 'POST',
+         headers: { 'Content-Type': 'application/json' },
+         body: JSON.stringify({
+         contents: [{ parts: [{ text: prompt }] }],
+         generationConfig: { maxOutputTokens: 100, temperature: 0.9 }
+         })
+         }, 10000);
+         
+         if (res.ok) {
+         const data = await res.json();
+         const newQ = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+         if (newQ && newQ.length > 10 && newQ.length < 150) {
+         generalPool.push(newQ);
+         console.log('Added new question to pool:', newQ);
+         }
+         }
+         } catch (e) {
+         console.log('Failed to generate question, pool will use seed questions');
+         }
+         isGeneratingQuestion = false;
+         }
+         
+         // === HISTORY & WELCOME ===
+         let history = [];
+         try {
+         const raw = localStorage.getItem('bibleHistory');
+         if (raw) history = JSON.parse(raw).filter(i => i && i.q && (i.rawAnswer || i.a));
+         } catch (e) {}
+         const saveAnswer = (q, rawMarkdown, verse, keepDate = null, insertAfterDate = null) => {
+         const newItem = { q, rawAnswer: rawMarkdown, date: keepDate || new Date().toLocaleString('en-GB') };
+         if (verse) newItem.verse = verse;
+         
+         // If insertAfterDate is provided, insert right after that item
+         if (insertAfterDate) {
+         const insertIndex = history.findIndex(h => h.date === insertAfterDate);
+         if (insertIndex !== -1) {
+         history.splice(insertIndex + 1, 0, newItem);
+         } else {
+         history = [newItem, ...history];
+         }
+         } else {
+         history = [newItem, ...history];
+         }
+         
+         history = history.slice(0, 200);
+         try { localStorage.setItem('bibleHistory', JSON.stringify(history)); } catch(e) {}
+         updateHistoryBtn();
+         showWelcome();
+         };
+             const updateHistoryBtn = () => {
+                 const cnt = history.length;
+                 showHistoryBtn.textContent = `HISTRI: Ol kwestin we yu askem finis (${cnt})`;
+                 document.getElementById('historyBtn').style.display = cnt ? 'block' : 'none';
+             };
+             const showWelcome = () => {
+                 welcomeVerse.style.display = 'none';
+                 if (history.length > 0 && history[0].verse) {
+                     const v = history[0].verse;
+                     welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
+                 } else {
+                     const v = { ref: "John 3:16", text: "For God loved the world so much that he gave his one and only Son, so that everyone who believes in him may not die but have eternal life." };
+                     welcomeVerse.innerHTML = `<strong>${v.ref}</strong><br><em>${v.text}</em>`;
+                 }
+                 welcomeVerse.style.display = 'block';
+             };
+         
+         showHistoryBtn.onclick = () => {
+         historyList.innerHTML = '';
+         
+         history.forEach((item, index) => {
+         const itemDiv = document.createElement('div');
+         itemDiv.className = 'history-item';
+         
+         // Create wrapper for question and delete button
+         const questionWrapper = document.createElement('div');
+         questionWrapper.style.cssText = 'position:relative;padding-right:32px';
+         
+         const questionDiv = document.createElement('div');
+         questionDiv.className = 'history-question';
+         // Check if question ends with '-longfala' and format accordingly
+         const displayTitle = item.q.endsWith(' -longfala') 
+         ? item.q.replace(' -longfala', ' <em style="font-style:italic;font-weight:normal">-longfala</em>')
+         : item.q;
+         questionDiv.innerHTML = `
+         <p style="margin:0;font-weight:bold;color:var(--primary)">${displayTitle}</p>
+         <p style="margin:4px 0 0;font-size:.9em;color:#7f8c8d">${item.date}</p>
+         `;
+         
+         // Create share button
+         const shareBtn = document.createElement('button');
+         shareBtn.className = 'share-item-btn';
+         shareBtn.innerHTML = '📤';
+         shareBtn.title = 'Serem';
+         shareBtn.style.cssText = 'background:transparent;color:var(--accent);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:32px';
+         
+         // Create delete button separately
+         const deleteBtn = document.createElement('button');
+         deleteBtn.className = 'delete-item-btn';
+         deleteBtn.innerHTML = '🗑️';
+         deleteBtn.title = 'Karemaot';
+         deleteBtn.style.cssText = 'background:transparent;color:var(--danger);border:none;width:24px;height:24px;min-width:24px;max-width:24px;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:0px';
+         
+         // Add share button handler
+         shareBtn.onclick = (e) => {
+         e.stopPropagation(); // Prevent opening the answer
+         // Remove '-longfala' suffix for cleaner sharing
+         const cleanQuestion = item.q.replace(' -longfala', '');
+         shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
+         };
+         
+         // Add delete button handler
+         deleteBtn.onclick = (e) => {
+         e.stopPropagation(); // Prevent opening the answer
+         if (confirm(`Karemaot "${item.q}"?`)) {
+         // Remove from history array
+         const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
+         if (histIndex !== -1) {
+         history.splice(histIndex, 1);
+         try { 
+         localStorage.setItem('bibleHistory', JSON.stringify(history)); 
+         updateHistoryBtn();
+         showWelcome();
+         } catch(e) {}
+         // Remove from display
+         itemDiv.remove();
+         }
+         }
+         };
+         
+         const answerDiv = document.createElement('div');
+         answerDiv.className = 'history-answer';
+         const renderedAnswer = marked.parse(item.rawAnswer || item.a || '');
+         answerDiv.innerHTML = renderedAnswer;
+         
+         // Create extend button for THIS item (hidden by default)
+         const extendBtnContainer = document.createElement('div');
+         extendBtnContainer.className = 'item-extend-btn';
+         extendBtnContainer.style = 'display:none;text-align:center;margin:12px 0;padding:12px;background:var(--border);border-radius:8px';
+         const extendBtn = document.createElement('button');
+         extendBtn.textContent = 'Mekem ansa i longfala...';
+         extendBtn.style = 'background:#e67e22;color:white;padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:1em';
+         extendBtn.onmouseover = () => extendBtn.style.background = '#d35400';
+         extendBtn.onmouseout = () => extendBtn.style.background = '#e67e22';
+         extendBtnContainer.appendChild(extendBtn);
+         
+         // Toggle expand/collapse on click
+         questionDiv.onclick = () => {
+             const wasExpanded = answerDiv.classList.contains('expanded');
+             
+             // Collapse all other answers and hide their buttons
+             document.querySelectorAll('.history-answer').forEach(a => a.classList.remove('expanded'));
+             document.querySelectorAll('.item-extend-btn').forEach(b => b.style.display = 'none');
+             
+         if (!wasExpanded) {
+         answerDiv.classList.add('expanded');
+         // Only show extend button if question doesn't already end with '-longfala'
+         if (!item.q.endsWith(' -longfala')) {
+         extendBtnContainer.style.display = 'block';
+         }
+                 
+                 // Scroll the button into view
+                 setTimeout(() => extendBtnContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+                 
+                 // Set up extend button click handler
+                 extendBtn.onclick = async () => {
+                     extendBtn.disabled = true;
+                     extendBtn.textContent = 'Wet smol...';
+                     extendBtn.classList.add('button-loading');
+                     
+                     const result = await getAnswer(item.q, true);
+                     
+                     if (result.source === 'fallback') {
+                         errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
+                         errorMessage.style.display = 'block';
+                         setTimeout(() => errorMessage.style.display = 'none', 3000);
+                         extendBtn.disabled = false;
+                         extendBtn.textContent = 'Mekem ansa i longfala...';
+                         extendBtn.classList.remove('button-loading');
+         } else {
+         // Extract verse for the extended answer
+         const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+         const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+         
+         // Save as NEW history entry with modified question, keeping original date and position
+         const longQuestion = item.q + ' -longfala';
+         saveAnswer(longQuestion, result.text, verse, item.date, item.date);
+         
+         // Close and reopen modal, then auto-open the new long answer
+         historyModal.style.display = 'none';
+         setTimeout(() => {
+         showHistoryBtn.click();
+         // Wait for modal to render, then click the first matching longfala question
+         setTimeout(() => {
+         const longAnswers = document.querySelectorAll('.history-question');
+         for (let qa of longAnswers) {
+         	if (qa.textContent.includes(item.q) && qa.textContent.includes('longfala')) {
+         		qa.click();
+         		break;
+         	}
+         }
+         }, 150);
+         }, 100);
+         }
+                 };
+             }
+         };
+         
+         questionWrapper.appendChild(questionDiv);
+         questionWrapper.appendChild(shareBtn);
+         questionWrapper.appendChild(deleteBtn);
+         itemDiv.appendChild(questionWrapper);
+         itemDiv.appendChild(extendBtnContainer); // Button goes between question and answer
+         itemDiv.appendChild(answerDiv);
+         historyList.appendChild(itemDiv);
+         });
+         historyModal.style.display = 'flex';
+         };
+         
+         closeHistoryBtn.onclick = () => { historyModal.style.display = 'none'; };
+         
+         // Download history backup
+         document.getElementById('downloadHistoryBtn').onclick = () => {
+         if (history.length === 0) {
+         alert('Nogat eni ansa blong daonlotem!');
+         return;
+         }
+         
+         let textContent = 'BAEBOL KWESTIN - Ol Kwestin mo Ansa Blong Mi\n';
+         textContent += '='.repeat(50) + '\n\n';
+         
+         history.forEach((item, index) => {
+         textContent += `Kwestin ${index + 1}: ${item.q}\n`;
+         textContent += `Taem: ${item.date}\n`;
+         textContent += '-'.repeat(50) + '\n';
+         textContent += item.rawAnswer || item.a || '';
+         textContent += '\n\n' + '='.repeat(50) + '\n\n';
+         });
+         
+         const blob = new Blob([textContent], { type: 'text/plain' });
+         const url = URL.createObjectURL(blob);
+         const a = document.createElement('a');
+         a.href = url;
+         a.download = `Baebol-Kwestin-${new Date().toISOString().split('T')[0]}.txt`;
+         a.click();
+         URL.revokeObjectURL(url);
+         
+         alert('Ol ansa i daonlot long wan fael finis');
+         };
+         
+         // Clear all history
+         document.getElementById('clearHistoryBtn').onclick = () => {
+         if (history.length === 0) {
+         alert('Nogat ansa blong waepemaot!');
+         return;
+         }
+         
+         if (confirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
+         localStorage.removeItem('bibleHistory');
+         history = [];
+         updateHistoryBtn();
+         showWelcome();
+         historyModal.style.display = 'none';
+         alert('Ol olfala ansa i  aot finis!');
+         }
+         };
+         
+             historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
+         explainMoreBtn.onclick = async () => {
+         askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
+         explainMoreBtn.disabled = true;
+         explainMoreBtn.textContent = 'Wet smol...';
+         explainMoreBtn.classList.add('button-loading');
+         errorMessage.style.display = 'none'; // Hide any previous errors
+         
+         const result = await getAnswer(currentQuestion, true);
+         
+         // If fallback response (connection failed), keep original answer
+         if (result.source === 'fallback') {
+         errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
+         errorMessage.style.display = 'block';
+         answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
+         } else {
+         answerContent.innerHTML = marked.parse(result.text);
+         currentAnswer = result.text; // Update stored answer
+         const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+         const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+         // Save as NEW entry with modified question
+         const longQuestion = currentQuestion + ' -longfala';
+         saveAnswer(longQuestion, result.text, verse);
+         }			
+         askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+         explainMoreBtn.disabled = false;
+         explainMoreBtn.textContent = 'Mekem ansa i longfala...';
+         explainMoreBtn.classList.remove('button-loading');
+         };
+             questionInput.addEventListener('input', () => {
+                 clearBtn.style.display = questionInput.value ? 'flex' : 'none';
+             });
+             clearBtn.onclick = () => {
+                 questionInput.value = '';
+                 clearBtn.style.display = 'none';
+                 questionInput.focus();
+             };
+         
+         // === PWA INSTALL
+         let deferredPrompt = null;
+         let installBtn = null;
+         let hasEngaged = false;
+         
+         // Strong engagement
+         const engage = () => {
+         hasEngaged = true;
+         document.removeEventListener('click', engage);
+         document.removeEventListener('touchstart', engage);
+         document.removeEventListener('keydown', engage);
+         if (deferredPrompt) showInstallButton();
+         };
+         document.addEventListener('click', engage);
+         document.addEventListener('touchstart', engage);
+         document.addEventListener('keydown', engage);
+         
+         window.addEventListener('beforeinstallprompt', (e) => {
+         console.log('PWA: beforeinstallprompt fired');
+         e.preventDefault();
+         deferredPrompt = e;
+         
+         // Auto-show install button after 1.5 s (no user tap required)
+         setTimeout(showInstallButton, 1500);
+         });
+         
+         function showInstallButton() {
+         if (installBtn) return;
+         installBtn = document.createElement('button');
+         installBtn.id = 'installBtn';
+         installBtn.textContent = 'Instolem Baebol Kwestin';
+         installBtn.onclick = () => {
+         installBtn.style.display = 'none';
+         deferredPrompt.prompt();
+         deferredPrompt.userChoice.then(() => {
+             deferredPrompt = null;
+             installBtn = null;
+         });
+         };
+         document.body.appendChild(installBtn);
+         }
+         
+         // Force after 10s
+         setTimeout(() => {
+         if (deferredPrompt && !installBtn) showInstallButton();
+         }, 10000);
+         
+         // iOS
+         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+         if (isIOS && !window.navigator.standalone) {
+         const iosDiv = document.createElement('div');
+         iosDiv.id = 'iosInstall';
+         iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
+         document.body.appendChild(iosDiv);
+         }
+         
+         // SW with correct path
+         if ('serviceWorker' in navigator) {
+         navigator.serviceWorker.register('./sw.js')
+         .then(r => console.log('SW registered:', r.scope))
+         .catch(e => console.error('SW failed:', e));
+         }
+         
+             // === INIT ===
+             updateHistoryBtn();
+             showWelcome();
+         }); // END DOMContentLoaded
+      </script>
+   </body>
 </html>
-
-
