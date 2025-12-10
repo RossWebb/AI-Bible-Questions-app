@@ -551,16 +551,13 @@
          askBtn.classList.remove('button-loading');
                  isAutoSubmit = false;
              };
-			 form.addEventListener('submit', e => {
-				 e.preventDefault();
-				 if (isAutoSubmit) {
-					 isAutoSubmit = false;  // Reset flag immediately
-					 return;
-				 }
-				 const q = questionInput.value.trim();
-				 if (!q) return;
-				 handleSubmit(q);
-			 });
+		 form.addEventListener('submit', e => {
+		     e.preventDefault();
+		     if (isAutoSubmit) return;
+		     const q = questionInput.value.trim();
+		     if (!q) return;
+		     handleSubmit(q);
+		 });
          
              // === RANDOM QUESTIONS ===
              const ANIMISM_SEED = [
@@ -1048,3 +1045,4 @@
       </script>
    </body>
 </html>
+
