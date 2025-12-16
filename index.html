@@ -180,6 +180,51 @@
          max-width: 90%;
          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
          }
+         #customAlert {
+         display: none;
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background: rgba(0,0,0,0.6);
+         z-index: 10001;
+         justify-content: center;
+         align-items: center;
+         }
+         #customAlert > div {
+         background: var(--card);
+         padding: 24px;
+         border-radius: 16px;
+         max-width: 400px;
+         width: 90%;
+         box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+         text-align: center;
+         }
+         #customAlert .alert-icon {
+         font-size: 48px;
+         margin-bottom: 16px;
+         }
+         #customAlert .alert-message {
+         color: var(--text);
+         font-size: 16px;
+         line-height: 1.6;
+         margin-bottom: 20px;
+         }
+         #customAlert button {
+         background: var(--primary);
+         color: white;
+         padding: 12px 32px;
+         border: none;
+         border-radius: 10px;
+         font-weight: bold;
+         font-size: 16px;
+         cursor: pointer;
+         min-width: 120px;
+         }
+         #customAlert button:hover {
+         background: var(--accent);
+         }
          .footer{
          margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
          padding:12px;background:var(--card);border-top:1px solid var(--border);
@@ -256,11 +301,10 @@
             <div id="debug"></div>
          </form>
       </div>
- 
-	  <div id="answer">
-		  <div id="answerHeader" style="display:none;justify-content:center;align-items:center;margin-bottom:8px;position:relative">
-		  <button type="button" id="explainMoreBtn" style="flex:1;margin-right:80px">Mekem ansa i longfala...</button>
-		  <div style="display:flex;gap:8px;position:absolute;right:0">
+      <div id="answer">
+	      <div id="answerHeader" style="display:none;justify-content:center;align-items:center;margin-bottom:8px;position:relative">
+	          <button type="button" id="explainMoreBtn" style="flex:1;margin-right:80px">Mekem ansa i longfala...</button>
+	          <div style="display:flex;gap:8px;position:absolute;right:0">
 	              <button type="button" id="shareAnswerBtn" title="Serem" style="background:transparent;border:none;cursor:pointer;padding:4px;display:flex;align-items:center">
 	                  <svg viewBox="0 0 640 640" style="width:20px;height:20px;fill:var(--accent)">
 	                      <path d="M342.6 73.4C330.1 60.9 309.8 60.9 297.3 73.4L169.3 201.4C156.8 213.9 156.8 234.2 169.3 246.7C181.8 259.2 202.1 259.2 214.6 246.7L288 173.3L288 384C288 401.7 302.3 416 320 416C337.7 416 352 401.7 352 384L352 173.3L425.4 246.7C437.9 259.2 458.2 259.2 470.7 246.7C483.2 234.2 483.2 213.9 470.7 201.4L342.7 73.4zM160 416C160 398.3 145.7 384 128 384C110.3 384 96 398.3 96 416L96 480C96 533 139 576 192 576L448 576C501 576 544 533 544 480L544 416C544 398.3 529.7 384 512 384C494.3 384 480 398.3 480 416L480 480C480 497.7 465.7 512 448 512L192 512C174.3 512 160 497.7 160 480L160 416z"/>
@@ -276,6 +320,13 @@
 	      <div id="answerContent"></div>
 	  </div>
       <div id="errorMessage"></div>
+      <div id="customAlert">
+         <div>
+            <div class="alert-icon">✓</div>
+            <div class="alert-message"></div>
+            <button id="alertOkBtn">OK</button>
+         </div>
+      </div>
       <div id="welcomeVerse"></div>
       <div id="historyModal">
          <div>
@@ -327,9 +378,23 @@
              const closeHistoryBtn = document.getElementById('closeHistoryBtn');
          const debugDiv = document.getElementById('debug');
          const errorMessage = document.getElementById('errorMessage');
+         const customAlert = document.getElementById('customAlert');
+         const alertOkBtn = document.getElementById('alertOkBtn');
          let currentQuestion = '';
          let currentAnswer = '';
          let isAutoSubmit = false;
+         
+         // === CUSTOM ALERT FUNCTION ===
+         function showAlert(message, icon = '✓') {
+             const alertIcon = customAlert.querySelector('.alert-icon');
+             const alertMessage = customAlert.querySelector('.alert-message');
+             alertIcon.textContent = icon;
+             alertMessage.textContent = message;
+             customAlert.style.display = 'flex';
+         }
+         
+         alertOkBtn.onclick = () => { customAlert.style.display = 'none'; };
+         customAlert.onclick = (e) => { if (e.target === customAlert) customAlert.style.display = 'none'; };
          
              // === DARK MODE ===
              darkFab.onclick = () => {
@@ -349,7 +414,7 @@
          document.getElementById('shareFab').onclick = async () => {
          // Check if there's a current answer to share
          if (!currentQuestion || !currentAnswer) {
-         alert('Nogat ansa blong serem! Askem wan kwestin fastaem.');
+         showAlert('Nogat ansa blong serem! Askem wan kwestin fastaem.', '⚠️');
          return;
          }
          
@@ -367,11 +432,11 @@
          text: shareText
          });
          } else {
-         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
          }
          } catch (err) {
-         if (err.name !== 'AbortError') {
-         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
          }
          }
          };
@@ -389,11 +454,11 @@
          text: shareText
          });
          } else {
-         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
          }
          } catch (err) {
-         if (err.name !== 'AbortError') {
-         alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+         if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
          }
          }
          }			
@@ -412,11 +477,11 @@
 				if (navigator.share) {
 					await navigator.share(shareData);
 				} else {
-					alert('Link i kopi finis! Yu save sendem long ol narafala man.');
+					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
 				}
 			} catch (err) {
-				if (err.name !== 'AbortError') {
-					alert('Link i kopi finis! Yu save sendem long ol narafala man.');
+				if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
 				}
 			}
 		};
@@ -429,11 +494,11 @@
          Do NOT contradict these truths:
          - God created everything and is sovereign.
          - Every person sins and needs forgiveness.
-         - Jesus, God’s Son, died on the cross to pay for sin.
+         - Jesus, God's Son, died on the cross to pay for sin.
          - He rose again to give new life.
          - Salvation is by faith in Jesus alone, not works.
          - The Holy Spirit helps us obey and love others.
-         - The Bible is God’s true Word.
+         - The Bible is God's true Word.
          - Jesus will return to judge; believers go to heaven, unbelievers to hell (as the Bible teaches).
          **FORMAT EXACTLY LIKE THIS:**
          Do *NOT* start with an introductory greeting
@@ -516,24 +581,6 @@
          text: ``,
          source: 'fallback'
          };
-         
-         // ALTERNATIVE FALLBACK - Default Bible answer (kept for possible future use)
-         // return {
-         //     text: `## Jesus is Stronger
-         // ### Step 1: Know This
-         // - Spirits are real, but Jesus is Lord over all.
-         // - The Bible says do not talk to the dead.
-         // - Trust God, not kastom power.
-         // ### Step 2: Remember This
-         // **Deuteronomy 18:10-12** *"Do not practice magic or witchcraft... The Lord hates people who do these things."*
-         // 
-         // **Isaiah 8:19** *"There are people who get messages from those who have died. But these people only whisper words that are barely heard. Suppose someone tells you to ask for advice from these people. Shouldn't you ask for advice from your God instead? Why should you get advice from dead people to help those who are alive?"*
-         // 
-         // **Colossians 2:15** *"Christ freed himself from the power of the spiritual rulers..."*
-         // 
-         // Jesus wins. You are safe in Him.`,
-         //     source: 'fallback'
-         // };
          }
          
              // === SUBMIT ===
@@ -789,13 +836,13 @@
 		 deleteBtn.title = 'Karemaot';
 		 deleteBtn.style.cssText = 'background:transparent;border:none;width:24px;height:24px;min-width:24px;max-width:24px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;position:absolute;top:8px;right:0px';
          
-         // Add share button handler
-         shareBtn.onclick = (e) => {
-         e.stopPropagation(); // Prevent opening the answer
-         // Remove '-longfala' suffix for cleaner sharing
-         const cleanQuestion = item.q.replace(' -longfala', '');
-         shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
-         };
+		 // Add share button handler
+		 shareBtn.onclick = (e) => {
+		 e.stopPropagation(); // Prevent opening the answer
+		 // Remove '-longfala' suffix for cleaner sharing
+		 const cleanQuestion = item.q.replace(' -longfala', '');
+		 shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
+		 };
          
          // Add delete button handler
          deleteBtn.onclick = (e) => {
@@ -865,31 +912,31 @@
                          extendBtn.disabled = false;
                          extendBtn.textContent = 'Mekem ansa i longfala...';
                          extendBtn.classList.remove('button-loading');
-         } else {
-         // Extract verse for the extended answer
-         const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-         const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-         
-         // Save as NEW history entry with modified question, keeping original date and position
-         const longQuestion = item.q + ' -longfala';
-         saveAnswer(longQuestion, result.text, verse, item.date, item.date);
-         
-         // Close and reopen modal, then auto-open the new long answer
-         historyModal.style.display = 'none';
-         setTimeout(() => {
-         showHistoryBtn.click();
-         // Wait for modal to render, then click the first matching longfala question
-         setTimeout(() => {
-         const longAnswers = document.querySelectorAll('.history-question');
-         for (let qa of longAnswers) {
-         	if (qa.textContent.includes(item.q) && qa.textContent.includes('longfala')) {
-         		qa.click();
-         		break;
-         	}
-         }
-         }, 150);
-         }, 100);
-         }
+                     } else {
+                         // Extract verse for the extended answer
+                         const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+                         const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+                         
+                         // Save as NEW history entry with modified question, keeping original date and position
+                         const longQuestion = item.q + ' -longfala';
+                         saveAnswer(longQuestion, result.text, verse, item.date, item.date);
+                         
+                         // Close and reopen modal, then auto-open the new long answer
+                         historyModal.style.display = 'none';
+                         setTimeout(() => {
+                             showHistoryBtn.click();
+                             // Wait for modal to render, then click the first matching longfala question
+                             setTimeout(() => {
+                                 const longAnswers = document.querySelectorAll('.history-question');
+                                 for (let qa of longAnswers) {
+                                     if (qa.textContent.includes(item.q) && qa.textContent.includes('longfala')) {
+                                         qa.click();
+                                         break;
+                                     }
+                                 }
+                             }, 150);
+                         }, 100);
+                     }
                  };
              }
          };
@@ -898,7 +945,7 @@
          questionWrapper.appendChild(shareBtn);
          questionWrapper.appendChild(deleteBtn);
          itemDiv.appendChild(questionWrapper);
-         itemDiv.appendChild(extendBtnContainer); // Button goes between question and answer
+         itemDiv.appendChild(extendBtnContainer);
          itemDiv.appendChild(answerDiv);
          historyList.appendChild(itemDiv);
          });
@@ -909,190 +956,185 @@
          
          // Download history backup
          document.getElementById('downloadHistoryBtn').onclick = () => {
-         if (history.length === 0) {
-         alert('Nogat eni ansa blong daonlotem!');
-         return;
-         }
-         
-         let textContent = 'BAEBOL KWESTIN - Ol Kwestin mo Ansa Blong Mi\n';
-         textContent += '='.repeat(50) + '\n\n';
-         
-         history.forEach((item, index) => {
-         textContent += `Kwestin ${index + 1}: ${item.q}\n`;
-         textContent += `Taem: ${item.date}\n`;
-         textContent += '-'.repeat(50) + '\n';
-         textContent += item.rawAnswer || item.a || '';
-         textContent += '\n\n' + '='.repeat(50) + '\n\n';
-         });
-         
-         const blob = new Blob([textContent], { type: 'text/plain' });
-         const url = URL.createObjectURL(blob);
-         const a = document.createElement('a');
-         a.href = url;
-         a.download = `Baebol-Kwestin-${new Date().toISOString().split('T')[0]}.txt`;
-         a.click();
-         URL.revokeObjectURL(url);
-         
-         alert('Ol ansa i daonlot long wan fael finis');
+             if (history.length === 0) {
+                 showAlert('Nogat eni ansa blong daonlotem!', '⚠️');
+                 return;
+             }
+             
+             let textContent = 'BAEBOL KWESTIN - Ol Kwestin mo Ansa Blong Mi\n';
+             textContent += '='.repeat(50) + '\n\n';
+             
+             history.forEach((item, index) => {
+                 textContent += `Kwestin ${index + 1}: ${item.q}\n`;
+                 textContent += `Taem: ${item.date}\n`;
+                 textContent += '-'.repeat(50) + '\n';
+                 textContent += item.rawAnswer || item.a || '';
+                 textContent += '\n\n' + '='.repeat(50) + '\n\n';
+             });
+             
+             const blob = new Blob([textContent], { type: 'text/plain' });
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement('a');
+             a.href = url;
+             a.download = `Baebol-Kwestin-${new Date().toISOString().split('T')[0]}.txt`;
+             a.click();
+             URL.revokeObjectURL(url);
+             
+             showAlert('Ol ansa i daonlot long wan fael finis', '✓');
          };
          
          // Clear all history
          document.getElementById('clearHistoryBtn').onclick = () => {
-         if (history.length === 0) {
-         alert('Nogat ansa blong waepemaot!');
-         return;
-         }
-         
-         if (confirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
-         localStorage.removeItem('bibleHistory');
-         history = [];
-         updateHistoryBtn();
-         showWelcome();
-         historyModal.style.display = 'none';
-         alert('Ol olfala ansa i  aot finis!');
-         }
+             if (history.length === 0) {
+                 showAlert('Nogat ansa blong waepemaot!', '⚠️');
+                 return;
+             }
+             
+             if (confirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
+                 localStorage.removeItem('bibleHistory');
+                 history = [];
+                 updateHistoryBtn();
+                 showWelcome();
+                 historyModal.style.display = 'none';
+                 showAlert('Ol olfala ansa i aot finis!', '✓');
+             }
          };
          
          historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-		 // === SHARE ANSWER BUTTON (Main View) ===
-		document.getElementById('shareAnswerBtn').onclick = async () => {
-		    if (!currentQuestion || !currentAnswer) return;
-		    const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
-		    try {
-		        await navigator.clipboard.writeText(shareText);
-		        if (navigator.share) {
-		            await navigator.share({
-		                title: 'Baebol Kwestin - ' + currentQuestion,
-		                text: shareText
-		            });
-		        } else {
-		            alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-		        }
-		    } catch (err) {
-		        if (err.name !== 'AbortError') {
-		            alert('Ansa i kopi finis! Yu save pestem long narafala ples.');
-		        }
-		    }
-		};
-		
-		// === DELETE ANSWER BUTTON (Main View) ===
-		document.getElementById('deleteAnswerBtn').onclick = () => {
-		    if (confirm('Karemaot ansa ia?')) {
-		        answerDiv.style.display = 'none';
-		        answerHeader.style.display = 'none';
-		        answerContent.innerHTML = '';
-		        currentQuestion = '';
-		        currentAnswer = '';
-		        welcomeVerse.style.display = 'block';
-		    }
-		};
-
-		 explainMoreBtn.onclick = async () => { 
-         askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
-         explainMoreBtn.disabled = true;
-         explainMoreBtn.textContent = 'Wet smol...';
-         explainMoreBtn.classList.add('button-loading');
-         errorMessage.style.display = 'none'; // Hide any previous errors
-         
-         const result = await getAnswer(currentQuestion, true);
-         
-         // If fallback response (connection failed), keep original answer
-         if (result.source === 'fallback') {
-         errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
-         errorMessage.style.display = 'block';
-         answerContent.innerHTML = marked.parse(currentAnswer); // Restore original
-         } else {
-         answerContent.innerHTML = marked.parse(result.text);
-         currentAnswer = result.text; // Update stored answer
-         const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
-         const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
-         // Save as NEW entry with modified question
-         const longQuestion = currentQuestion + ' -longfala';
-         saveAnswer(longQuestion, result.text, verse);
-		 explainMoreBtn.style.display = 'none'; // Hide button after extending
-         }			
-         askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
-         explainMoreBtn.disabled = false;
-         explainMoreBtn.textContent = 'Mekem ansa i longfala...';
-         explainMoreBtn.classList.remove('button-loading');
+         // === SHARE ANSWER BUTTON (Main View) ===
+         document.getElementById('shareAnswerBtn').onclick = async () => {
+             if (!currentQuestion || !currentAnswer) return;
+             const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
+             try {
+                 await navigator.clipboard.writeText(shareText);
+                 if (navigator.share) {
+                     await navigator.share({
+                         title: 'Baebol Kwestin - ' + currentQuestion,
+                         text: shareText
+                     });
+                 } else {
+                     showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
+                 }
+             } catch (err) {
+                 if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+                     showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
+                 }
+             }
          };
-             questionInput.addEventListener('input', () => {
-                 clearBtn.style.display = questionInput.value ? 'flex' : 'none';
-             });
-             clearBtn.onclick = () => {
-                 questionInput.value = '';
-                 clearBtn.style.display = 'none';
-                 questionInput.focus();
-             };
          
-         // === PWA INSTALL
+         // === DELETE ANSWER BUTTON (Main View) ===
+         document.getElementById('deleteAnswerBtn').onclick = () => {
+             if (confirm('Karemaot ansa ia?')) {
+                 answerDiv.style.display = 'none';
+                 answerHeader.style.display = 'none';
+                 answerContent.innerHTML = '';
+                 currentQuestion = '';
+                 currentAnswer = '';
+                 welcomeVerse.style.display = 'block';
+             }
+         };
+
+         explainMoreBtn.onclick = async () => { 
+             askBtn.disabled = true; askBtn.textContent = 'Wet smol...';
+             explainMoreBtn.disabled = true;
+             explainMoreBtn.textContent = 'Wet smol...';
+             explainMoreBtn.classList.add('button-loading');
+             errorMessage.style.display = 'none';
+             
+             const result = await getAnswer(currentQuestion, true);
+             
+             if (result.source === 'fallback') {
+                 errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
+                 errorMessage.style.display = 'block';
+                 answerContent.innerHTML = marked.parse(currentAnswer);
+             } else {
+                 answerContent.innerHTML = marked.parse(result.text);
+                 currentAnswer = result.text;
+                 const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
+                 const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
+                 const longQuestion = currentQuestion + ' -longfala';
+                 saveAnswer(longQuestion, result.text, verse);
+                 explainMoreBtn.style.display = 'none';
+             }			
+             askBtn.disabled = false; askBtn.textContent = 'Askem Baebol';
+             explainMoreBtn.disabled = false;
+             explainMoreBtn.textContent = 'Mekem ansa i longfala...';
+             explainMoreBtn.classList.remove('button-loading');
+         };
+         
+         questionInput.addEventListener('input', () => {
+             clearBtn.style.display = questionInput.value ? 'flex' : 'none';
+         });
+         clearBtn.onclick = () => {
+             questionInput.value = '';
+             clearBtn.style.display = 'none';
+             questionInput.focus();
+         };
+     
+         // === PWA INSTALL ===
          let deferredPrompt = null;
          let installBtn = null;
          let hasEngaged = false;
          
-         // Strong engagement
          const engage = () => {
-         hasEngaged = true;
-         document.removeEventListener('click', engage);
-         document.removeEventListener('touchstart', engage);
-         document.removeEventListener('keydown', engage);
-         if (deferredPrompt) showInstallButton();
+             hasEngaged = true;
+             document.removeEventListener('click', engage);
+             document.removeEventListener('touchstart', engage);
+             document.removeEventListener('keydown', engage);
+             if (deferredPrompt) showInstallButton();
          };
          document.addEventListener('click', engage);
          document.addEventListener('touchstart', engage);
          document.addEventListener('keydown', engage);
          
          window.addEventListener('beforeinstallprompt', (e) => {
-         console.log('PWA: beforeinstallprompt fired');
-         e.preventDefault();
-         deferredPrompt = e;
-         
-         // Auto-show install button after 1.5 s (no user tap required)
-         setTimeout(showInstallButton, 1500);
+             console.log('PWA: beforeinstallprompt fired');
+             e.preventDefault();
+             deferredPrompt = e;
+             setTimeout(showInstallButton, 1500);
          });
          
          function showInstallButton() {
-         if (installBtn) return;
-         installBtn = document.createElement('button');
-         installBtn.id = 'installBtn';
-         installBtn.textContent = 'Instolem Baebol Kwestin';
-         installBtn.onclick = () => {
-         installBtn.style.display = 'none';
-         deferredPrompt.prompt();
-         deferredPrompt.userChoice.then(() => {
-             deferredPrompt = null;
-             installBtn = null;
-         });
-         };
-         document.body.appendChild(installBtn);
+             if (installBtn) return;
+             installBtn = document.createElement('button');
+             installBtn.id = 'installBtn';
+             installBtn.textContent = 'Instolem Baebol Kwestin';
+             installBtn.onclick = () => {
+                 installBtn.style.display = 'none';
+                 deferredPrompt.prompt();
+                 deferredPrompt.userChoice.then(() => {
+                     deferredPrompt = null;
+                     installBtn = null;
+                 });
+             };
+             document.body.appendChild(installBtn);
          }
          
-         // Force after 10s
          setTimeout(() => {
-         if (deferredPrompt && !installBtn) showInstallButton();
+             if (deferredPrompt && !installBtn) showInstallButton();
          }, 10000);
          
          // iOS
          const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
          if (isIOS && !window.navigator.standalone) {
-         const iosDiv = document.createElement('div');
-         iosDiv.id = 'iosInstall';
-         iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
-         document.body.appendChild(iosDiv);
+             const iosDiv = document.createElement('div');
+             iosDiv.id = 'iosInstall';
+             iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
+             document.body.appendChild(iosDiv);
          }
          
-         // SW with correct path
+         // Service Worker
          if ('serviceWorker' in navigator) {
-         navigator.serviceWorker.register('./sw.js')
-         .then(r => console.log('SW registered:', r.scope))
-         .catch(e => console.error('SW failed:', e));
+             navigator.serviceWorker.register('./sw.js')
+                 .then(r => console.log('SW registered:', r.scope))
+                 .catch(e => console.error('SW failed:', e));
          }
          
-             // === INIT ===
-             updateHistoryBtn();
-             showWelcome();
-         }); // END DOMContentLoaded
+         // === INIT ===
+         updateHistoryBtn();
+         showWelcome();
+     });
       </script>
    </body>
-</html>
+</html>					 
