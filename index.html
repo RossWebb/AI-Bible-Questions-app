@@ -465,25 +465,31 @@
          
 		// === FOOTER SHARE BUTTON (Share App) ===
 		document.getElementById('footerShareBtn').onclick = async () => {
-			const shareData = {
-				title: 'Baebol Kwestin',
-				text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
-				url: "https://tinyurl.com/AskemBaebol"
-			};
-			
-			try {
-				await navigator.clipboard.writeText(window.location.href);
-				
-				if (navigator.share) {
-					await navigator.share(shareData);
-				} else {
-					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
-				}
-			} catch (err) {
-				if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
-				}
-			}
+		    const shareData = {
+		        title: 'Baebol Kwestin',
+		        text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
+		        url: window.location.href
+		    };
+		    
+		    try {
+		        if (navigator.share) {
+		            await navigator.share(shareData);
+		        } else {
+		            // Only copy to clipboard if share isn't available
+		            await navigator.clipboard.writeText(window.location.href);
+		            showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
+		        }
+		    } catch (err) {
+		        if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+		            // Fallback: try clipboard copy
+		            try {
+		                await navigator.clipboard.writeText(window.location.href);
+		                showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
+		            } catch (e) {
+		                showAlert('Sore - no save serem. Traem bakegen.', '⚠️');
+		            }
+		        }
+		    }
 		};
 		 
              // === SYSTEM PROMPT ===
@@ -1138,3 +1144,4 @@
       </script>
    </body>
 </html>					 
+
