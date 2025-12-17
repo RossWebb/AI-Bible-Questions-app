@@ -82,20 +82,27 @@
          margin-bottom: 0.8em;
          }		
          #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
-         #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
-         #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
-         #welcomeVerse em::before{content:'"';color:var(--accent)}
-         #welcomeVerse em::after{content:'"';color:var(--accent)}
-         #historyBtn{margin-top:12px;text-align:center;display:none}
-         #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
+         
+		 #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
+         
+		 #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
+         
+		 #welcomeVerse em::before{content:'"';color:var(--accent)}
+         
+		 #welcomeVerse em::after{content:'"';color:var(--accent)}
+         
+		 #historyBtn{margin-top:12px;text-align:center;display:none}
+         
+		 #historyBtn button{background:#27ae60;color:white;padding:8px 16px;border-radius:8px;font-weight:bold}
          #historyModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:center}
-         #historyModal > div{
+         
+		 #historyModal > div{
          background:var(--card);padding:20px;border-radius:16px;
          width:90%;max-width:700px;max-height:80%;
          overflow-y:auto;box-shadow:0 10px 30px var(--shadow);position:relative;
          }
-         #closeHistoryBtn{
-         position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
+        
+		#closeHistoryBtn{          position:absolute;top:8px;right:8px;background:var(--danger);color:white;border:none;
          width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
          display:flex;align-items:center;justify-content:center;z-index:999;
          }
@@ -162,6 +169,7 @@
          .history-open-btn:hover {
          background: #d35400;
          }
+
          #errorMessage {
          display: none;
          background: #e74c3c;
@@ -180,6 +188,7 @@
          max-width: 90%;
          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
          }
+
          #customAlert {
          display: none;
          position: fixed;
@@ -192,6 +201,7 @@
          justify-content: center;
          align-items: center;
          }
+
          #customAlert > div {
          background: var(--card);
          padding: 24px;
@@ -205,13 +215,15 @@
          font-size: 48px;
          margin-bottom: 16px;
          }
-         #customAlert .alert-message {
+ 
+        #customAlert .alert-message {
          color: var(--text);
          font-size: 16px;
          line-height: 1.6;
          margin-bottom: 20px;
          }
-         #customAlert button {
+         
+		 #customAlert button {
          background: var(--primary);
          color: white;
          padding: 12px 32px;
@@ -222,9 +234,70 @@
          cursor: pointer;
          min-width: 120px;
          }
-         #customAlert button:hover {
+         
+		 #customAlert button:hover {
          background: var(--accent);
          }
+		 
+		 #customConfirm {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.6);
+			z-index: 10002;
+			justify-content: center;
+			align-items: center;
+		}
+		#customConfirm > div {
+			background: var(--card);
+			padding: 24px;
+			border-radius: 16px;
+			max-width: 400px;
+			width: 90%;
+			box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+			text-align: center;
+		}
+		#customConfirm .confirm-icon {
+			font-size: 48px;
+			margin-bottom: 16px;
+			color: var(--danger);
+		}
+		#customConfirm .confirm-message {
+			color: var(--text);
+			font-size: 16px;
+			line-height: 1.6;
+			margin-bottom: 20px;
+		}
+		#customConfirm .confirm-buttons {
+			display: flex;
+			gap: 12px;
+		}
+		#customConfirm button {
+			flex: 1;
+			padding: 12px 24px;
+			border: none;
+			border-radius: 10px;
+			font-weight: bold;
+			font-size: 16px;
+			cursor: pointer;
+		}
+		#customConfirm .confirm-yes {
+			background: var(--danger);
+			color: white;
+		}
+		#customConfirm .confirm-yes:hover {
+			background: #c0392b;
+		}
+		#customConfirm .confirm-no {
+			background: var(--border);
+			color: var(--text);
+		}
+		#customConfirm .confirm-no:hover {
+			background: #bdc3c7;
+		}
          .footer{
          margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
          padding:12px;background:var(--card);border-top:1px solid var(--border);
@@ -327,6 +400,16 @@
             <button id="alertOkBtn">OK</button>
          </div>
       </div>
+	  <div id="customConfirm">
+		  <div>
+			  <div class="confirm-icon">⚠️</div>
+			  <div class="confirm-message"></div>
+			  <div class="confirm-buttons">
+				  <button class="confirm-no" id="confirmNoBtn">Nogat</button>
+				  <button class="confirm-yes" id="confirmYesBtn">Yes</button>
+			  </div>
+		  </div>
+	  </div>	  
       <div id="welcomeVerse"></div>
       <div id="historyModal">
          <div>
@@ -395,6 +478,45 @@
          
          alertOkBtn.onclick = () => { customAlert.style.display = 'none'; };
          customAlert.onclick = (e) => { if (e.target === customAlert) customAlert.style.display = 'none'; };
+		 
+		// === CUSTOM CONFIRM FUNCTION ===
+		function showConfirm(message) {
+			return new Promise((resolve) => {
+				const customConfirm = document.getElementById('customConfirm');
+				const confirmMessage = customConfirm.querySelector('.confirm-message');
+				const confirmYesBtn = document.getElementById('confirmYesBtn');
+				const confirmNoBtn = document.getElementById('confirmNoBtn');
+				
+				confirmMessage.textContent = message;
+				customConfirm.style.display = 'flex';
+				
+				const handleYes = () => {
+					customConfirm.style.display = 'none';
+					cleanup();
+					resolve(true);
+				};
+				
+				const handleNo = () => {
+					customConfirm.style.display = 'none';
+					cleanup();
+					resolve(false);
+				};
+				
+				const cleanup = () => {
+					confirmYesBtn.removeEventListener('click', handleYes);
+					confirmNoBtn.removeEventListener('click', handleNo);
+					customConfirm.removeEventListener('click', handleClickOutside);
+				};
+				
+				const handleClickOutside = (e) => {
+					if (e.target === customConfirm) handleNo();
+				};
+				
+				confirmYesBtn.addEventListener('click', handleYes);
+				confirmNoBtn.addEventListener('click', handleNo);
+				customConfirm.addEventListener('click', handleClickOutside);
+			});
+		}
          
              // === DARK MODE ===
              darkFab.onclick = () => {
@@ -465,31 +587,31 @@
          
 		// === FOOTER SHARE BUTTON (Share App) ===
 		document.getElementById('footerShareBtn').onclick = async () => {
-		    const shareData = {
-		        title: 'Baebol Kwestin',
-		        text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
-		        url: window.location.href
-		    };
-		    
-		    try {
-		        if (navigator.share) {
-		            await navigator.share(shareData);
-		        } else {
-		            // Only copy to clipboard if share isn't available
-		            await navigator.clipboard.writeText(window.location.href);
-		            showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
-		        }
-		    } catch (err) {
-		        if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-		            // Fallback: try clipboard copy
-		            try {
-		                await navigator.clipboard.writeText(window.location.href);
-		                showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
-		            } catch (e) {
-		                showAlert('Sore - no save serem. Traem bakegen.', '⚠️');
-		            }
-		        }
-		    }
+			const shareData = {
+				title: 'Baebol Kwestin',
+				text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
+				url: window.location.href
+			};
+			
+			try {
+				if (navigator.share) {
+					await navigator.share(shareData);
+				} else {
+					// Only copy to clipboard if share isn't available
+					await navigator.clipboard.writeText(window.location.href);
+					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
+				}
+			} catch (err) {
+				if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+					// Fallback: try clipboard copy
+					try {
+						await navigator.clipboard.writeText(window.location.href);
+						showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
+					} catch (e) {
+						showAlert('Sore - no save serem. Traem bakegen.', '⚠️');
+					}
+				}
+			}
 		};
 		 
              // === SYSTEM PROMPT ===
@@ -851,9 +973,9 @@
 		 };
          
          // Add delete button handler
-         deleteBtn.onclick = (e) => {
+         deleteBtn.onclick = async (e) => {
          e.stopPropagation(); // Prevent opening the answer
-         if (confirm(`Karemaot "${item.q}"?`)) {
+         if (await showConfirm(`Karemaot "${item.q}"?`)) {
          // Remove from history array
          const histIndex = history.findIndex(h => h.q === item.q && h.date === item.date);
          if (histIndex !== -1) {
@@ -990,13 +1112,13 @@
          };
          
          // Clear all history
-         document.getElementById('clearHistoryBtn').onclick = () => {
+         document.getElementById('clearHistoryBtn').onclick = async () => {
              if (history.length === 0) {
                  showAlert('Nogat ansa blong waepemaot!', '⚠️');
                  return;
              }
              
-             if (confirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
+             if (await showConfirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
                  localStorage.removeItem('bibleHistory');
                  history = [];
                  updateHistoryBtn();
@@ -1030,8 +1152,8 @@
          };
          
          // === DELETE ANSWER BUTTON (Main View) ===
-         document.getElementById('deleteAnswerBtn').onclick = () => {
-             if (confirm('Karemaot ansa ia?')) {
+         document.getElementById('deleteAnswerBtn').onclick = async () => {
+             if (await showConfirm('Karemaot ansa ia?')) {
                  answerDiv.style.display = 'none';
                  answerHeader.style.display = 'none';
                  answerContent.innerHTML = '';
