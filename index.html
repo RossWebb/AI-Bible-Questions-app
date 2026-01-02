@@ -81,11 +81,11 @@
          #answerContent p {
          margin-bottom: 0.8em;
          }		
-         #welcomeVerse{text-align:center;background:var(--card);padding:18px;border-radius:12px;display:block}
+         #welcomeVerse{text-align:center;background:var(--card);padding:40px;border-radius:12px;display:block}
          
 		 #welcomeVerse strong{display:block;color:var(--primary);margin-bottom:.4rem}
          
-		 #welcomeVerse em{display:block;margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
+		 #welcomeVerse em{margin:0 0 1.2rem;padding-left:0;position:relative;text-align:center}
          
 		 #welcomeVerse em::before{content:'"';color:var(--accent)}
          
@@ -298,10 +298,19 @@
 		#customConfirm .confirm-no:hover {
 			background: #bdc3c7;
 		}
-         .footer{
-         margin-top:auto;text-align:center;color:#95a5a6;font-size:.85em;
-         padding:12px;background:var(--card);border-top:1px solid var(--border);
-         }
+		.footer {
+		  margin-top: auto;
+		  display: flex;
+		  align-items: center;      /* vertical centring */
+		  justify-content: center;  /* horizontal centring */
+		  text-align: center;
+		  color: #95a5a6;
+		  font-size: .85em;
+		  padding: 10px;            /* 2px smaller than 12px */
+		  background: var(--card);
+		  border-top: 1px solid var(--border);
+}
+
          #debug{font-size:12px;color:#7f8c8d;text-align:right;margin-top:4px}
          /* PWA Install Button */
          #installBtn, #iosInstall {
@@ -367,7 +376,7 @@
             </div>
             <div class="btn-row">
                <button type="submit" id="askBtn">ASKEM Baebol</button>
-               <button type="button" id="randomBtn">GIVIM Kwestin</button>
+               <button type="button" id="randomBtn">JUSUM Kwestin</button>
             </div>
             <div id="historyBtn"><button type="button" id="showHistoryBtn">Ol kwestin (0)</button></div>
             <div id="randomQuestions"></div>
@@ -423,17 +432,12 @@
             </div>
          </div>
       </div>
-	  <footer class="footer" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-		  <span>Ross Webb (2.0) 2025</span>
-		  <div style="display:flex;align-items:center;gap:4px">
-			  <span>Serem app</span>
-			  <button id="footerShareBtn" style="background:transparent;border:none;cursor:pointer;padding:4px;display:flex;align-items:center;margin-top:2px" title="Serem app">
-				  <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--primary)">
-					  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
-				  </svg>
-			  </button>
-		  </div>
-	  </footer>
+	  
+		<footer class="footer">
+		  Ross Webb 2.0 © 2025
+		</footer>
+
+
       <script>
          document.addEventListener('DOMContentLoaded', () => {
              // === KEYS ===
@@ -459,13 +463,26 @@
              const historyModal = document.getElementById('historyModal');
              const historyList = document.getElementById('historyList');
              const closeHistoryBtn = document.getElementById('closeHistoryBtn');
-         const debugDiv = document.getElementById('debug');
-         const errorMessage = document.getElementById('errorMessage');
-         const customAlert = document.getElementById('customAlert');
-         const alertOkBtn = document.getElementById('alertOkBtn');
-         let currentQuestion = '';
-         let currentAnswer = '';
-         let isAutoSubmit = false;
+			 const debugDiv = document.getElementById('debug');
+			 const errorMessage = document.getElementById('errorMessage');
+			 const customAlert = document.getElementById('customAlert');
+			 const alertOkBtn = document.getElementById('alertOkBtn');
+			 let currentQuestion = '';
+			 let currentAnswer = '';
+			 let isAutoSubmit = false;
+			 
+			 // === HELPERS ===
+
+			// Convert markdown answer to WhatsApp-friendly plain text
+			function formatAnswerForShare(markdown) {
+			  return markdown
+				.replace(/^#{1,6}\s+(.+)$/gm, '*$1*')      // headings -> *Bold*
+				.replace(/\*\s*"(.+?)"\s*\*/g, '_$1_')     // *"Quote text"* -> _Quote text_
+				.replace(/\*\*([^*]+?)\*\*/g, '*$1*')      // **Reference** -> *Reference*
+				.replace(/^[-*+]\s+/gm, '• ')              // -, *, + lists -> • 
+				.replace(/^\d+\.\s+/gm, '')                // Remove numbered list markers
+				.trim();
+			}
          
          // === CUSTOM ALERT FUNCTION ===
          function showAlert(message, icon = '✓') {
@@ -532,87 +549,52 @@
                  sun.style.display = 'block';
              }
          
-         // === SHARE BUTTON ===
-         document.getElementById('shareFab').onclick = async () => {
-         // Check if there's a current answer to share
-         if (!currentQuestion || !currentAnswer) {
-         showAlert('Nogat ansa blong serem! Askem wan kwestin fastaem.', '⚠️');
-         return;
-         }
-         
-         // Format the answer for sharing
-         const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
-         
-         try {
-         // Always copy to clipboard first
-         await navigator.clipboard.writeText(shareText);
-         
-         // Try native share if available
-         if (navigator.share) {
-         await navigator.share({
-         title: 'Baebol Kwestin - ' + currentQuestion,
-         text: shareText
-         });
-         } else {
-         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-         }
-         } catch (err) {
-         if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-         }
-         }
-         };
-         
-         // === SHARE FUNCTION ===
-         async function shareAnswer(question, answer) {
-         const shareText = `KWESTIN: ${question}\n\nANSA:\n${answer}\n\n--- Baebol Kwestin App ---`;
-         
-         try {
-         await navigator.clipboard.writeText(shareText);
-         
-         if (navigator.share) {
-         await navigator.share({
-         title: 'Baebol Kwestin - ' + question,
-         text: shareText
-         });
-         } else {
-         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-         }
-         } catch (err) {
-         if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-         showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-         }
-         }
-         }			
-         
-		// === FOOTER SHARE BUTTON (Share App) ===
-		document.getElementById('footerShareBtn').onclick = async () => {
-			const shareData = {
-				title: 'Baebol Kwestin',
-				text: 'Askem eni kwestin long Baebol - Bible Questions App for Vanuatu',
-				url: window.location.href
-			};
-			
-			try {
+			// SHARE BUTTON – just share app link
+			document.getElementById('shareFab').onclick = async () => {
+			  const appLink = window.location.origin + window.location.pathname;
+			  const shareText =
+				`Tajem link ia ${appLink} blong instolem Baebol Kwestin app.\n\n` +
+				`Askem eni kwestin long Baebol – Bible Questions App for Vanuatu.`;
+
+			  try {
+				// Copy link + message to clipboard
+				await navigator.clipboard.writeText(shareText);
+
+				// Try native share if available
 				if (navigator.share) {
-					await navigator.share(shareData);
+				  await navigator.share({
+					title: 'Baebol Kwestin',
+					text: shareText // no url: field to keep body text in desktop email clients
+				  });
 				} else {
-					// Only copy to clipboard if share isn't available
-					await navigator.clipboard.writeText(window.location.href);
-					showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
+				  showAlert('Link i kopi finis! Yu save sendem long ol narafala man.');
 				}
-			} catch (err) {
+			  } catch (err) {
 				if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-					// Fallback: try clipboard copy
-					try {
-						await navigator.clipboard.writeText(window.location.href);
-						showAlert('Link i kopi finis! Yu save sendem long ol narafala man.', '📋');
-					} catch (e) {
-						showAlert('Sore - no save serem. Traem bakegen.', '⚠️');
-					}
+				  showAlert('Sore - no save serem. Traem bakegen.');
 				}
+			  }
+			};
+
+         
+			// === SHARE FUNCTION ===
+			async function shareAnswer(question, answer) {
+			  const plainAnswer = formatAnswerForShare(answer);
+			  const appLink = window.location.origin + window.location.pathname;
+			  const shareText = `Tajem link ia ${appLink} blong instolem app we i mekem ansa ia.\n\n---\nKWESTIN: ${question}\n\nANSA:\n${plainAnswer}\n\n--- Baebol Kwestin App ---`;
+			  try {
+				await navigator.clipboard.writeText(shareText);
+				if (navigator.share) {
+				  await navigator.share({ title: `Baebol Kwestin - ${question}`, text: shareText });
+				} else {
+				  showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+				}
+			  } catch (err) {
+				if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+				  showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+				}
+			  }
 			}
-		};
 		 
              // === SYSTEM PROMPT ===
              const systemPrompt = `You are a kind Bible teacher in Vanuatu.
@@ -703,7 +685,7 @@
          
          // Fallback if Gemini fails
          debugDiv.textContent = "Offline (no connection)";
-         errorMessage.textContent = "⚠️ Sore, nogat intanet! Onem intanet, afta traem bakegen.";
+         errorMessage.textContent = "âš ï¸ Sore, nogat intanet! Onem intanet, afta traem bakegen.";
          errorMessage.style.display = 'block';
          return {
          text: ``,
@@ -750,30 +732,29 @@
 		     handleSubmit(q);
 		 });
          
-             // === RANDOM QUESTIONS ===
-             const ANIMISM_SEED = [
-         "Why does the Bible say not to talk to dead people?",
-             "Can spirits in the bush really hurt me?",
-             "Is it wrong to use kastom medicine and Christian prayers together?",
-             "What does the Bible say about people who see spirits or other hidden things?",
-             "Can a Christian go to a kastom dance?",
-             "What does the Bible say about nakaemas? (sorcery)",
-             "Is it okay to destroy a house where someone died?",
-             "Can a Christian use love magic?",
-             "What does the Bible say about dreams from spirits?",
-             "Is it wrong to pay bride price - some people say it is wrong to buy a wife.",
-             "Can spirits follow you if you move villages?",
-             "What does the Bible say about tabu places?",
-             "Is it okay to eat food offered to spirits?",
-             "Does it matter if a person wearing kastom clothes comes to church?",
-             "What does the Bible say about people who do poison (harming by sorcery)?",
-             "Is it wrong to go to a kastom healer?",
-             "Can Christians dance in kastom ceremonies?",
-             "What does the Bible say about ancestors watching us?",
-             "Is it okay to keep kastom carvings in the house?",
-			 "Should I burn my old kastom things?",
-             "Can a Christian marry someone who follows kastom?"
-             ];
+		const ANIMISM_SEED = [
+			{ en: "Why does the Bible say not to talk to dead people?", bi: "From wanem Baebol i talem se yumi no save toktok long ol ded man?" },
+			{ en: "Can spirits in the bush really hurt me?", bi: "[BISLAMA HERE]" },
+			{ en: "Is it wrong to use kastom medicine and Christian prayers together?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about people who see spirits or other hidden things?", bi: "[BISLAMA HERE]" },
+			{ en: "Can a Christian go to a kastom dance?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about nakaemas? (sorcery)", bi: "[BISLAMA HERE]" },
+			{ en: "Is it okay to destroy a house where someone died?", bi: "[BISLAMA HERE]" },
+			{ en: "Can a Christian use love magic?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about dreams from spirits?", bi: "[BISLAMA HERE]" },
+			{ en: "Is it wrong to pay bride price - some people say it is wrong to buy a wife.", bi: "[BISLAMA HERE]" },
+			{ en: "Can spirits follow you if you move villages?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about tabu places?", bi: "[BISLAMA HERE]" },
+			{ en: "Is it okay to eat food offered to spirits?", bi: "[BISLAMA HERE]" },
+			{ en: "Does it matter if a person wearing kastom clothes comes to church?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about people who do poison (harming by sorcery)?", bi: "[BISLAMA HERE]" },
+			{ en: "Is it wrong to go to a kastom healer?", bi: "[BISLAMA HERE]" },
+			{ en: "Can Christians dance in kastom ceremonies?", bi: "[BISLAMA HERE]" },
+			{ en: "What does the Bible say about ancestors watching us?", bi: "[BISLAMA HERE]" },
+			{ en: "Is it okay to keep kastom carvings in the house?", bi: "[BISLAMA HERE]" },
+			{ en: "Should I burn my old kastom things?", bi: "[BISLAMA HERE]" },
+			{ en: "Can a Christian marry someone who follows kastom?", bi: "[BISLAMA HERE]" }
+		];
          const GENERAL_SEED = [
 			 "Why do I still sin sometimes even after trusting Jesus?",
 			 "What is the real thinking behind my sins? Why do I sin?",
@@ -811,49 +792,52 @@
          let usedAnimism = JSON.parse(localStorage.getItem('usedAnimism') || '[]');
          let isGeneratingQuestion = false;
          
-         const showQuestionButtons = (qs) => {
-         randomDiv.innerHTML = '';
-         qs.forEach(q => {
-         const b = document.createElement('button');
-         b.className = 'random-q-btn';
-         b.textContent = q;
-         b.onclick = () => {
-         questionInput.value = q;
-         questionInput.dispatchEvent(new Event('input'));
-         randomDiv.style.display = 'none';
-         isAutoSubmit = true;
-         handleSubmit(q);
-         };
-         randomDiv.appendChild(b);
-         });
-         randomDiv.style.display = 'block';
-         };
+		const showQuestionButtons = (qs) => {
+			randomDiv.innerHTML = '';
+			qs.forEach(q => {
+				const b = document.createElement('button');
+				b.className = 'random-q-btn';
+				// Display Bislama if available, otherwise English
+				b.textContent = q.bi || q;
+				b.onclick = () => {
+					// Use English for the AI query
+					const aiQuestion = q.en || q;
+					questionInput.value = aiQuestion;
+					questionInput.dispatchEvent(new Event('input'));
+					randomDiv.style.display = 'none';
+					isAutoSubmit = true;
+					handleSubmit(aiQuestion);
+				};
+				randomDiv.appendChild(b);
+			});
+			randomDiv.style.display = 'block';
+		};
          
-         randomBtn.onclick = () => {
-         // Get 1 animism question (track usage)
-         const availableAnimism = ANIMISM_SEED.filter(q => !usedAnimism.includes(q));
-         if (availableAnimism.length === 0) {
-         usedAnimism = []; // Reset when all used
-         localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
-         }
-         const animismQ = availableAnimism.length > 0 
-         ? availableAnimism[Math.floor(Math.random() * availableAnimism.length)]
-         : ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
-         usedAnimism.push(animismQ);
-         localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
-         
-         // Get 4 general questions from pool
-         const shuffled = generalPool.sort(() => 0.5 - Math.random());
-         const selectedGeneral = shuffled.slice(0, 4);
-         
-         // Show all 5 questions
-         showQuestionButtons([animismQ, ...selectedGeneral]);
-         
-         // Replenish pool if needed (async in background)
-         if (generalPool.length < 10 && !isGeneratingQuestion) {
-         replenishPool();
-         }
-         };
+		randomBtn.onclick = () => {
+			// Get 1 animism question (track usage) - now tracking English version
+			const availableAnimism = ANIMISM_SEED.filter(q => !usedAnimism.includes(q.en));
+			if (availableAnimism.length === 0) {
+				usedAnimism = []; // Reset when all used
+				localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+			}
+			const animismQ = availableAnimism.length > 0 
+				? availableAnimism[Math.floor(Math.random() * availableAnimism.length)]
+				: ANIMISM_SEED[Math.floor(Math.random() * ANIMISM_SEED.length)];
+			usedAnimism.push(animismQ.en); // Track by English version
+			localStorage.setItem('usedAnimism', JSON.stringify(usedAnimism));
+			
+			// Get 4 general questions from pool (these stay as strings)
+			const shuffled = generalPool.sort(() => 0.5 - Math.random());
+			const selectedGeneral = shuffled.slice(0, 4);
+			
+			// Show all 5 questions
+			showQuestionButtons([animismQ, ...selectedGeneral]);
+			
+			// Replenish pool if needed (async in background)
+			if (generalPool.length < 10 && !isGeneratingQuestion) {
+				replenishPool();
+			}
+		};
          
          // Background function to add AI questions to pool
          async function replenishPool() {
@@ -969,6 +953,7 @@
 		 e.stopPropagation(); // Prevent opening the answer
 		 // Remove '-longfala' suffix for cleaner sharing
 		 const cleanQuestion = item.q.replace(' -longfala', '');
+		 console.log('DEBUG history answer:', item.rawAnswer, item.a);  // ← ADD THIS
 		 shareAnswer(cleanQuestion, item.rawAnswer || item.a || '');
 		 };
          
@@ -1034,7 +1019,7 @@
                      const result = await getAnswer(item.q, true);
                      
                      if (result.source === 'fallback') {
-                         errorMessage.textContent = "⚠️ Sore! Intanet i no wok - traem bakegen";
+                         errorMessage.textContent = "âš ï¸ Sore! Intanet i no wok - traem bakegen";
                          errorMessage.style.display = 'block';
                          setTimeout(() => errorMessage.style.display = 'none', 3000);
                          extendBtn.disabled = false;
@@ -1118,7 +1103,7 @@
                  return;
              }
              
-             if (await showConfirm(`Karemaot ${history.length} ol ansa blo bifo? Yu no save karembak!`)) {
+             if (await showConfirm(`Karemaot ol ansa blo bifo? Yu no save karembak!`)) {
                  localStorage.removeItem('bibleHistory');
                  history = [];
                  updateHistoryBtn();
@@ -1130,26 +1115,26 @@
          
          historyModal.onclick = e => { if (e.target === historyModal) historyModal.style.display = 'none'; };
 
-         // === SHARE ANSWER BUTTON (Main View) ===
-         document.getElementById('shareAnswerBtn').onclick = async () => {
-             if (!currentQuestion || !currentAnswer) return;
-             const shareText = `KWESTIN: ${currentQuestion}\n\nANSA:\n${currentAnswer}\n\n--- Baebol Kwestin App ---`;
-             try {
-                 await navigator.clipboard.writeText(shareText);
-                 if (navigator.share) {
-                     await navigator.share({
-                         title: 'Baebol Kwestin - ' + currentQuestion,
-                         text: shareText
-                     });
-                 } else {
-                     showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-                 }
-             } catch (err) {
-                 if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
-                     showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.', '📋');
-                 }
-             }
-         };
+		// === SHARE ANSWER BUTTON (Main View) ===
+		document.getElementById('shareAnswerBtn').onclick = async () => {
+		  if (!currentQuestion || !currentAnswer) return;
+		  const plainAnswer = formatAnswerForShare(currentAnswer);
+		  const appLink = window.location.origin + window.location.pathname;
+		  const shareText = `Tajem link ia ${appLink} blong instolem app we i mekem ansa ia.\n\n---\nKWESTIN: ${currentQuestion}\n\nANSA:\n${plainAnswer}\n\n--- Baebol Kwestin App ---`;
+		  try {
+			await navigator.clipboard.writeText(shareText);
+			if (navigator.share) {
+			  await navigator.share({ title: `Baebol Kwestin - ${currentQuestion}`, text: shareText });
+			} else {
+			  showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+			}
+		  } catch (err) {
+			if (err.name !== 'AbortError' && err.name !== 'NotAllowedError') {
+			  showAlert('Ansa i kopi finis! Yu save pestem long narafala ples.');
+			}
+		  }
+		};
+
          
          // === DELETE ANSWER BUTTON (Main View) ===
          document.getElementById('deleteAnswerBtn').onclick = async () => {
@@ -1173,7 +1158,7 @@
              const result = await getAnswer(currentQuestion, true);
              
              if (result.source === 'fallback') {
-                 errorMessage.textContent = "⚠️ Sore! Intanet i no wok - mi no jenisim ansa yet.";
+                 errorMessage.textContent = "âš ï¸ Sore! Intanet i no wok - mi no jenisim ansa yet.";
                  errorMessage.style.display = 'block';
                  answerContent.innerHTML = marked.parse(currentAnswer);
              } else {
@@ -1248,7 +1233,7 @@
          if (isIOS && !window.navigator.standalone) {
              const iosDiv = document.createElement('div');
              iosDiv.id = 'iosInstall';
-             iosDiv.innerHTML = 'Tap Share → Add to Home Screen';
+             iosDiv.innerHTML = 'Tap Share â†’ Add to Home Screen';
              document.body.appendChild(iosDiv);
          }
          
@@ -1266,4 +1251,3 @@
       </script>
    </body>
 </html>					 
-
