@@ -2,7 +2,7 @@
   "name": "Baebol Kwestin",
   "short_name": "Baebol",
   "start_url": ".",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#f0f7ff",
   "theme_color": "#1a5276",
   "orientation": "portrait-primary",
@@ -21,6 +21,7 @@
     }
   ]
 }
+
 
 
 
