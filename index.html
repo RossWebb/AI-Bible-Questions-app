@@ -1185,64 +1185,94 @@
              questionInput.focus();
          };
      
-         // === PWA INSTALL ===
-         let deferredPrompt = null;
-         let installBtn = null;
-         let hasEngaged = false;
-         
-         const engage = () => {
-             hasEngaged = true;
-             document.removeEventListener('click', engage);
-             document.removeEventListener('touchstart', engage);
-             document.removeEventListener('keydown', engage);
-             if (deferredPrompt) showInstallButton();
-         };
-         document.addEventListener('click', engage);
-         document.addEventListener('touchstart', engage);
-         document.addEventListener('keydown', engage);
-         
-         window.addEventListener('beforeinstallprompt', (e) => {
-             console.log('PWA: beforeinstallprompt fired');
-             e.preventDefault();
-             deferredPrompt = e;
-             setTimeout(showInstallButton, 1500);
-         });
-         
-         function showInstallButton() {
-             if (installBtn) return;
-             installBtn = document.createElement('button');
-             installBtn.id = 'installBtn';
-             installBtn.textContent = 'Instolem Baebol Kwestin';
-             installBtn.onclick = () => {
-                 installBtn.style.display = 'none';
-                 deferredPrompt.prompt();
-                 deferredPrompt.userChoice.then(() => {
-                     deferredPrompt = null;
-                     installBtn = null;
-                 });
-             };
-             document.body.appendChild(installBtn);
-         }
-         
-         setTimeout(() => {
-             if (deferredPrompt && !installBtn) showInstallButton();
-         }, 10000);
-         
-         // iOS
-         const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
-         if (isIOS && !window.navigator.standalone) {
-             const iosDiv = document.createElement('div');
-             iosDiv.id = 'iosInstall';
-             iosDiv.innerHTML = 'Tap Share â†’ Add to Home Screen';
-             document.body.appendChild(iosDiv);
-         }
-         
-         // Service Worker
-         if ('serviceWorker' in navigator) {
-             navigator.serviceWorker.register('./sw.js')
-                 .then(r => console.log('SW registered:', r.scope))
-                 .catch(e => console.error('SW failed:', e));
-         }
+		// === PWA INSTALL (aligned with TTK style, but keeps engagement check) ===
+		let deferredPrompt = null;
+		let installBanner = null;  // We'll create or use a div for the banner
+		
+		// Create banner if not already in HTML (or add <div id="installBanner">...</div> in body)
+		function createInstallBanner() {
+		  if (installBanner) return;
+		  installBanner = document.createElement('div');
+		  installBanner.id = 'installBanner';
+		  installBanner.style.cssText = 'display: none; background: #1a5276; color: white; padding: 12px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); flex-direction: row; justify-content: center; align-items: center; gap: 15px;';
+		  installBanner.innerHTML = `
+		    <span>Install Baebol Kwestin as an app for better experience!</span>
+		    <button style="background: white; color: #1a5276; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">Install</button>
+		    <button style="background: transparent; color: white; border: none; font-size: 20px; cursor: pointer; margin-left: auto;" onclick="this.parentElement.style.display='none'">✕</button>
+		  `;
+		  
+		  // Wire up the install button click
+		  installBanner.querySelector('button').onclick = () => {
+		    if (deferredPrompt) {
+		      deferredPrompt.prompt();
+		      deferredPrompt.userChoice.then((choiceResult) => {
+		        console.log('Install outcome:', choiceResult.outcome);
+		        deferredPrompt = null;
+		        installBanner.style.display = 'none';
+		      });
+		    }
+		    installBanner.style.display = 'none';  // Hide even if no prompt
+		  };
+		  
+		  document.body.appendChild(installBanner);
+		}
+		
+		let hasEngaged = false;
+		const engage = () => {
+		  hasEngaged = true;
+		  document.removeEventListener('click', engage);
+		  document.removeEventListener('touchstart', engage);
+		  document.removeEventListener('keydown', engage);
+		  if (deferredPrompt) showInstallUI();
+		};
+		document.addEventListener('click', engage);
+		document.addEventListener('touchstart', engage);
+		document.addEventListener('keydown', engage);
+		
+		window.addEventListener('beforeinstallprompt', (e) => {
+		  console.log('✅ beforeinstallprompt fired');
+		  e.preventDefault();
+		  deferredPrompt = e;
+		  if (hasEngaged) showInstallUI();
+		  else setTimeout(showInstallUI, 2000);  // Slight delay if not engaged yet
+		});
+		
+		function showInstallUI() {
+		  createInstallBanner();
+		  installBanner.style.display = 'flex';
+		}
+		
+		window.addEventListener('appinstalled', () => {
+		  console.log('✅ App installed!');
+		  deferredPrompt = null;
+		  if (installBanner) installBanner.style.display = 'none';
+		});
+		
+		// Fallback: force show after 10s if prompt arrived but not shown
+		setTimeout(() => {
+		  if (deferredPrompt && !hasEngaged) showInstallUI();
+		}, 10000);
+		
+		// iOS handling (keep yours – it's good)
+		const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.MSStream;
+		if (isIOS && !('standalone' in navigator && navigator.standalone)) {
+		  setTimeout(() => {
+		    const iosDiv = document.createElement('div');
+		    iosDiv.id = 'iosInstall';
+		    iosDiv.style.cssText = 'background: #007aff; color: white; padding: 12px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 9999;';
+		    iosDiv.innerHTML = 'Tap <strong>Share</strong> → <strong>Add to Home Screen</strong> to install';
+		    document.body.appendChild(iosDiv);
+		  }, 3000);
+		}
+		
+		// Service Worker (keep if you have sw.js, or remove if not needed yet)
+		if ('serviceWorker' in navigator) {
+		  window.addEventListener('load', () => {
+		    navigator.serviceWorker.register('./sw.js')
+		      .then(reg => console.log('Service Worker registered:', reg.scope))
+		      .catch(err => console.error('Service Worker failed:', err));
+		  });
+		}
          
          // === INIT ===
          updateHistoryBtn();
@@ -1251,3 +1281,4 @@
       </script>
    </body>
 </html>					 
+
