@@ -1,4 +1,4 @@
-const CACHE = 'baebol-v1';
+const CACHE = 'baebol-v2';
 const FILES = [
   '/',
   'manifest.json',
@@ -30,4 +30,5 @@ self.addEventListener('message', e => {
     });
   }
 });
+
 
