@@ -440,6 +440,13 @@
 
 
       <script>
+		  if (location.hostname !== 'localhost' && !location.hostname.includes('127.0.0.')) {
+		  // Production – silence non-error logs
+		  console.log = () => {};
+		  console.debug = () => {};
+		  // Optionally silence info-level, keep errors
+		  // console.info = () => {};
+		}
          document.addEventListener('DOMContentLoaded', () => {
              // === KEYS ===
              const GEMINI_KEY = atob("QUl6YVN5RDZXbzB1cHFmd0NiaUEwRTZpQ0tIclJ2Mm5EYTZfSTVN");
@@ -1282,6 +1289,7 @@
       </script>
    </body>
 </html>					 
+
 
 
 
