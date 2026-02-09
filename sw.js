@@ -1,4 +1,4 @@
-const CACHE_NAME = 'baebel-cache-v1';
+const CACHE_NAME = 'baebel-cache-v1.1';
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -25,3 +25,4 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
