@@ -1,7 +1,10 @@
 {
+
   "name": "Baebol Kwestin",
   "short_name": "Baebol",
-  "start_url": ".",
+  "id": "/AI-Bible-Questions-app/",
+  "start_url": "/AI-Bible-Questions-app/",
+  "scope": "/AI-Bible-Questions-app/",
   "display": "standalone",
   "background_color": "#f0f7ff",
   "theme_color": "#1a5276",
@@ -21,7 +24,3 @@
     }
   ]
 }
-
-
-
-
