@@ -555,7 +555,7 @@
 				title: "Baebol Kwestin",
 				subtitle: "Askem eni kwestin long Baebol",
 				inputLabel: "Raetem kwestin blong yu:",
-				inputPlaceholder: "Raetem kwestin blong yu long ples ia. Yu save raetem long Bislama, Englis o Franis",
+				inputPlaceholder: "Raetem kwestin blong yu long ples ia. Yu save raetem long Bislama, Englis o Franis.",
 				askBtn: "ASKEM Baebol",
 				randomBtn: "JUSUM Kwestin",
 				historyBtn: "HISTRI: Ol kwestin we yu askem finis",
@@ -657,6 +657,19 @@
 			 let isAutoSubmit = false;
 			 
 			 // === HELPERS ===
+
+			// Clear placeholder on focus
+			questionInput.addEventListener('focus', () => {
+				questionInput.placeholder = '';
+			});
+
+			// Restore placeholder on blur if empty
+			questionInput.addEventListener('blur', () => {
+				if (!questionInput.value.trim()) {
+					const t = translations[currentLang];
+					questionInput.placeholder = t.inputPlaceholder;
+				}
+			});  
 
 			// Convert markdown answer to WhatsApp-friendly plain text
 			function formatAnswerForShare(markdown) {
@@ -1560,4 +1573,5 @@
       </script>
    </body>
 </html>					 
+
 
