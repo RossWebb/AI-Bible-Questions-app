@@ -1427,6 +1427,14 @@
          questionInput.addEventListener('input', () => {
              clearBtn.style.display = questionInput.value ? 'flex' : 'none';
          });
+         questionInput.addEventListener('focus', () => {
+             questionInput.setAttribute('data-placeholder', questionInput.placeholder);
+             questionInput.placeholder = '';
+         });
+         questionInput.addEventListener('blur', () => {
+             const saved = questionInput.getAttribute('data-placeholder');
+             if (saved) questionInput.placeholder = saved;
+         });
          clearBtn.onclick = () => {
              questionInput.value = '';
              clearBtn.style.display = 'none';
