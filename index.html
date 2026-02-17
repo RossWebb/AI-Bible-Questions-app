@@ -555,7 +555,7 @@
 				title: "Baebol Kwestin",
 				subtitle: "Askem eni kwestin long Baebol",
 				inputLabel: "Raetem kwestin blong yu:",
-				inputPlaceholder: "Raetem kwestin blong yu long ples ia. Yu save raetem long Bislama, Englis o Franis.",
+				inputPlaceholder: "Raetem kwestin blong yu long ples ia. Yu save raetem long Bislama, Englis o Franis",
 				askBtn: "ASKEM Baebol",
 				randomBtn: "JUSUM Kwestin",
 				historyBtn: "HISTRI: Ol kwestin we yu askem finis",
@@ -657,19 +657,6 @@
 			 let isAutoSubmit = false;
 			 
 			 // === HELPERS ===
-
-			// Clear placeholder on focus
-			questionInput.addEventListener('focus', () => {
-				questionInput.placeholder = '';
-			});
-
-			// Restore placeholder on blur if empty
-			questionInput.addEventListener('blur', () => {
-				if (!questionInput.value.trim()) {
-					const t = translations[currentLang];
-					questionInput.placeholder = t.inputPlaceholder;
-				}
-			});  
 
 			// Convert markdown answer to WhatsApp-friendly plain text
 			function formatAnswerForShare(markdown) {
@@ -925,6 +912,10 @@
 			const verseMatch = result.text.match(/\*\*([A-Za-z0-9 ]+:\d+)\*\* \*"([^"]+)"\*/);
 			const verse = verseMatch ? { ref: verseMatch[1], text: verseMatch[2] } : null;
 			saveAnswer(q, result.text, verse);
+			// Slide the page up so the answer is as visible as possible
+			setTimeout(() => {
+				answerDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			}, 80);
 		 } else {
 			 // Don't show answer header/div for fallback
 			 answerHeader.style.display = 'none';
@@ -940,6 +931,7 @@
 			if (isAutoSubmit) return;
 			const q = questionInput.value.trim();
 			if (!q) return;
+			questionInput.blur(); // Dismiss keyboard on mobile
 			handleSubmit(q);
 		 });
 
@@ -949,6 +941,7 @@
 				e.preventDefault();
 				const q = questionInput.value.trim();
 				if (q) {
+					questionInput.blur(); // Dismiss keyboard on mobile
 					handleSubmit(q);
 				}
 			}
@@ -1572,6 +1565,4 @@
      });
       </script>
    </body>
-</html>					 
-
-
+</html>
