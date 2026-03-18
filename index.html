@@ -1416,6 +1416,10 @@
                  const longQuestion = currentQuestion + ' -longfala';
                  saveAnswer(longQuestion, result.text, verse);
                  explainMoreBtn.style.display = 'none';
+                 // Scroll answer into view, same as main ask flow
+                 setTimeout(() => {
+                     answerDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                 }, 80);
              }			
              askBtn.disabled = false; 
 			 askBtn.textContent = t.askBtn;
