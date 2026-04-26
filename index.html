@@ -831,7 +831,8 @@
 		async function getAnswer(q, isExplainMore = false) {
 		// Determine target language based on UI
 		// For 'bi' (Bislama) and 'en' (English), both get English answers
-		let languageInstruction = "Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.";
+		// let languageInstruction = "Answer in SIMPLE, ACTIVE English that a 13-year-old can read and understand.";
+		let languageInstruction = "Answer in Bislama. NO Tokpisin, No Pijin. Pure Bislama";	
 		if (currentLang === 'fr') {
 			languageInstruction = "Answer in SIMPLE, ACTIVE French (français simple) that a 13-year-old can read and understand.";
 		}
