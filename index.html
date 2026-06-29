@@ -12,10 +12,50 @@
       <meta name="apple-mobile-web-app-title" content="Baebol">
       <style>
          :root{--bg:#f8fbff;--card:#fff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);--danger:#e74c3c}
-		  html {
-			  height: 100%;
-			  overflow-y: auto;
-		  }
+		/* 1. Allow the full page to handle the scroll bar naturally */
+		html, body {
+			height: auto;
+			overflow-y: auto;
+		}
+		body {
+			display: block; /* Removes flex layout constraints */
+			min-height: 100vh;
+		}
+
+		/* 2. Let the answer block expand completely so it forces the page to scroll */
+		#answer {
+			background: var(--card);
+			padding: 18px;
+			border-radius: 12px;
+			border-left: 5px solid var(--accent);
+			display: none;
+			max-height: none; /* Changed from 60vh to let it scroll the whole screen */
+			overflow-y: visible; /* Changed from auto */
+		}
+
+		/* 3. Add a floating Scroll to Top Button */
+		#scrollTopFab {
+			position: fixed;
+			bottom: 40px;
+			right: 20px;
+			width: 48px;
+			height: 48px;
+			border-radius: 50%;
+			background: var(--primary);
+			border: none;
+			box-shadow: 0 4px 12px var(--shadow);
+			display: none; /* Hidden by default */
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			z-index: 999;
+			transition: opacity 0.3s ease;
+		}
+		#scrollTopFab svg {
+			width: 24px;
+			height: 24px;
+			fill: white;
+		}
          .dark-mode{--bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;--border:#444;--shadow:rgba(0,0,0,0.3)}
          *{box-sizing:border-box;margin:0;padding:0}
          body{font-family:Georgia,serif;background:var(--bg);color:var(--text);padding:12px;max-width:800px;margin:auto;display:flex;flex-direction:column;min-height:100vh}
@@ -351,6 +391,11 @@
 			  </button>
 		  </div>
 	  </footer>
+	  <button id="scrollTopFab" title="Go bak long tap">
+         <svg viewBox="0 0 24 24">
+            <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+         </svg>
+      </button>
       <script>
          document.addEventListener('DOMContentLoaded', () => {
              // === KEYS ===
@@ -485,6 +530,25 @@
 				}
 			}
 		};
+		
+		const scrollTopFab = document.getElementById('scrollTopFab');
+
+		// Show the button when user scrolls down 300px
+		window.addEventListener('scroll', () => {
+			if (window.scrollY > 300) {
+				scrollTopFab.style.display = 'flex';
+			} else {
+				scrollTopFab.style.display = 'none';
+			}
+		});
+
+		// Smoothly scroll back to the top when clicked
+		scrollTopFab.onclick = () => {
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+		};		
 		 
              // === SYSTEM PROMPT ===
              const systemPrompt = `You are a kind Bible teacher in Vanuatu.
@@ -621,6 +685,11 @@
 		     if (!q) return;
 		     handleSubmit(q);
 		 });
+		 
+		 // Add this right at the end of your handleSubmit function after the answer displays
+		setTimeout(() => {
+			document.getElementById('answer').scrollIntoView({ behavior: 'smooth' });
+		}, 200);
          
              // === RANDOM QUESTIONS ===
              const ANIMISM_SEED = [
