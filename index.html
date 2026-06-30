@@ -12,14 +12,27 @@
       <meta name="apple-mobile-web-app-title" content="Baebol">
       <style>
          :root{--bg:#f8fbff;--card:#fff;--text:#2c3e50;--primary:#1a5276;--accent:#3498db;--border:#d6eaf8;--shadow:rgba(0,0,0,0.1);--danger:#e74c3c}
+
 		/* 1. Allow the full page to handle the scroll bar naturally */
-		html, body {
+		html {
 			height: auto;
 			overflow-y: auto;
 		}
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
 		body {
-			display: block; /* Removes flex layout constraints */
-			min-height: 100vh;
+			font-family: Georgia, serif;
+			background: var(--bg);
+			color: var(--text);
+			padding: 12px;
+			max-width: 800px;
+			margin: auto;
+			display: flex;          /* Re-enable flex layout */
+			flex-direction: column; /* Stacks items vertically */
+			min-height: 100vh;      /* Forces body to fill at least the full screen height */
 		}
 
 		/* 2. Let the answer block expand completely so it forces the page to scroll */
@@ -29,11 +42,11 @@
 			border-radius: 12px;
 			border-left: 5px solid var(--accent);
 			display: none;
-			max-height: none; /* Changed from 60vh to let it scroll the whole screen */
-			overflow-y: visible; /* Changed from auto */
+			max-height: none; 
+			overflow-y: visible; 
 		}
 
-		/* 3. Add a floating Scroll to Top Button */
+		/* 3. Floating Scroll to Top Button */
 		#scrollTopFab {
 			position: fixed;
 			bottom: 40px;
@@ -44,7 +57,7 @@
 			background: var(--primary);
 			border: none;
 			box-shadow: 0 4px 12px var(--shadow);
-			display: none; /* Hidden by default */
+			display: none; 
 			align-items: center;
 			justify-content: center;
 			cursor: pointer;
@@ -56,10 +69,38 @@
 			height: 24px;
 			fill: white;
 		}
-         .dark-mode{--bg:#1a1a1a;--card:#2d2d2d;--text:#f0f0f0;--primary:#64B5F6;--accent:#4FC3F7;--border:#444;--shadow:rgba(0,0,0,0.3)}
-         *{box-sizing:border-box;margin:0;padding:0}
-         body{font-family:Georgia,serif;background:var(--bg);color:var(--text);padding:12px;max-width:800px;margin:auto;display:flex;flex-direction:column;min-height:100vh}
-         .header{position:relative;text-align:center;padding:16px 56px 4px}
+
+		.dark-mode {
+			--bg: #1a1a1a;
+			--card: #2d2d2d;
+			--text: #f0f0f0;
+			--primary: #64B5F6;
+			--accent: #4FC3F7;
+			--border: #444;
+			--shadow: rgba(0,0,0,0.3);
+		}
+
+		/* 4. Keep the header stuck cleanly to the top */
+		.header {
+			position: sticky;
+			top: 0;
+			background: var(--bg); 
+			z-index: 100;          
+			text-align: center;
+			padding: 16px 56px 4px;
+			margin-bottom: 4px;
+		}
+
+		/* 5. Anchor the footer cleanly to the very bottom of the screen */
+		.footer {
+			margin-top: auto;      /* Pushes the footer down to fill all empty space */
+			text-align: center;
+			color: #95a5a6;
+			font-size: .85em;
+			padding: 12px;
+			background: var(--card);
+			border-top: 1px solid var(--border);
+		}
          h1{color:var(--primary);font-size:1.8em;margin:0;line-height:1.2}
          .fab{
          position:absolute;top:16px;width:48px;height:48px;border-radius:50%;
